@@ -10,6 +10,8 @@ object AwtHelper {
 
   def newActionListener(action: ActionEvent => Unit) = new ActionListener() { override def actionPerformed(e: ActionEvent) = action(e) }
 
+  def newActionListener(action: () => Unit) = new ActionListener() { override def actionPerformed(e: ActionEvent) = action() }
+
   def newRunnable(runnable: () => Unit) = new Runnable() { override def run() = runnable() }
 
   def positionToCenter(component: Component) = {
