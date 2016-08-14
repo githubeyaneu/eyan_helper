@@ -6,8 +6,9 @@ object Log {
   type LogEntry = Tuple2[LogLevel, String]
   val logs = new MutableList[LogEntry]
   def log(level: LogLevel, message: String) = {
+    val stack = Thread.currentThread().getStackTrace
     logs.+=((level, message))
-    LogWindow.add(message)
+    LogWindow.add(stack(3).getClassName.substring(stack(3).getClassName.lastIndexOf(".") + 1) + "." + stack(3).getMethodName + ": " + message)
   }
   def error(message: String) = log(Error, message)
   def warn(message: String) = log(Warn, message)
