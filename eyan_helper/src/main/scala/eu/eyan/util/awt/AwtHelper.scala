@@ -31,13 +31,13 @@ object AwtHelper {
 
   def positionToLeft(component: Component) = {
     val screenSize = Toolkit.getDefaultToolkit().getScreenSize()
-    component.setSize(screenSize.width / 2, screenSize.height)
+    component.setSize(screenSize.width / 2, screenSize.height - 30)
     component.setLocation(0, 0)
   }
 
   def positionToRight(component: Component) = {
     val screenSize = Toolkit.getDefaultToolkit().getScreenSize()
-    component.setSize(screenSize.width / 2, screenSize.height)
+    component.setSize(screenSize.width / 2, screenSize.height - 30)
     component.setLocation(screenSize.width / 2, 0)
   }
 
