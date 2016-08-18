@@ -87,11 +87,11 @@
 			<version>4.12</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.easytesting</groupId>
-			<artifactId>fest-assert</artifactId>
-			<version>1.4</version>
-		</dependency>
+<!-- 	Conflict with fes assert!	<dependency> -->
+<!-- 			<groupId>org.easytesting</groupId> -->
+<!-- 			<artifactId>fest-assert</artifactId> -->
+<!-- 			<version>1.4</version> -->
+<!-- 		</dependency> -->
 
 	</dependencies>
 </project>

@@ -14,6 +14,13 @@ import java.awt.event.ActionEvent
 import eu.eyan.util.awt.AwtHelper._
 import javax.swing.JTextArea
 import javax.swing.JScrollPane
+import java.awt.Dimension
+
+object JPanelWithFrameLayout {
+  def apply(firstRowSpec: String = "p", firstColumnSpec: String = "p") = {
+    new JPanelWithFrameLayout(firstRowSpec).newColumn(firstColumnSpec)
+  }
+}
 
 class JPanelWithFrameLayout(firstRowSpec: String = "p") extends JPanel {
   val frameLayout = new FormLayout("", firstRowSpec)
@@ -45,6 +52,13 @@ class JPanelWithFrameLayout(firstRowSpec: String = "p") extends JPanel {
     this
   }
 
+  def newRow(spec: String) = {
+    newRowSeparator()
+    frameLayout.appendRow(RowSpec.decode(spec))
+    row += 1
+    this
+  }
+
   def addButton(text: String, action: ActionEvent => Unit = null) = {
     val button = new JButtonPlus(text)
     this.add(button, CC.xy(column, row))
@@ -60,9 +74,11 @@ class JPanelWithFrameLayout(firstRowSpec: String = "p") extends JPanel {
   }
 
   def addTextArea() = {
-    val textarea = new JTextArea()
-    this.add(new JScrollPane(textarea), CC.xy(column, row))
-    textarea
+    val textArea = new JTextAreaPlus()
+    val scrollPane = new JScrollPane(textArea)
+    val containerPanel = JPanelWithFrameLayout("f:1px:g", "f:1px:g").add(scrollPane)
+    this.add(containerPanel, CC.xy(column, row))
+    textArea
   }
 
   def addLabel(text: String) = {
@@ -76,6 +92,12 @@ class JPanelWithFrameLayout(firstRowSpec: String = "p") extends JPanel {
     if (column == 0) newColumn()
     this.add(comp, CC.xy(column, row))
     comp
+  }
+
+  def addPanelWithFormLayout(firstRowSpec: String = "p") = {
+    val panel = new JPanelWithFrameLayout(firstRowSpec)
+    this.add(panel, CC.xy(column, row))
+    panel
   }
 
 }
