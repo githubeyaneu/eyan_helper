@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.google.common.collect.Lists;
+
 import eu.eyan.util.collection.MapsPlus;
 
 /**
@@ -30,9 +29,9 @@ public class CachedFileLineReader implements Iterable<String> {
 
 	private FileInputStream fileInputStream;
 
-	private List<long[]> lineOffsets = Lists.newArrayList();
+	protected List<long[]> lineOffsets = Lists.newArrayList();
 
-	private Map<Integer, String> lineCache = MapsPlus.newMaxSizeHashMap(Runtime.getRuntime().availableProcessors() * LINE_COUNT_EARLY_READ);
+	protected Map<Integer, String> lineCache = MapsPlus.newMaxSizeHashMap(Runtime.getRuntime().availableProcessors() * LINE_COUNT_EARLY_READ);
 
 	private String longestLine = "";
 
