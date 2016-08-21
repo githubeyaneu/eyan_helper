@@ -3,11 +3,11 @@ package eu.eyan.log
 import scala.collection.mutable.MutableList
 
 object Log {
-  type LogEntry = Tuple2[LogLevel, String]
+  type LogEntry = (LogLevel, String)
   val logs = new MutableList[LogEntry]
-  def log(level: LogLevel, message: String) = {
+  private def log(level: LogLevel, message: String) = {
     val stack = Thread.currentThread().getStackTrace
-    logs.+=((level, message))
+    logs += ((level, message))
     LogWindow.add(stack(3).getClassName.substring(stack(3).getClassName.lastIndexOf(".") + 1) + "." + stack(3).getMethodName + ": " + message)
   }
   def error(message: String) = log(Error, message)
