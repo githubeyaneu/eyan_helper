@@ -20,11 +20,9 @@ import javax.swing.JTextPane;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import eu.eyan.util.swing.JProgressBarPlus;
-import eu.eyan.util.jgoodies.FormLayoutPlus;
 import com.jgoodies.forms.factories.CC;
 
-import eu.eyan.util.swing.FlowPanel;
+import eu.eyan.util.jgoodies.FormLayoutPlus;
 
 public class SwingUtilitiesPlus {
 
@@ -121,19 +119,9 @@ public class SwingUtilitiesPlus {
 		return progressBar;
 	}
 
-	// public static Container jPanelOneRow(String rowSpec, Object...
-	// colspecsUndComponents) {
-	// String colSpec = "";
-	// List<Object> cols = ArraysPlus.secondElements(0, colspecsUndComponents);
-	// ArraysPlus.secondElements(1, colspecsUndComponents);
-	// FormLayoutPlus layout = new FormLayoutPlus(new JPanel(), colSpec);
-	//
-	// return layout.getComponent();
-	// }
-
 	public static Container jPanelOneRow(String rowSpec, String col1Spec, Component col1Comp, String col2Spec, Component col2Comp) {
 		FormLayoutPlus layout = new FormLayoutPlus(new JPanel(), col1Spec + "," + col2Spec);
-		layout.appendRow("f:p:g");
+		layout.appendRow(rowSpec);
 		layout.getComponent().add(col1Comp, CC.xy(1, 1));
 		layout.getComponent().add(col2Comp, CC.xy(2, 1));
 		return layout.getComponent();

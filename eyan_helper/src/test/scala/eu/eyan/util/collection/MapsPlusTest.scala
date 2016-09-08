@@ -9,7 +9,7 @@ import org.scalatest.junit.JUnitSuite
 import eu.eyan.testutil.ScalaEclipseJunitRunner
 
 @RunWith(classOf[ScalaEclipseJunitRunner])
-class MapsPlusTestS extends JUnitSuite {
+class MapsPlusTest extends JUnitSuite {
 
   @Test def empty = assertThat(MapsPlus.newMap()).hasSize(0)
 

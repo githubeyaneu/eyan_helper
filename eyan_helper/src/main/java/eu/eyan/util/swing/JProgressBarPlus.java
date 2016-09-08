@@ -11,23 +11,29 @@ public class JProgressBarPlus extends JProgressBar {
 
 	private Consumer<Integer> percentChangedConsumer;
 	private String format;
+	private String finishedText = "Ready";
 
 	public JProgressBarPlus(int min, int max, String format) {
 		super(min, max);
 		this.format = format;
 		this.percentChangedConsumer = createPercentChangedConsumer();
+		this.setNewValue(min);
 	}
 
 	public Consumer<Integer> createPercentChangedConsumer() {
 		return percent -> invokeLater(() -> {
 			this.setVisible(true);
-			this.setString(String.format(format, percent));
-			this.setValue(percent);
+			setNewValue(percent);
 		});
 	}
 
+	private void setNewValue(Integer percent) {
+		this.setString(String.format(format, percent));
+		this.setValue(percent);
+	}
+
 	public JProgressBarPlus percentChanged(int value) {
-		if (this.getValue() != value && this.percentChangedConsumer != null) {
+		if (this.getValue() != value) {
 			this.percentChangedConsumer.accept(value);
 		}
 		return this;
@@ -39,13 +45,14 @@ public class JProgressBarPlus extends JProgressBar {
 
 	public JProgressBarPlus setFormat(String format) {
 		this.format = format;
+		setNewValue(this.getValue());
 		return this;
 	}
 
 	public JProgressBarPlus finished() {
 		invokeLater(() -> {
-			this.setString("Ready");
-			this.setValue(100);
+			this.setString(finishedText);
+			this.setValue(this.getMaximum());
 		});
 		return this;
 	}

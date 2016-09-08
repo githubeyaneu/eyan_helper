@@ -57,7 +57,7 @@ public class VideoRecorder {
 
 	}
 
-	public void stopUndVideoSpeichern() {
+	public void stopAndSaveVideo() {
 		Pause.pause(3000);
 		try {
 			stop();
@@ -66,7 +66,7 @@ public class VideoRecorder {
 		}
 	}
 
-	public void stopUndVideoVerwerfen() {
+	public void stopAndDeleteVideo() {
 		File videoFile = screenRecorder.getVideoFile();
 		try {
 			stop();

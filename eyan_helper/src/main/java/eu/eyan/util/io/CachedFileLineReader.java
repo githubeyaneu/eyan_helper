@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 
 import com.google.common.collect.Lists;
 
+import eu.eyan.log.Log;
 import eu.eyan.util.collection.MapsPlus;
 
 /**
@@ -76,7 +77,7 @@ public class CachedFileLineReader implements Iterable<String> {
 						}
 					}
 
-					final long newProgressPercent = endIndex * 100 / fileLength;
+					final long newProgressPercent = fileLength == 0 ? 100 : endIndex * 100 / fileLength;
 					if (progressPercent != newProgressPercent && loadFileProgressChangedEvent != null) {
 						loadFileProgressChangedEvent.accept(Math.toIntExact(newProgressPercent));
 						progressPercent = newProgressPercent;
@@ -87,12 +88,14 @@ public class CachedFileLineReader implements Iterable<String> {
 				fileInputStream = new FileInputStream(file);
 				fileChannel = fileInputStream.getChannel();
 				longestLine = get(longestLineIndex);
-				if (fileLength != endIndex) {
-					// FIXME special characters brake the offsets
-					System.out.println("Length: " + fileLength + " endOffset:" + endIndex + " ");
-					System.err.println("Error at loading file. There are newline problems! ");
-				}
-				System.gc();
+				// if (fileLength != endIndex) { //special characters brake the
+				// offsets
+				// System.out.println("Length: " + fileLength + " endOffset:" +
+				// endIndex + " ");
+				// System.err.println("Error at loading file. There are newline problems! ");
+				// }
+				// System.gc();// wow... Test for big files again if it is
+				// really necessary
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -122,22 +125,18 @@ public class CachedFileLineReader implements Iterable<String> {
 						}
 					}
 				}
-			} catch (Exception e) {
-				e.printStackTrace();
+			} catch (IOException e) {
+				Log.error(e);
 			}
 		}
 		return line;
 	}
 
-	private String readFromFile(int index) {
+	private String readFromFile(int index) throws IOException {
 		long start = lineOffsets.get(index)[0];
 		long end = lineOffsets.get(index)[1];
 		ByteBuffer dst = ByteBuffer.allocate(Math.toIntExact(end - start));
-		try {
-			fileChannel.read(dst, start);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		fileChannel.read(dst, start);
 		String line = new String(dst.array(), Charset.forName("UTF-8"));
 		return line;
 	}

@@ -1,4 +1,4 @@
-package eu.eyan.idakonyvtar.util;
+package eu.eyan.util.http;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;

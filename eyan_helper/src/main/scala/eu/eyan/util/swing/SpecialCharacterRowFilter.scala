@@ -1,9 +1,8 @@
-package eu.eyan.idakonyvtar.util;
+package eu.eyan.util.swing;
 
 import java.util.regex.Matcher;
 
 import org.jdesktop.swingx.sort.RowFilters.GeneralFilter;
-import eu.eyan.util.swing.SpecialCharacterHelper
 
 class SpecialCharacterRowFilter(filterText: String) extends GeneralFilter {
   val matcher = SpecialCharacterHelper.filterPattern(filterText).matcher("")

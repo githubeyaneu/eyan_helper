@@ -1,6 +1,7 @@
 package eu.eyan.testutil.video;
 
 import java.awt.Component;
+import java.util.List;
 
 import org.junit.internal.runners.statements.InvokeMethod;
 import org.junit.runner.Runner;
@@ -52,9 +53,9 @@ public class VideoRunner extends BlockJUnit4ClassRunner {
 				try {
 					videoRecorder.start(componentToRecord, "FailedTestVideos", testVideoCounter + "_" + testName);
 					super.evaluate();
-					videoRecorder.stopUndVideoVerwerfen();
+					videoRecorder.stopAndDeleteVideo();
 				} catch (Throwable t) {
-					videoRecorder.stopUndVideoSpeichern();
+					videoRecorder.stopAndSaveVideo();
 					testVideoCounter++;
 					throw t;
 				} finally {
@@ -62,5 +63,17 @@ public class VideoRunner extends BlockJUnit4ClassRunner {
 				}
 			}
 		};
+	}
+
+	@Override
+	protected void validateTestMethods(List<Throwable> errors) {
+	}
+
+	@Override
+	protected void validateInstanceMethods(List<Throwable> errors) {
+	}
+
+	@Override
+	protected void collectInitializationErrors(List<Throwable> errors) {
 	}
 }

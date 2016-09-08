@@ -18,4 +18,8 @@ public class ScalaEclipseJunitRunner extends BlockJUnit4ClassRunner {
 	@Override
 	protected void validateInstanceMethods(List<Throwable> errors) {
 	}
+
+	@Override
+	protected void collectInitializationErrors(List<Throwable> errors) {
+	}
 }

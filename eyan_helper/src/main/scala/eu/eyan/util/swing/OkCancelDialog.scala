@@ -1,4 +1,4 @@
-package eu.eyan.idakonyvtar.util;
+package eu.eyan.util.swing;
 
 import java.awt.Window;
 

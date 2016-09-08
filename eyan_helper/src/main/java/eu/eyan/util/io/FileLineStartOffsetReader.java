@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class FileLineStartOffsetReader implements Closeable {
 	private static final char EGAL = 'x';
-	private FileReader reader;
+	private final FileReader reader;
 	private FileInputStream fis;
 	private final char[] buffer;
 	private final byte[] byteBuffer;
@@ -97,10 +97,8 @@ public class FileLineStartOffsetReader implements Closeable {
 
 	@Override
 	public void close() throws IOException {
-		if (reader != null) {
-			reader.close();
-			fis.close();
-		}
+		reader.close();
+		fis.close();
 	}
 
 	public long getOffset() {

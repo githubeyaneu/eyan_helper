@@ -1,13 +1,12 @@
-package eu.eyan.idakonyvtar.util
+package eu.eyan.util.swing
 
 import java.awt.Component
 import java.util.regex.Matcher
 
 import javax.swing.JTable
 import javax.swing.table.DefaultTableCellRenderer
-import eu.eyan.util.swing.SpecialCharacterHelper
 
-object HighlightRenderer extends DefaultTableCellRenderer {
+object HighlightRenderer /*extends DefaultTableCellRenderer*/ {
   val HIGHLIGHT_START_TAG = "<span style=\"background-color:#F2F5A9;\">"
   val HIGHLIGHT_END_TAG = "</span>"
   val HTML_START_TAG = "<html>"
@@ -15,7 +14,7 @@ object HighlightRenderer extends DefaultTableCellRenderer {
 }
 
 class HighlightRenderer extends DefaultTableCellRenderer {
-  import eu.eyan.idakonyvtar.util.HighlightRenderer._
+  import eu.eyan.util.swing.HighlightRenderer._
 
   var textToHighlighWithoutSpecChars = ""
   var matcher: Matcher = null
