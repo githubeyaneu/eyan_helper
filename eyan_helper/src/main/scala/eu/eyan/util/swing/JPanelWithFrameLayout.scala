@@ -1,5 +1,3 @@
-
-
 package eu.eyan.util.swing
 
 import javax.swing.JPanel

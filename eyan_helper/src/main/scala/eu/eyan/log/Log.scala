@@ -3,21 +3,40 @@ package eu.eyan.log
 import scala.collection.mutable.MutableList
 
 object Log {
-  type LogEntry = Tuple2[LogLevel, String]
+  var isActive: Boolean = false
+  type LogEntry = (LogLevel, String)
   val logs = new MutableList[LogEntry]
-  def log(level: LogLevel, message: String) = {
-    val stack = Thread.currentThread().getStackTrace
-    logs.+=((level, message))
-    LogWindow.add(stack(3).getClassName.substring(stack(3).getClassName.lastIndexOf(".") + 1) + "." + stack(3).getMethodName + ": " + message)
+  private def log(level: LogLevel, message: String = "") = {
+    if (isActive) {
+      val stack = Thread.currentThread().getStackTrace
+      logs += ((level, message))
+      val logText = stack(3).getClassName.substring(stack(3).getClassName.lastIndexOf(".") + 1) + "." + stack(3).getMethodName + ": " + message
+      if (level != Trace) {
+        println(level + " " + logText)
+        LogWindow.add(logText)
+      }
+    }
   }
+
+  def activate() = isActive = true
+
+  def error() = log(Error)
   def error(message: String) = log(Error, message)
   def error(exception: Throwable) = log(Error, exception.getMessage + "\r\n  " + exception.getStackTrace.mkString("  \r\n"))
+
+  def warn() = log(Warn)
   def warn(message: String) = log(Warn, message)
+
+  def info() = log(Info)
   def info(message: String) = log(Info, message)
+
+  def debug() = log(Debug)
   def debug(message: String) = log(Debug, message)
+
+  def trace() = log(Trace)
   def trace(message: String) = log(Trace, message)
 }
-class Log{}
+class Log {}
 
 abstract class LogLevel {}
 case object Error extends LogLevel

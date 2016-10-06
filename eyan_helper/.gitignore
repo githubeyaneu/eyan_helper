@@ -1,1 +1,7 @@
 /target/
+/.idea/
+/.settings/
+.cache-main
+.cache-tests
+.project
+eyan_helper.iml

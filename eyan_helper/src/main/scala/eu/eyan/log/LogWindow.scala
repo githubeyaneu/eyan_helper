@@ -16,7 +16,12 @@ object LogWindow {
     AwtHelper.positionToRight(window.frame)
     if (origin != null) AwtHelper.positionToLeft(origin)
   }
-  def add(text: String) = window.textArea.append(text + "\r\n")
+  def add(text: String) = {
+    window.textArea.append(text + "\r\n")
+    window.textArea.invalidate()
+    window.textArea.repaint()
+    window.textArea.validate()
+  }
   def close() = window.frame.dispose()
 }
 

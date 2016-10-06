@@ -45,7 +45,20 @@
 					</execution>
 				</executions>
 			</plugin>
-
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.0.2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>test-jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
 		</plugins>
 	</build>
 
@@ -66,8 +79,6 @@
 		</pluginRepository>
 	</pluginRepositories>
 
-
-
 	<dependencies>
 		<dependency>
 			<groupId>org.scala-lang</groupId>
@@ -76,9 +87,21 @@
 		</dependency>
 
 		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava-collections</artifactId>
+			<version>r03</version>
+		</dependency>
+
+		<dependency>
 			<groupId>com.jgoodies</groupId>
 			<artifactId>jgoodies-forms</artifactId>
-			<version>1.7.2</version>
+			<version>1.9.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.swinglabs</groupId>
+			<artifactId>swingx</artifactId>
+			<version>1.6.1</version>
 		</dependency>
 
 		<dependency>
@@ -87,11 +110,48 @@
 			<version>4.12</version>
 		</dependency>
 
-<!-- 	Conflict with fes assert!	<dependency> -->
-<!-- 			<groupId>org.easytesting</groupId> -->
-<!-- 			<artifactId>fest-assert</artifactId> -->
-<!-- 			<version>1.4</version> -->
-<!-- 		</dependency> -->
+		<!-- https://mvnrepository.com/artifact/org.specs2/specs2_2.11 -->
+		<dependency>
+			<groupId>org.specs2</groupId>
+			<artifactId>specs2_2.11</artifactId>
+			<version>3.7</version>
+			<type>pom</type>
+		</dependency>
+
+		<dependency>
+			<groupId>org.easytesting</groupId>
+			<artifactId>fest-swing</artifactId>
+			<version>1.2.1</version>
+<!-- 			<scope>test</scope> -->
+		</dependency>
+
+		<!-- Conflict with fes assert! <dependency> -->
+		<!-- <groupId>org.easytesting</groupId> -->
+		<!-- <artifactId>fest-assert</artifactId> -->
+		<!-- <version>1.4</version> -->
+		<!-- </dependency> -->
+
+		<dependency>
+			<groupId>ch.randelshofer</groupId>
+			<artifactId>monte</artifactId>
+			<version>1.0</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/src/main/resources/lib/MonteScreenRecorder.jar</systemPath>
+		</dependency>
+
+		<dependency>
+			<groupId>net.sourceforge.jexcelapi</groupId>
+			<artifactId>jxl</artifactId>
+			<version>2.6.12</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.scalatest/scalatest_2.11 -->
+		<dependency>
+			<groupId>org.scalatest</groupId>
+			<artifactId>scalatest_2.11</artifactId>
+			<version>3.0.0</version>
+		</dependency>
+
 
 	</dependencies>
 </project>
