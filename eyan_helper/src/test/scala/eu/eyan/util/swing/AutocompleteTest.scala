@@ -136,10 +136,11 @@ class AutocompleteTest extends AbstractUiTest {
   def popup_up_down_keys = {
     autocomplete.setAutocompleteList("a", "ba", "ca", "da", "ea")
     autocomplete.enterText("a")
-    autocomplete.pressUp
-    autocomplete.list.requireNoSelection
-    autocomplete.pressDown
     autocomplete.list.requireSelection(0)
+    autocomplete.pressUp
+    autocomplete.list.requireSelection(0)
+    autocomplete.pressDown
+    autocomplete.list.requireSelection(1)
     autocomplete.pressDown
     autocomplete.pressDown
     autocomplete.pressDown
@@ -166,7 +167,6 @@ class AutocompleteTest extends AbstractUiTest {
   def popup_selecting_item = {
     autocomplete.setAutocompleteList("a", "ba", "ca", "da", "ea")
     autocomplete.enterText("a")
-    autocomplete.pressDown
     autocomplete.pressDown
     autocomplete.pressEnter
     autocomplete.requireText("ba")
@@ -306,7 +306,6 @@ class AutocompleteTest extends AbstractUiTest {
     autocomplete.enterText("a")
     autocomplete.pressDown
     autocomplete.pressDown
-    autocomplete.pressDown
     autocomplete.list.requireSelection(2)
     autocomplete.pressEscape
     autocomplete.pressDown
@@ -334,12 +333,22 @@ class AutocompleteTest extends AbstractUiTest {
 
   @Test
   def items_sorted_beginsWith_then_Contains = {
-    autocomplete.setAutocompleteList("aba", "ba", "ab", "bac", "dba", "aba")
+    autocomplete.setAutocompleteList("aba", "ba", "ab", "bac", "dba")
     autocomplete.setMaxElementsVisible(6)
 
     autocomplete.enterText("ba")
 
-    autocomplete.requireItems("ba", "bac", "aba", "dba", "aba")
+    autocomplete.requireItems("ba", "bac", "aba", "dba")
+  }
+
+  @Test
+  def items_distinct = {
+    autocomplete.setAutocompleteList("aba", "ba", "ab", "aba", "aba")
+    autocomplete.setMaxElementsVisible(6)
+
+    autocomplete.enterText("ba")
+
+    autocomplete.requireItems("ba", "aba")
   }
 
   @Test
@@ -371,24 +380,6 @@ class AutocompleteTest extends AbstractUiTest {
     autocomplete.requireItems("AéFhe", "anuSMpZifwNPgKŰx", "aVmIáQbüazéj", "a Áú ÚkTűÓÉb")
     println(System.currentTimeMillis - start2)
     assertThat(System.currentTimeMillis - start2).isLessThan(3000)
-  }
-
-  @Test
-  def sortAlgo = {
-    assertThat(Autocomplete.sortAlgo("dé").apply("Déry", "Déry")).isFalse
-    assertThat(Autocomplete.sortAlgo("dé").apply("Déry", "Dery")).isTrue
-    assertThat(Autocomplete.sortAlgo("dé").apply("Dery", "Déry")).isFalse
-    assertThat(Autocomplete.sortAlgo("dé").apply("Dery", "Dery")).isFalse
-
-    assertThat(Autocomplete.sortAlgo("de").apply("Déry", "Déry")).isFalse
-    assertThat(Autocomplete.sortAlgo("de").apply("Déry", "eDery")).isTrue
-    assertThat(Autocomplete.sortAlgo("de").apply("eDery", "Déry")).isFalse
-    assertThat(Autocomplete.sortAlgo("de").apply("eDery", "eDery")).isFalse
-
-    assertThat(Autocomplete.sortAlgo("de").apply("ederi", "ederi")).isFalse
-    assertThat(Autocomplete.sortAlgo("de").apply("ederi", "edri")).isTrue
-    assertThat(Autocomplete.sortAlgo("de").apply("edri", "ederi")).isFalse
-    assertThat(Autocomplete.sortAlgo("de").apply("edri", "edri")).isFalse
   }
 
   @Test

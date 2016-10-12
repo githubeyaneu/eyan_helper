@@ -9,14 +9,15 @@ import org.fest.swing.fixture.JTextComponentFixture
 import org.fest.swing.fixture.WindowFixture
 
 import eu.eyan.util.swing.Autocomplete
+import eu.eyan.util.swing.AutocompletePopupWindow
 
 class AutocompleteFixture(frameFixture: WindowFixture[_], componentName: String) extends JTextComponentFixture(frameFixture.robot, componentName) {
   private def autocompleteComponent = frameFixture.textBox(componentName).target.asInstanceOf[Autocomplete]
-  def popup = new JWindowFixture(frameFixture, Autocomplete.NAME_POPUP)
-  def list = popup.list(Autocomplete.NAME_LIST)
+  def popup = new JWindowFixture(frameFixture, AutocompletePopupWindow.NAME_POPUP)
+  def list = popup.list(AutocompletePopupWindow.NAME_LIST)
 
   def requirePopupNotVisible = {
-    try { new JWindowFixture(frameFixture, Autocomplete.NAME_POPUP).requireNotVisible() }
+    try { new JWindowFixture(frameFixture, AutocompletePopupWindow.NAME_POPUP).requireNotVisible() }
     catch {
       case cle: ComponentLookupException => //ok
       case t: Throwable                  => throw t

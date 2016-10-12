@@ -4,15 +4,18 @@ import scala.collection.mutable.MutableList
 
 object Log {
   var isActive: Boolean = false
+  var prevTime = System.currentTimeMillis
   type LogEntry = (LogLevel, String)
   val logs = new MutableList[LogEntry]
+
   private def log(level: LogLevel, message: String = "") = {
     if (isActive) {
-      val stack = Thread.currentThread().getStackTrace
-      logs += ((level, message))
-      val logText = stack(3).getClassName.substring(stack(3).getClassName.lastIndexOf(".") + 1) + "." + stack(3).getMethodName + ": " + message
       if (level != Trace) {
-        println(level + " " + logText)
+        val stack = Thread.currentThread().getStackTrace
+        logs += ((level, message))
+        val logText = stack(3).getClassName.substring(stack(3).getClassName.lastIndexOf(".") + 1) + "." + stack(3).getMethodName + ": " + message
+        println(level + " " + (System.currentTimeMillis - prevTime) + " " + logText)
+        prevTime = System.currentTimeMillis
         LogWindow.add(logText)
       }
     }
