@@ -13,4 +13,6 @@ class RandomPlus(salt: Int) extends Random(salt) {
 
   def nextReadableStrings(number: Int, lengthFrom: Int, lengthTo: Int) =
     for (i <- 1 to number) yield randomReadableString(lengthFrom, lengthTo)
+
+  def nextInts(number: Int, n: Int) = for (i <- 1 to number) yield nextInt(n) 
 }
