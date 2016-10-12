@@ -1,7 +1,10 @@
 package eu.eyan.util.string
+import StringsSearchTree._
 
 object StringsSearchTree {
   def newTree[T](): StringsSearchTree[T] = new StringsSearchTree[T](None)
+  
+  def allSubStrings(line:String, depth:Int) = (for (size <- 1 to depth) yield line.sliding(size)).flatten
 }
 
 class StringsSearchTree[TYPE] private (char: Option[Char], values: Set[TYPE] = Set[TYPE](), nodes: Map[Char, StringsSearchTree[TYPE]] = Map[Char, StringsSearchTree[TYPE]]()) {
@@ -27,6 +30,8 @@ class StringsSearchTree[TYPE] private (char: Option[Char], values: Set[TYPE] = S
       if (nodesContainKey) addToNode
       else newNode
   }
+  
+  def addAll(key: String, value: TYPE): StringsSearchTree[TYPE] = allSubStrings(key, key.length).foldLeft(this)((tree, string) => tree.add(string, value)) 
 
   override def toString: String = toString("")
 

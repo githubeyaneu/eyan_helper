@@ -29,8 +29,8 @@ object FileIndex {
     println("lines done "+timerElapsed)
     printmem
     
-    def itemsOfLine(line:String) = (for (size <- 1 to INDEXING_DEPTH) yield line.sliding(size)).flatten
-    val itemsOfLines = linesWithIndices.map(p => (itemsOfLine(p._1).map((_,p._2)))).flatten
+    
+    val itemsOfLines = linesWithIndices.map(p => (StringsSearchTree.allSubStrings(p._1, INDEXING_DEPTH).map((_,p._2)))).flatten
     println("itemsOfLines done "+timerElapsed)
     printmem
 

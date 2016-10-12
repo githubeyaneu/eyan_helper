@@ -40,7 +40,13 @@ class StringsSearchTreeTest extends JUnitSuite {
   
   @Test def ab1_ac2_get_ac_returns_2 = assertThat(newTree[Int].add("ab",1).add("ac",2).get("ac")).isEqualTo(Set(2))
 
+  @Test def addAllSubstrings_abc1_bc_2_a_returns_1 = assertThat(newTree[Int].addAll("abc",1).addAll("bc",2).get("a")).isEqualTo(Set(1))
+
+  @Test def addAllSubstrings_Empty = assertThat(newTree[Int].addAll("",1).get("")).isEqualTo(Set(1))
+
   @Test def printer = assertThat(newTree[Int].add("ab",1).add("ab",2).toString).isEqualTo(": \r\na: \r\nab: 1, 2")
+  
+  @Test def printer2 = println(newTree[Int].addAll("abc",1).addAll("bc",2))
   
   @Test def tree5000 = {
     val rnd = new RandomPlus(13)
