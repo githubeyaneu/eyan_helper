@@ -13,6 +13,7 @@ import eu.eyan.util.awt.AwtHelper._
 import javax.swing.JTextArea
 import javax.swing.JScrollPane
 import java.awt.Dimension
+import eu.eyan.util.awt.AwtHelper
 
 object JPanelWithFrameLayout {
   def apply(firstRowSpec: String = "p", firstColumnSpec: String = "p") = {
@@ -41,6 +42,8 @@ class JPanelWithFrameLayout(firstRowSpec: String = "p") extends JPanel {
     column += 1
     this
   }
+  
+  def nextColumn = column += 2
 
   def newRow(comp: Component = null, spec: String = "p") = {
     newRowSeparator()
@@ -54,6 +57,7 @@ class JPanelWithFrameLayout(firstRowSpec: String = "p") extends JPanel {
     newRowSeparator()
     frameLayout.appendRow(RowSpec.decode(spec))
     row += 1
+    column=1
     this
   }
 
@@ -71,11 +75,12 @@ class JPanelWithFrameLayout(firstRowSpec: String = "p") extends JPanel {
     tf
   }
 
-  def addTextArea() = {
-    val textArea = new JTextAreaPlus()
+  def addTextArea(text:String = "", documentAction: () => Unit = null) = {
+    val textArea = new JTextAreaPlus().appendText(text)
     val scrollPane = new JScrollPane(textArea)
     val containerPanel = JPanelWithFrameLayout("f:1px:g", "f:1px:g").add(scrollPane)
     this.add(containerPanel, CC.xy(column, row))
+    if(documentAction!=null) textArea.getDocument.addDocumentListener(AwtHelper.docListener(documentAction))
     textArea
   }
 
@@ -97,5 +102,4 @@ class JPanelWithFrameLayout(firstRowSpec: String = "p") extends JPanel {
     this.add(panel, CC.xy(column, row))
     panel
   }
-
 }

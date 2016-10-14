@@ -155,7 +155,7 @@ public class CachedFileLineReader implements Iterable<String> {
 
 			@Override
 			public String next() {
-				Log.debug("Line "+(index+1)+" "+(100*(index+1)/size())+"%");
+				if(size() != 0) Log.debug("Line "+(index+1)+" "+(100*(index+1)/size())+"%");
 				String line = get(index);
 				index++;
 				return line;
