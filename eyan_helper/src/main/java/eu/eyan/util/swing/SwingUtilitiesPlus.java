@@ -94,12 +94,12 @@ public class SwingUtilitiesPlus {
 	}
 
 	// TEXTFIELD
-	public static JTextField jTextField(int columns, Consumer<JTextField> actionListener) {
+	public static JTextFieldPlus jTextField(int columns, Consumer<JTextField> actionListener) {
 		return newTextFieldWithAction(columns, (tf, e) -> actionListener.accept(tf));
 	}
 
-	public static JTextField newTextFieldWithAction(int columns, BiConsumer<JTextField, ActionEvent> actionListener) {
-		JTextField tf = new JTextField(columns);
+	public static JTextFieldPlus newTextFieldWithAction(int columns, BiConsumer<JTextField, ActionEvent> actionListener) {
+		JTextFieldPlus tf = new JTextFieldPlus(columns);
 		tf.addActionListener(e -> actionListener.accept(tf, e));
 		return tf;
 	}

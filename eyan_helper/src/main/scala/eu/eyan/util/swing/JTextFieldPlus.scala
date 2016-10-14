@@ -7,6 +7,7 @@ import java.awt.event.FocusEvent
 import java.awt.event.FocusAdapter
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
+import eu.eyan.util.awt.AwtHelper
 
 class JTextFieldPlus(cols: Int) extends JTextField(cols) {
 
@@ -37,4 +38,6 @@ class JTextFieldPlus(cols: Int) extends JTextField(cols) {
     addComponentListener(new ComponentAdapter { override def componentResized(e: ComponentEvent) = { componentResizedEvent(e) } })
     this
   }
+  
+  def clickSelectAll = {addMouseListener(AwtHelper.mouseClick { () => this.selectAll }); this}
 }

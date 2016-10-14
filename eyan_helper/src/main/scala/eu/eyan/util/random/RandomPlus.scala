@@ -4,14 +4,12 @@ import scala.util.Random
 import java.text.Normalizer
 
 object RandomPlus {
-  val chars = "aábcdeéfghiíjklmnoóöőpqrstuúüűvwxyzAÁBCDEÉFGHIÍJKLMNOÓÖŐPQRSTUÚÜŰVWXYZ     "
+  val chars = "aábcdeéfghiíjklmnoóöőpqrstuúüűvwxyzAÁBCDEÉFGHIÍJKLMNOÓÖŐPQRSTUÚÜŰVWXYZß     "
 
   def main(args: Array[String]): Unit = {
-    //    println(chars.toCharArray().map(c => (c, c.toInt)).mkString("\r\n"))
     val reg = "[\\p{InCombiningDiacriticalMarks}]".r
     def norm(c: Char) = reg.replaceAllIn(Normalizer.normalize(c + "", Normalizer.Form.NFD), "")
     for (i <- 0x0 to 0xFFFF) {
-      //      print((i, i.toChar) + "   ")
       if (norm(i.toChar).length() > 0 && i != norm(i.toChar).charAt(0).toInt)
         println((i, i.toChar + "", norm(i.toChar), norm(i.toChar).charAt(0).toInt))
     }
