@@ -113,8 +113,7 @@ class SwingUtilitiesPlusTest() {
   @Test
   def test_jTextField = {
     var runned = false
-    val action = new Consumer[JTextField] { override def accept(cb: JTextField) = { runned = true } }
-    val textField = SwingUtilitiesPlus.jTextField(3, action)
+    val textField = SwingPlus.jTextField(3, tf => runned = true)
     assertThat(textField.getColumns).isEqualTo(3)
     textField.getActionListeners()(0).actionPerformed(null)
     assertThat(runned).isTrue
@@ -123,8 +122,7 @@ class SwingUtilitiesPlusTest() {
   @Test
   def test_newTextFieldWithAction = {
     var runned = false
-    val action = new BiConsumer[JTextField, ActionEvent] { override def accept(cb: JTextField, e: ActionEvent) = { runned = true } }
-    val textField = SwingUtilitiesPlus.newTextFieldWithAction(3, action)
+    val textField = SwingPlus.newTextFieldWithAction(3, (tf,e) =>  runned = true)
     assertThat(textField.getColumns).isEqualTo(3)
     textField.getActionListeners()(0).actionPerformed(null)
     assertThat(runned).isTrue
@@ -132,13 +130,13 @@ class SwingUtilitiesPlusTest() {
 
   @Test
   def test_jLabel = {
-    val label = SwingUtilitiesPlus.jLabel("a")
+    val label = SwingPlus.label("a")
     assertThat(label.getText).isEqualTo("a")
   }
 
   @Test
   def test_jProgressBarPercent = {
-    val progressBar = SwingUtilitiesPlus.jProgressBarPercent("_%d%%_")
+    val progressBar = SwingPlus.jProgressBarPercent("_%d%%_")
     waitFor(() => assertThat(progressBar.getString).isEqualTo("..."))
     assertThat(progressBar.getValue).isEqualTo(0)
     assertThat(progressBar.isVisible).isFalse
@@ -148,7 +146,7 @@ class SwingUtilitiesPlusTest() {
   def test_jPanelOneRow = {
     val comp1 = new JPanel
     val comp2 = new JPanel
-    val container = SwingUtilitiesPlus.jPanelOneRow("1px", "2px", comp1, "3px", comp2)
+    val container = SwingPlus.jPanelOneRow("1px", "2px", comp1, "3px", comp2)
     assertThat(container.getLayout.asInstanceOf[FormLayoutPlus].getColumnSpec(1).encode).isEqualTo("2px")
     assertThat(container.getLayout.asInstanceOf[FormLayoutPlus].getColumnSpec(2).encode).isEqualTo("3px")
 
