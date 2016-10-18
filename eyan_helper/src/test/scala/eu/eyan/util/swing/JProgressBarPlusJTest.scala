@@ -1,22 +1,15 @@
 package eu.eyan.util.swing
 
-import eu.eyan.testutil.ScalaEclipseJunitRunner
-import org.fest.assertions.Assertions._
-import java.io.File
-import java.io.IOException
-import java.io.PrintWriter
+import org.fest.assertions.Assertions.assertThat
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TemporaryFolder
-import eu.eyan.util.tuple.Tuple2
 import org.junit.runner.RunWith
-import javax.swing.JPanel
-import java.awt.Component
-import eu.eyan.testutil.TestPlus._
+
+import eu.eyan.testutil.ScalaEclipseJunitRunner
+import eu.eyan.testutil.TestPlus.waitFor
 
 @RunWith(classOf[ScalaEclipseJunitRunner])
-class JProgressBarPlusTest() {
+class JProgressBarPlusJTest() {
 
   @Before
   def setUp {}
@@ -31,8 +24,8 @@ class JProgressBarPlusTest() {
   @Test
   def test_createPercentChangedConsumer = {
     val pb = new JProgressBarPlus(0, 100, "for %d mat")
-    val pc = pb.createPercentChangedConsumer()
-    pc.accept(50)
+    val pc = pb.createPercentChangedConsumer
+    pc(50)
     assertThat(pb.isVisible).isTrue()
     waitFor(() => assertThat(pb.getValue).isEqualTo(50))
     waitFor(() => assertThat(pb.getString).isEqualTo("for 50 mat"))
@@ -63,8 +56,8 @@ class JProgressBarPlusTest() {
 
     waitFor(() => assertThat(pb.isVisible).isTrue)
 
-    val doneRunner = pb.doneThenInvisible()
-    doneRunner.run()
+    val doneRunner = pb.doneThenInvisible
+    doneRunner()
 
     waitFor(() => assertThat(pb.isVisible).isFalse)
   }
@@ -83,7 +76,7 @@ class JProgressBarPlusTest() {
   def test_finished = {
     val pb = new JProgressBarPlus(0, 444, "for %d%% mat")
 
-    pb.finished()
+    pb.finished
     waitFor(() => assertThat(pb.getString).isEqualTo("Ready"))
     waitFor(() => assertThat(pb.getValue).isEqualTo(444))
   }

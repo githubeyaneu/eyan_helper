@@ -85,7 +85,6 @@ class JPanelWithFrameLayout(firstRowSpec: String = "p") extends JPanel {
   }
 
   def addLabel(text: String) = {
-    newColumn()
     val label = new JLabel(text)
     this.add(label, CC.xy(column, row))
     label
