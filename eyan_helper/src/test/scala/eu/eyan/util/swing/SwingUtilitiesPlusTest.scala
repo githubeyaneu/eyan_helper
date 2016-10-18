@@ -34,13 +34,10 @@ import eu.eyan.util.jgoodies.FormLayoutPlus
 @RunWith(classOf[ScalaEclipseJunitRunner])
 class SwingUtilitiesPlusTest() {
 
-  @Test def test_SwingUtilitiesPlus = new SwingUtilitiesPlus
-
   @Test
   def test_createListContentsChangedListener = {
     var called = false
-    val listener = SwingUtilitiesPlus.createListContentsChangedListener(
-      new Consumer[ListDataEvent] { override def accept(e: ListDataEvent) = { called = true } })
+    val listener = SwingPlus.createListContentsChangedListener( e =>  called = true )
     listener.contentsChanged(null)
     listener.intervalAdded(null)
     listener.intervalRemoved(null)
@@ -57,24 +54,21 @@ class SwingUtilitiesPlusTest() {
         processKeyEvent(new KeyEvent(this, KeyEvent.KEY_TYPED, 0, KeyEvent.VK_UNDEFINED, KeyEvent.VK_UNDEFINED))
       }
     }
-    val listener = SwingUtilitiesPlus.addKeyPressedListener(
-      textPane,
-      new Consumer[KeyEvent] { override def accept(e: KeyEvent) = { called = true } })
+    val listener = SwingPlus.addKeyPressedListener( textPane, e =>  called = true  ) 
     textPane.pressKey
     assertThat(called).isTrue
   }
 
   @Test
   def test_newLeftFlowPanel = {
-    val panel = SwingUtilitiesPlus.newLeftFlowPanel
+    val panel = SwingPlus.newLeftFlowPanel
     assertThat(panel.getLayout.asInstanceOf[FlowLayout].getAlignment).isEqualTo(FlowLayout.LEFT)
   }
 
   @Test
   def test_newCheckBoxWithAction = {
     var runned = false
-    val action = new Runnable { def run() = { runned = true } }
-    val cb = SwingUtilitiesPlus.newCheckBoxWithAction("a", action)
+    val cb = SwingPlus.newCheckBoxWithAction("a", ()=>runned = true)
     assertThat(cb.getText).isEqualTo("a")
     cb.getActionListeners()(0).actionPerformed(null)
     assertThat(runned).isTrue
@@ -83,8 +77,7 @@ class SwingUtilitiesPlusTest() {
   @Test
   def test_jCheckBox = {
     var runned = false
-    val action = new Consumer[JCheckBox] { override def accept(cb: JCheckBox) = { runned = true } }
-    val cb = SwingUtilitiesPlus.jCheckBox("a", action)
+    val cb = SwingPlus.checkBox("a", (cb)=>runned = true)
     assertThat(cb.getText).isEqualTo("a")
     cb.getActionListeners()(0).actionPerformed(null)
     assertThat(runned).isTrue
@@ -93,8 +86,7 @@ class SwingUtilitiesPlusTest() {
   @Test
   def test_jButton = {
     var runned = false
-    val action = new Runnable { def run() = { runned = true } }
-    val button = SwingUtilitiesPlus.jButton("a", action)
+    val button = SwingPlus.button("a", ()=>runned = true )
     assertThat(button.getText).isEqualTo("a")
     button.getActionListeners()(0).actionPerformed(null)
     assertThat(runned).isTrue
@@ -103,8 +95,7 @@ class SwingUtilitiesPlusTest() {
   @Test
   def test_newButtonWithAction = {
     var runned = false
-    val action = new BiConsumer[JButton, ActionEvent] { override def accept(cb: JButton, e: ActionEvent) = { runned = true } }
-    val button = SwingUtilitiesPlus.newButtonWithAction("a", action)
+    val button = SwingPlus.newButtonWithAction("a", (b,e)=>runned = true)
     assertThat(button.getText).isEqualTo("a")
     button.getActionListeners()(0).actionPerformed(null)
     assertThat(runned).isTrue
@@ -113,7 +104,7 @@ class SwingUtilitiesPlusTest() {
   @Test
   def test_jTextField = {
     var runned = false
-    val textField = SwingPlus.jTextField(3, tf => runned = true)
+    val textField = SwingPlus.textField(3, tf => runned = true)
     assertThat(textField.getColumns).isEqualTo(3)
     textField.getActionListeners()(0).actionPerformed(null)
     assertThat(runned).isTrue
