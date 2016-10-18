@@ -84,7 +84,7 @@ object SwingPlus {
   }
 
   def jPanelOneRow(rowSpec: String, col1Spec: String, col1Comp: Component, col2Spec: String, col2Comp: Component) = {
-    val layout = new FormLayoutPlus(new JPanel(), col1Spec + "," + col2Spec)
+    val layout = FormLayoutPlus(new JPanel(), col1Spec + "," + col2Spec)
     layout.appendRow(rowSpec)
     layout.getComponent().add(col1Comp, CC.xy(1, 1))
     layout.getComponent().add(col2Comp, CC.xy(2, 1))

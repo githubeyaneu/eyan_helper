@@ -28,7 +28,7 @@ class FormLayoutPlusTest() {
   @Test
   @throws(classOf[Exception])
   def test_FormLayoutPlus_col = {
-    val flp = new FormLayoutPlus(container, "p")
+    val flp = FormLayoutPlus(container, "p")
     assertThat(getLayout().getColumnSpec(1).encode()).isEqualTo("p")
     assertThat(getLayout().getRowCount).isEqualTo(0)
   }
@@ -37,7 +37,7 @@ class FormLayoutPlusTest() {
   @throws(classOf[Exception])
   def test_FormLayoutPlus_colRowComp = {
     val subComponent = new JPanel
-    val flp = new FormLayoutPlus(container, "p", "1px", subComponent)
+    val flp = FormLayoutPlus(container, "p", "1px", subComponent)
     assertThat(getLayout().getColumnSpec(1).encode()).isEqualTo("p")
     assertThat(getLayout().getRowSpec(1).encode()).isEqualTo("1px")
 
@@ -49,7 +49,7 @@ class FormLayoutPlusTest() {
   @Test
   @throws(classOf[Exception])
   def test_FormLayoutPlus = {
-    val flp = new FormLayoutPlus(container, "p")
+    val flp = FormLayoutPlus(container, "p")
     flp.appendRow("1px", "2px")
     assertThat(getLayout().getRowSpec(1).encode()).isEqualTo("1px")
     assertThat(getLayout().getRowSpec(2).encode()).isEqualTo("2px")
