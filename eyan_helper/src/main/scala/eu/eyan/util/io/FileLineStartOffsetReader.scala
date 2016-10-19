@@ -52,7 +52,7 @@ class CachedFileLineReader extends Iterable[String] {
 
     Log.info("Loading " + file + " " + fileLength + " bytes")
 
-    val lnr = new FileLineStartOffsetReader(file)
+    val lnr = FileLineStartOffsetReader(file)
     var endIndex = 0L
     var startOffset = 0L
     var progressPercent = 0L
@@ -63,9 +63,9 @@ class CachedFileLineReader extends Iterable[String] {
       lineOffsets.clear
       try {
         while (startOffset != -1) {
-          startOffset = lnr.readLine()
+          startOffset = lnr.readLine
           if (startOffset != -1) {
-            endIndex = lnr.getOffset()
+            endIndex = lnr.getOffset
             lineOffsets.add(Array(startOffset, endIndex))
             if (endIndex - startOffset > longestLineLength) {
               longestLineIndex = lineOffsets.size() - 1

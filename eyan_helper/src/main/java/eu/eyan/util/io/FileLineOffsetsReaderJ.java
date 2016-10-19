@@ -5,7 +5,7 @@ package eu.eyan.util.io;
  * Not used anymore
  *
  */
-public class FileLineOffsetsReader /* implements Closeable */{
+public class FileLineOffsetsReaderJ /* implements Closeable */{
 	// private FileReader reader;
 	// private final char[] buffer;
 	// int bufferOffset = 0;
