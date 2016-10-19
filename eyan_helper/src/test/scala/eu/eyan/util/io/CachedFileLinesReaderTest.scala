@@ -35,12 +35,8 @@ class CachedFileLinesReaderTest() {
   def test_load = {
     writeFileLines(100)
     var expectedPercent = 1
-    cflr.load(file, Java8ScalaHelper.newConsumer { percent =>
-      {
-        assertThat(percent).isEqualTo(expectedPercent)
-        expectedPercent += 1
-      }
-    })
+    cflr.load(file,  percent => { assertThat(percent).isEqualTo(expectedPercent); expectedPercent += 1 }
+    )
   }
 
   @Test
@@ -55,7 +51,7 @@ class CachedFileLinesReaderTest() {
   def test_load_1Line = {
     writeFileLines(1000)
     var expectedPercent = 1
-    cflr.load(file, Java8ScalaHelper.newConsumer { percent => { assertThat(percent).isEqualTo(expectedPercent); expectedPercent += 1 } })
+    cflr.load(file,  percent => { assertThat(percent).isEqualTo(expectedPercent); expectedPercent += 1 } )
   }
 
   @Test(expected = classOf[NullPointerException])
@@ -92,6 +88,15 @@ class CachedFileLinesReaderTest() {
     writeFile("1")
     cflr.load(file, null)
     assertThat(cflr.size).isEqualTo(1)
+  }
+
+  @Test
+  def test_Size_1Line_load_twice = {
+	  writeFileLines(1, false)
+	  cflr.load(file, null)
+	  cflr.load(file, null)
+	  assertThat(cflr.size).isEqualTo(1)
+	  assertThat(cflr.get(0)).isEqualTo("line1\r\n")
   }
 
   @Test
