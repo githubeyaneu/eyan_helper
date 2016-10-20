@@ -1,19 +1,19 @@
 package eu.eyan.util.io
 
-import eu.eyan.testutil.ScalaEclipseJunitRunner
-import org.fest.assertions.Assertions._
 import java.io.File
 import java.io.IOException
 import java.io.PrintWriter
+import java.io.RandomAccessFile
+
+import org.fest.assertions.Assertions.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
-import eu.eyan.util.tuple.Tuple2
 import org.junit.runner.RunWith
+
+import eu.eyan.testutil.ScalaEclipseJunitRunner
 import eu.eyan.util.java.Java8ScalaHelper
-import java.nio.channels.FileChannel
-import java.io.RandomAccessFile
 
 @RunWith(classOf[ScalaEclipseJunitRunner])
 class CachedFileLinesReaderTest() {

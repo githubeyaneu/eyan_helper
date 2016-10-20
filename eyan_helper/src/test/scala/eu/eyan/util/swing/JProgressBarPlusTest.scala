@@ -1,19 +1,12 @@
 package eu.eyan.util.swing
 
-import eu.eyan.testutil.ScalaEclipseJunitRunner
-import org.fest.assertions.Assertions._
-import java.io.File
-import java.io.IOException
-import java.io.PrintWriter
+import org.fest.assertions.Assertions.assertThat
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TemporaryFolder
-import eu.eyan.util.tuple.Tuple2
 import org.junit.runner.RunWith
-import javax.swing.JPanel
-import java.awt.Component
-import eu.eyan.testutil.TestPlus._
+
+import eu.eyan.testutil.ScalaEclipseJunitRunner
+import eu.eyan.testutil.TestPlus.waitFor
 
 @RunWith(classOf[ScalaEclipseJunitRunner])
 class JProgressBarPlusTest() {
