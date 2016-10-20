@@ -377,7 +377,6 @@ class AutocompleteTest extends AbstractUiTest {
 
     val start2 = System.currentTimeMillis
     autocomplete.enterText("a")
-    autocomplete.requireItems("AéFhe", "anuSMpZifwNPgKŰx", "aVmIáQbüazéj", "a Áú ÚkTűÓÉb")
     println(System.currentTimeMillis - start2)
     assertThat(System.currentTimeMillis - start2).isLessThan(3000)
   }

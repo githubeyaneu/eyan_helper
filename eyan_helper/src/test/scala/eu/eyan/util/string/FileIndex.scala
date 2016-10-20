@@ -1,7 +1,6 @@
 package eu.eyan.util.string
 
 import java.io.File
-import eu.eyan.util.io.FileLinesReader
 import eu.eyan.util.io.CachedFileLineReader
 import java.text.NumberFormat
 import eu.eyan.util.memory.Memory._
@@ -23,7 +22,7 @@ object FileIndex {
     println("loaded "+timerElapsed+" "+NumberFormat.getInstance.format(reader.size)+" lines.")
     printmem
 
-    val lineIterator = reader.iterator.asScala
+    val lineIterator = reader.iterator
     val linesWithIndices = lineIterator.zipWithIndex
 //    val lines = for (lineIndex <- 0 to reader.size-1) yield (lineIndex, reader.get(lineIndex))
     println("lines done "+timerElapsed)
