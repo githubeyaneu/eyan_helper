@@ -1,18 +1,15 @@
 package eu.eyan.util.jgoodies
 
-import eu.eyan.testutil.ScalaEclipseJunitRunner
-import org.fest.assertions.Assertions._
-import java.io.File
-import java.io.IOException
-import java.io.PrintWriter
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
-import eu.eyan.util.tuple.Tuple2
-import org.junit.runner.RunWith
-import javax.swing.JPanel
 import java.awt.Component
+import java.io.IOException
+
+import org.fest.assertions.Assertions.assertThat
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+
+import eu.eyan.testutil.ScalaEclipseJunitRunner
+import javax.swing.JPanel
 
 @RunWith(classOf[ScalaEclipseJunitRunner])
 class FormLayoutPlusTest() {

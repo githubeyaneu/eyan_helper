@@ -1,15 +1,14 @@
 package eu.eyan.util.io
 
-import java.util.regex.Pattern
-import scala.collection.JavaConverters._
-import eu.eyan.log.Log
 import java.io.File
-import java.util.function.Consumer
-import java.io.IOException
 import java.io.FileInputStream
+import java.io.IOException
 import java.nio.ByteBuffer
-import java.nio.charset.Charset
 import java.nio.channels.FileChannel
+import java.nio.charset.Charset
+import java.util.regex.Pattern
+
+import eu.eyan.log.Log
 import eu.eyan.util.collection.MapsPlus
 
 class CachedFileLineReader extends Iterable[String] {
@@ -115,7 +114,6 @@ class CachedFileLineReader extends Iterable[String] {
     def next = { if (lineOffsets.size != 0) Log.debug("Line " + (index + 1) + " " + (100 * (index + 1) / lineOffsets.size) + "%"); val line = get(index); index += 1; line }
   }
 
-  //FIXME: use scala matcher
   def findFirst(pattern: String) = {
     val matcher = Pattern.compile(pattern).matcher("")
 

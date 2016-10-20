@@ -1,7 +1,6 @@
 package eu.eyan.util.string
 
 import java.io.File
-import eu.eyan.util.io.FileLinesReader
 import eu.eyan.util.io.CachedFileLineReader
 import java.text.NumberFormat
 import eu.eyan.util.memory.Memory._

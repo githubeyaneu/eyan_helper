@@ -1,35 +1,17 @@
 package eu.eyan.util.swing
 
-import eu.eyan.testutil.ScalaEclipseJunitRunner
-import org.fest.assertions.Assertions._
-import java.io.File
-import java.io.IOException
-import java.io.PrintWriter
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
-import eu.eyan.util.tuple.Tuple2
-import org.junit.runner.RunWith
-import javax.swing.JPanel
-import java.awt.Component
-import java.util.function.Consumer
-import javax.swing.event.ListDataEvent
-import java.awt.event.KeyEvent
-import javax.swing.JTextPane
-import org.fest.swing.util.Modifiers
 import java.awt.FlowLayout
-import org.fest.swing.fixture.JCheckBoxFixture
-import org.fest.swing.core.Robot
-import org.fest.swing.core.BasicRobot
-import javax.swing.JCheckBox
-import java.util.function.BiConsumer
-import javax.swing.JButton
-import java.awt.event.ActionEvent
-import javax.swing.JTextField
-import eu.eyan.testutil.TestPlus._
-import com.jgoodies.forms.layout.FormLayout
+import java.awt.event.KeyEvent
+
+import org.fest.assertions.Assertions.assertThat
+import org.junit.Test
+import org.junit.runner.RunWith
+
+import eu.eyan.testutil.ScalaEclipseJunitRunner
+import eu.eyan.testutil.TestPlus.waitFor
 import eu.eyan.util.jgoodies.FormLayoutPlus
+import javax.swing.JPanel
+import javax.swing.JTextPane
 
 @RunWith(classOf[ScalaEclipseJunitRunner])
 class SwingUtilitiesPlusTest() {

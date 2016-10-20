@@ -1,11 +1,10 @@
 package eu.eyan.util.collection
 
+import org.fest.assertions.Assertions.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.specs2.runner.JUnitRunner
-import org.fest.assertions.Assertions._
-import org.scalatest.junit.AssertionsForJUnit
 import org.scalatest.junit.JUnitSuite
+
 import eu.eyan.testutil.ScalaEclipseJunitRunner
 
 @RunWith(classOf[ScalaEclipseJunitRunner])
@@ -30,5 +29,4 @@ class MapsPlusTest extends JUnitSuite {
     map.put("2", "")
     assertThat(map).hasSize(2)
   }
-
 }

@@ -7,6 +7,7 @@ import java.io.IOException
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 import eu.eyan.util.io.CloseablePlus
+import eu.eyan.util.string.StringPlus
 
 class BackupException(msg: String) extends Exception(msg)
 
@@ -16,11 +17,9 @@ object BackupHelper {
     val buffer = Array.ofDim[Byte](1024)
     var zipOutputStream: ZipOutputStream = null
     var fileInputStream: FileInputStream = null
-    // FIXME fájlnév ékezet probléma a zipben
     try {
       zipOutputStream = new ZipOutputStream(new FileOutputStream(to))
-      // FIXME: mindig ez a név...
-      zipOutputStream.putNextEntry(new ZipEntry("backup.xls"))
+      zipOutputStream.putNextEntry(new ZipEntry(StringPlus.withoutAccents(inputFile.getName)))
       fileInputStream = new FileInputStream(inputFile)
       var len = fileInputStream.read(buffer)
       while (len > 0) {
