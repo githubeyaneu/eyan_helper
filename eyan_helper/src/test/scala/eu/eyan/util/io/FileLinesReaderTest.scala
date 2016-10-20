@@ -44,7 +44,7 @@ class FileLinesReaderTest() {
   @Test
   @throws(classOf[Exception])
   def testStartOffsets = {
-    var flr: FileLineStartOffsetReader = new FileLineStartOffsetReader(filepath, 8192)
+    var flr: FileLineStartOffsetReader = FileLineStartOffsetReader(filepath, 8192)
     assertThat(flr.readLine).isEqualTo(0)
     assertThat(flr.readLine).isEqualTo(10)
     assertThat(flr.readLine).isEqualTo(18)
@@ -56,7 +56,7 @@ class FileLinesReaderTest() {
     assertThat(flr.readLine).isEqualTo(-1)
     assertThat(flr.readLine).isEqualTo(-1)
     flr.close
-    flr = new FileLineStartOffsetReader(filepath, 1)
+    flr = FileLineStartOffsetReader(filepath, 1)
     assertThat(flr.getOffset).isEqualTo(0)
     assertThat(flr.readLine).isEqualTo(0)
     assertThat(flr.readLine).isEqualTo(10)
