@@ -36,6 +36,8 @@ class JPanelWithFrameLayout(firstRowSpec: String = "p") extends JPanel {
     row += 1
   }
 
+  def newColumn:JPanelWithFrameLayout = newColumn()
+  
   def newColumn(spec: String = "p") = {
     if (column != 0) newColumnSeparator()
     frameLayout.appendColumn(ColumnSpec.decode(spec))
@@ -45,6 +47,8 @@ class JPanelWithFrameLayout(firstRowSpec: String = "p") extends JPanel {
   
   def nextColumn = column += 2
 
+  def newRow:JPanelWithFrameLayout = newRow()
+  
   def newRow(comp: Component = null, spec: String = "p") = {
     newRowSeparator()
     frameLayout.appendRow(RowSpec.decode(spec))
@@ -69,7 +73,6 @@ class JPanelWithFrameLayout(firstRowSpec: String = "p") extends JPanel {
   }
 
   def addTextField(text: String, size: Int = 15) = {
-    newColumn()
     val tf = new JTextField(text, size)
     this.add(tf, CC.xy(column, row))
     tf
@@ -90,9 +93,11 @@ class JPanelWithFrameLayout(firstRowSpec: String = "p") extends JPanel {
     label
   }
 
-  override def add(comp: Component) = {
+  override def add(comp: Component) = add(comp,1)
+  
+  override def add(comp: Component, width:Int) = {
     if (column == 0) newColumn()
-    this.add(comp, CC.xy(column, row))
+    this.add(comp, CC.xyw(column, row, width*2-1))
     comp
   }
 

@@ -12,7 +12,7 @@ class JButtonPlus(text:String) extends JButton(text) {
     } )) 
   }
   
-  def setDisabled() = {
+  def disabled = {
     this.setEnabled(false)
     this
   }

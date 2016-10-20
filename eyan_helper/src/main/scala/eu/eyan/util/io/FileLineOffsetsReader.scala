@@ -6,30 +6,27 @@ import java.io.FileReader
 import java.io.FileInputStream
 
 object FileLineStartOffsetReader {
-  def apply(file: File) = new FileLineStartOffsetReader(file.getAbsolutePath, 8192)
+  def apply(file: File) = new FileLineStartOffsetReader(file.getAbsolutePath, 64 * 1024)
   def apply(file: String, bufferSize: Int) = new FileLineStartOffsetReader(file, bufferSize)
 }
 
-class FileLineStartOffsetReader private (file: String, bufferSize: Int) extends  Closeable {
-	val EGAL = 'x'
-	
-	private var finished = false
-	private var offset = 0L
-	
-	private val buffer = new Array[Char](bufferSize)
-	private val byteBuffer = new Array[Byte](bufferSize)
-	private val reader = new FileReader(file)
-	private val fis = new FileInputStream(file)
-	
-	private var lastChar = EGAL
-	private var bufferOffset = 0
-	private var bufferLength = 0
-	private var byteBufferLength = 0
-	private var nextLineLength = 0L
-	
-	def getOffset = offset
+class FileLineStartOffsetReader private (file: String, bufferSize: Int) extends Closeable {
+  private val EGAL = 'x'
 
-  override def close() = { reader.close(); fis.close() }
+  private var offset = 0L
+
+  private val byteBuffer = new Array[Byte](bufferSize)
+  private val fis = new FileInputStream(file)
+
+  private var lastChar = EGAL
+  private var bufferOffset = 0
+  private var bufferLength = 0
+  private var byteBufferLength = 0
+  private var nextLineLength = 0L
+
+  def getOffset = offset
+
+  override def close() = { fis.close() }
 
   /**
    * @return start offset from the line. After calling this method the end
@@ -76,17 +73,16 @@ class FileLineStartOffsetReader private (file: String, bufferSize: Int) extends 
   }
 
   private def nextChar: Int = {
-    if (finished)
-      -1
-    else if (bufferOffset == byteBufferLength) {
-      bufferLength = reader.read(buffer)
-      byteBufferLength = fis.read(byteBuffer)
-      bufferOffset = 0
-      if (byteBufferLength == -1) { finished = true; -1 }
-      else byteBuffer(getAndIncBufferOffset)
-    }
-    else byteBuffer(getAndIncBufferOffset)
+    readFromFileToBufferIfNecessary
+    if (byteBufferLength != -1) nextCharFromBuffer
+    else -1
   }
 
-  private def getAndIncBufferOffset = { val ret = bufferOffset; bufferOffset += 1; ret }
+  private def readFromFileToBufferIfNecessary =
+    if (bufferOffset == byteBufferLength) {
+      byteBufferLength = fis.read(byteBuffer)
+      bufferOffset = 0
+    }
+
+  private def nextCharFromBuffer = { val c = byteBuffer(bufferOffset); bufferOffset += 1; c }
 }
