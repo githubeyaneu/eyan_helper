@@ -18,4 +18,6 @@ class JTextAreaPlus extends JTextArea {
   def appendText(text:String) = { this.append(text); this }
   
   def clickSelectsAll = { this.addMouseListener(AwtHelper.mouseClick { () => {this.selectAll} }); this }
+  
+  def lines = this.getText.lines
 }

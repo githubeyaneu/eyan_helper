@@ -24,8 +24,8 @@ class JProgressBarPlusTest() {
   @Test
   def test_createPercentChangedConsumer = {
     val pb = new JProgressBarPlus(0, 100, "for %d mat")
-    val pc = pb.createPercentChangedConsumer()
-    pc.accept(50)
+    val pc = pb.createPercentChangedConsumer
+    pc(50)
     assertThat(pb.isVisible).isTrue()
     waitFor(() => assertThat(pb.getValue).isEqualTo(50))
     waitFor(() => assertThat(pb.getString).isEqualTo("for 50 mat"))
@@ -55,10 +55,8 @@ class JProgressBarPlusTest() {
     val pb = new JProgressBarPlus(0, 100, "for %d%% mat")
 
     waitFor(() => assertThat(pb.isVisible).isTrue)
-
-    val doneRunner = pb.doneThenInvisible()
-    doneRunner.run()
-
+    
+    pb.doneThenInvisible()
     waitFor(() => assertThat(pb.isVisible).isFalse)
   }
 
@@ -76,7 +74,7 @@ class JProgressBarPlusTest() {
   def test_finished = {
     val pb = new JProgressBarPlus(0, 444, "for %d%% mat")
 
-    pb.finished()
+    pb.finished
     waitFor(() => assertThat(pb.getString).isEqualTo("Ready"))
     waitFor(() => assertThat(pb.getValue).isEqualTo(444))
   }
