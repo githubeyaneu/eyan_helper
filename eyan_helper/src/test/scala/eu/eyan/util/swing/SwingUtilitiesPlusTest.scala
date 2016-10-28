@@ -31,9 +31,9 @@ class SwingUtilitiesPlusTest() {
     var called = false
     val textPane = new JTextPane {
       def pressKey = {
-        processKeyEvent(new KeyEvent(this, KeyEvent.KEY_PRESSED, 0, KeyEvent.VK_UNDEFINED, 'A'))
-        processKeyEvent(new KeyEvent(this, KeyEvent.KEY_RELEASED, 0, KeyEvent.VK_UNDEFINED, 'A'))
-        processKeyEvent(new KeyEvent(this, KeyEvent.KEY_TYPED, 0, KeyEvent.VK_UNDEFINED, KeyEvent.VK_UNDEFINED))
+        processKeyEvent(new KeyEvent(this, KeyEvent.KEY_PRESSED, 0, KeyEvent.VK_UNDEFINED, 'A', 'A'))
+        processKeyEvent(new KeyEvent(this, KeyEvent.KEY_RELEASED, 0, KeyEvent.VK_UNDEFINED, 'A', 'A'))
+        processKeyEvent(new KeyEvent(this, KeyEvent.KEY_TYPED, 0, KeyEvent.VK_UNDEFINED, KeyEvent.VK_UNDEFINED, KeyEvent.VK_UNDEFINED))
       }
     }
     val listener = SwingPlus.addKeyPressedListener( textPane, e =>  called = true  ) 
