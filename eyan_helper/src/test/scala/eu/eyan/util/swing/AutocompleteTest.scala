@@ -36,10 +36,7 @@ import java.awt.Dimension
 
 class AutocompleteTest extends AbstractUiTest {
 
-  var frame: FrameFixture = null
   var autocomplete: AutocompleteFixture = null
-  var componentBefore: JTextComponentFixture = null
-  var componentAfter: JTextComponentFixture = null
 
   @Before def setUp = {
     AutocompleteTest.main(Array())
@@ -51,8 +48,6 @@ class AutocompleteTest extends AbstractUiTest {
     componentBefore = frame.textBox(AutocompleteTest.NAME_BEFORE)
     componentAfter = frame.textBox(AutocompleteTest.NAME_AFTER)
   }
-
-  @After def tearDown() = frame.cleanUp()
 
   @Test
   def create_Autocomplete = {

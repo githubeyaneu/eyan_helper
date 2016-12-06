@@ -50,12 +50,13 @@ object AwtHelper {
 		override def changedUpdate(e: DocumentEvent) = action()
   }
 
-  def positionToCenter(component: Component) = {
+  def positionToCenter[A<:Component](component: A):A  = {
     val screenSize = Toolkit.getDefaultToolkit().getScreenSize()
     val width = component.getSize().width
     val height = component.getSize().height
     component.setSize(width, height)
     component.setLocation((screenSize.width - width) / 2, (screenSize.height - height) / 2)
+    component
   }
 
   def positionToLeft(component: Component) = {
