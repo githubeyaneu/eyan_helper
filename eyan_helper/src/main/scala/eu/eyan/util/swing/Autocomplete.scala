@@ -17,48 +17,44 @@ import javax.swing.SwingUtilities
 import javax.swing.plaf.basic.BasicTextFieldUI
 import java.awt.Window
 
+object Autocomplete {
+  val NAME_LIST = "_autocompleteList"
+}
 /**
  * Autocomplete function to a TextField based on strings.
  * It also supports a hint text function that is shown if no text is in the textfield
- *
  */
-class Autocomplete extends JTextFieldPlus(10) {
+class Autocomplete extends JTextFieldPlus(10) /* TODO: refactor to a decorator*/ {
 
   private val hints = new AutocompleteHints
-  private var isPopupVisible = false
-  private lazy val autocompleteOwnerWindow = SwingUtilities.getWindowAncestor(this)
 
   private val hintTextUI = new HintTextFieldUI
-  setUI(hintTextUI)
-  def setHintText(hintText: String) = { hintTextUI.hint = hintText; repaint(); this }
-  def getHintText = hintTextUI.hint
 
-  val autocompleteList = new JListPlus[String].withName(AutocompletePopupWindow.NAME_LIST)
-  autocompleteList.addDoubleClickListener(e => selectTextFromList)
+  private val autocompleteList = new JListPlus[String]
+    .withName(Autocomplete.NAME_LIST)
+    .onDoubleClick(selectTextFromList)
+    .withBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY))
+
+  private val popup = new PopupWindow(autocompleteList, this)
+    .onComponentMoved(setPopupLocation)
 
   private var noItemsFoundText = "No items found"
+  
   private var maxElementsVisible = 4
 
-  lazy val popup = {
-    val popup = new AutocompletePopupWindow(autocompleteOwnerWindow)
-    autocompleteOwnerWindow.addComponentListener(
-      new ComponentAdapter {
-        override def componentMoved(e: ComponentEvent) = { if (isPopupVisible) setPopupLocation }
-      })
+  private var isListEnabled = false
 
-    popup.add(autocompleteList, CC.xy(1, 1))
-
-    popup
-  }
-  autocompleteList.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY))
+  setUI(hintTextUI)
+  onFocusLost(hidePopup)
+  onComponentResized(setPopupWidth)
 
   addKeyReleasedListener(event => {
     Log.debug("addKeyReleasedListener: " + getName + " " + event.getKeyChar)
     event.getKeyCode match {
       case KeyEvent.VK_DOWN   => selectNextInList
       case KeyEvent.VK_UP     => selectPreviousInList
-      case KeyEvent.VK_ENTER  => selectTextFromList
-      case KeyEvent.VK_ESCAPE => hidePopup
+      case KeyEvent.VK_ENTER  => selectTextFromList()
+      case KeyEvent.VK_ESCAPE => hidePopup()
       case _                  => showPopUp
     }
   })
@@ -72,98 +68,81 @@ class Autocomplete extends JTextFieldPlus(10) {
     }
   })
 
-  addFocusLostListener(e => hidePopup)
 
-  addComponentResizedListener(e => { if (isPopupVisible) setPopupWidth })
+  def setHintText(hintText: String) = { hintTextUI.hint = hintText; repaint(); this }
+  def getHintText = hintTextUI.hint
 
-  def selectTextFromList = {
-    if (isPopupVisible && isListEnabled && -1 < autocompleteList.getSelectedIndex) setText(autocompleteList.getSelectedValue)
-    hidePopup
-  }
-
-  var isListEnabled = false
-
-  def hidePopup = {
-    autocompleteList.clearSelection
-    popup.setVisible(false)
-    isPopupVisible = false
-  }
-
-  def selectNextInList = {
-    if (isPopupVisible) {
-      if (isListEnabled) autocompleteList.setSelectedIndex(autocompleteList.getSelectedIndex + 1)
-    } else {
-      showPopUp
-    }
-  }
-
-  def selectPreviousInList = {
-    if (isListEnabled)
-      autocompleteList.setSelectedIndex(if (autocompleteList.getSelectedIndex < 0) -1 else autocompleteList.getSelectedIndex - 1)
-  }
-
-  def showPopUp = {
-    val selectedElement = if (autocompleteList.getSelectedIndex < 0) 0 else autocompleteList.getSelectedIndex
-    val valuesBefore = autocompleteList.getValues
-
-    val list = hints.findElementsToShow(getText).take(maxElementsVisible)
-
-    Log.debug("new list: " + list + ", old list: " + valuesBefore)
-
-    if (!list.equals(valuesBefore) || !isPopupVisible) {
-      if (list.isEmpty) {
-        autocompleteList.withValues(List(noItemsFoundText))
-        isListEnabled = false
-      } else {
-        autocompleteList.withValues(list)
-        isListEnabled = true
-        autocompleteList.setSelectedIndex(selectedElement)
-      }
-      autocompleteList.setEnabled(isListEnabled)
-
-      popup.pack
-      setPopupWidth
-      setPopupLocation
-      popup.setFocusableWindowState(false)
-      popup.setAlwaysOnTop(true)
-      popup.setVisible(true)
-      isPopupVisible = true
-    }
-  }
-
-  def getValues = hints.getAutocompleteValues
   def setValues(values: List[String]) = {
     Log.debug(values.toList.mkString("\",\""))
     hints.setAutocompleteValues(values)
-    if (isPopupVisible) showPopUp
+    refreshPopup
     this
   }
 
-  def getMaxElementsVisible = maxElementsVisible
   def setMaxElementsVisible(maxElementsVisible: Int) = {
     this.maxElementsVisible = maxElementsVisible
-    if (isPopupVisible) showPopUp
+    refreshPopup
     this
   }
 
   def getNoItemsFoundText = noItemsFoundText
   def setNoItemsFoundText(noItemsFoundText: String) = {
     this.noItemsFoundText = noItemsFoundText
-    if (isPopupVisible) showPopUp
+    refreshPopup
     this
   }
 
-  def setPopupLocation: Unit = popup.setLocation(getLocationOnScreen.x, getLocationOnScreen.y + getHeight)
+  private def selectTextFromList: () => Unit = () => {
+    if (popup.isVisible && isListEnabled && -1 < autocompleteList.getSelectedIndex) setText(autocompleteList.getSelectedValue)
+    hidePopup()
+  }
 
-  def setPopupWidth = { popup.setSize(getWidth, popup.getHeight); popup.validate }
-}
+  private def hidePopup: () => Unit = () => {
+    autocompleteList.clearSelection
+    popup.setInvisible
+  }
 
-object AutocompletePopupWindow {
-  val NAME_LIST = "_autocompleteList"
-  val NAME_POPUP = "_autocompletePopup"
-}
-class AutocompletePopupWindow(owner: Window) extends JWindow(owner) {
-  setName(AutocompletePopupWindow.NAME_POPUP)
-  setLayout(new FormLayout("f:p:g", "f:p:g"))
-  setType(Type.POPUP)
+  private def selectNextInList = {
+    if (popup.isVisible) {
+      if (isListEnabled) autocompleteList.setSelectedIndex(autocompleteList.getSelectedIndex + 1)
+    }
+    else showPopUp
+  }
+
+  private def selectPreviousInList = {
+    if (isListEnabled)
+      autocompleteList.setSelectedIndex(if (autocompleteList.getSelectedIndex < 0) -1 else autocompleteList.getSelectedIndex - 1)
+  }
+
+  private def showPopUp = {
+    val oldSelectedIndex = if (autocompleteList.getSelectedIndex < 0) 0 else autocompleteList.getSelectedIndex
+    val oldValues = autocompleteList.getValues
+    val newValues = hints.findElementsToShow(getText).take(maxElementsVisible)
+
+    Log.debug("New list: " + newValues + ", old list: " + oldValues)
+
+    if (!newValues.equals(oldValues) || popup.isInvisible) {
+      if (newValues.isEmpty) {
+        autocompleteList.withValues(List(noItemsFoundText))
+        isListEnabled = false
+      }
+      else {
+        autocompleteList.withValues(newValues)
+        isListEnabled = true
+        autocompleteList.setSelectedIndex(oldSelectedIndex)
+      }
+      autocompleteList.setEnabled(isListEnabled)
+
+      popup.showPopup
+
+      setPopupWidth()
+      setPopupLocation()
+    }
+  }
+
+  private def refreshPopup = if (popup.isVisible) showPopUp
+
+  private def setPopupLocation: () => Unit = () => popup.setLocation(getLocationOnScreen.x, getLocationOnScreen.y + getHeight)
+
+  private def setPopupWidth: ()=>Unit = () => popup.setWidth(getWidth)
 }

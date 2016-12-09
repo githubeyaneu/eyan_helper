@@ -17,6 +17,8 @@ import javax.swing.event.DocumentListener
 import javax.swing.event.DocumentEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
 
 object AwtHelper {
 
@@ -37,6 +39,8 @@ object AwtHelper {
   def mouseReleased(action: () => Unit) = new MouseAdapter { override def mouseReleased(e: MouseEvent) = action() }
   
   def mousePressed(action: () => Unit) = new MouseAdapter { override def mousePressed(e: MouseEvent) = action() }
+  
+  def componentMoved(action: () => Unit) = new ComponentAdapter { override def componentMoved(e: ComponentEvent) = action() }
   
   def chooseFile(action: File => Unit, extension:String ="") = { 
     val fc = new JFileChooser
@@ -92,5 +96,4 @@ object AwtHelper {
     }
     Log.debug("new: " + newPos)
   }
-
 }

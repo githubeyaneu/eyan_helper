@@ -29,14 +29,24 @@ class JTextFieldPlus(cols: Int) extends JTextField(cols) {
     this
   }
 
-  def addComponentMovedListener(componentMovedEvent: ComponentEvent => Unit) = {
-    addComponentListener(new ComponentAdapter { override def componentMoved(e: ComponentEvent) = { componentMovedEvent(e) } })
+  def onFocusLost(action: () => Unit) = {
+		  addFocusListener(new FocusAdapter { override def focusLost(e: FocusEvent) = { action() } })
+		  this
+  }
+
+  def addComponentMovedListener(action: ComponentEvent => Unit) = {
+    addComponentListener(new ComponentAdapter { override def componentMoved(e: ComponentEvent) = { action(e) } })
     this
   }
 
-  def addComponentResizedListener(componentResizedEvent: ComponentEvent => Unit) = {
-    addComponentListener(new ComponentAdapter { override def componentResized(e: ComponentEvent) = { componentResizedEvent(e) } })
+  def addComponentResizedListener(action: ComponentEvent => Unit) = {
+    addComponentListener(new ComponentAdapter { override def componentResized(e: ComponentEvent) = { action(e) } })
     this
+  }
+
+  def onComponentResized(action: () => Unit) = {
+		  addComponentListener(new ComponentAdapter { override def componentResized(e: ComponentEvent) = { action() } })
+		  this
   }
   
   def clickSelectAll = {addMouseListener(AwtHelper.mouseClick { () => this.selectAll }); this}

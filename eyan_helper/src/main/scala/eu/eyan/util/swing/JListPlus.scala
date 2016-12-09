@@ -5,6 +5,7 @@ import javax.swing.ListModel
 import javax.swing.AbstractListModel
 import java.awt.event.MouseEvent
 import java.awt.event.MouseAdapter
+import javax.swing.border.Border
 
 class JListPlus[TYPE] extends JList[TYPE] {
 
@@ -22,7 +23,10 @@ class JListPlus[TYPE] extends JList[TYPE] {
     this
   }
 
-  def addDoubleClickListener(action: MouseEvent => Unit) =
-    addMouseListener(new MouseAdapter { override def mouseClicked(e: MouseEvent) = if (e.getClickCount() == 2) action(e) })
-
+  def onDoubleClick(action: () => Unit) = {
+    addMouseListener(new MouseAdapter { override def mouseClicked(e: MouseEvent) = if (e.getClickCount() == 2) action() })
+    this
+  }
+  
+  def withBorder(border: Border)= {setBorder(border); this}
 }
