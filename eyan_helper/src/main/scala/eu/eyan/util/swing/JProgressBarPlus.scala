@@ -1,15 +1,13 @@
 package eu.eyan.util.swing
 
-import SwingPlus._
-import eu.eyan.util.awt.AwtHelper
+import SwingPlus.invokeLater
 import javax.swing.JProgressBar
 
 class JProgressBarPlus(min: Int, max: Int, var format: String) extends JProgressBar(min, max) {
-	this.setNewValue(min)
+  this.setNewValue(min)
 
-	private var percentChangedConsumer = createPercentChangedConsumer
+  private var percentChangedConsumer = createPercentChangedConsumer
   private var finishedText = "Ready";
-
 
   def setNewValue(percent: Int) = {
     this.setString(String.format(format, percent: Integer))

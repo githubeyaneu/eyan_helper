@@ -1,15 +1,13 @@
 package eu.eyan.util.string
 
+import org.fest.assertions.Assertions.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.specs2.runner.JUnitRunner
-import org.fest.assertions.Assertions._
-import org.scalatest.junit.AssertionsForJUnit
 import org.scalatest.junit.JUnitSuite
-import eu.eyan.testutil.ScalaEclipseJunitRunner
+
 import StringsSearchTree.newTree
+import eu.eyan.testutil.ScalaEclipseJunitRunner
 import eu.eyan.util.random.RandomPlus
-import org.fest.assertions.Assertions
 
 @RunWith(classOf[ScalaEclipseJunitRunner])
 class StringsSearchTreeTest extends JUnitSuite {

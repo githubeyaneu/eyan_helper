@@ -3,6 +3,10 @@ package eu.eyan.util.swing
 import java.awt.Component
 import java.util.regex.Matcher
 
+import eu.eyan.util.swing.HighlightRenderer.HIGHLIGHT_END_TAG
+import eu.eyan.util.swing.HighlightRenderer.HIGHLIGHT_START_TAG
+import eu.eyan.util.swing.HighlightRenderer.HTML_END_TAG
+import eu.eyan.util.swing.HighlightRenderer.HTML_START_TAG
 import javax.swing.JTable
 import javax.swing.table.DefaultTableCellRenderer
 
@@ -14,7 +18,6 @@ object HighlightRenderer /*extends DefaultTableCellRenderer*/ {
 }
 
 class HighlightRenderer extends DefaultTableCellRenderer {
-  import eu.eyan.util.swing.HighlightRenderer._
 
   var textToHighlighWithoutSpecChars = ""
   var matcher: Matcher = null

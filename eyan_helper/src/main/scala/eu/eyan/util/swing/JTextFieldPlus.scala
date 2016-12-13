@@ -8,46 +8,48 @@ import java.awt.event.FocusAdapter
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import eu.eyan.util.awt.AwtHelper
+import javax.swing.text.JTextComponent
 
-class JTextFieldPlus(cols: Int) extends JTextField(cols) {
+object JTextFieldPlus {
+  implicit class JTextFieldPlusImplicit[A <: JTextComponent](val textField: A) {
+    def onFocusLost(action: () => Unit) = {
+      textField.addFocusListener(new FocusAdapter { override def focusLost(e: FocusEvent) = { action() } })
+      textField
+    }
 
-  def addKeyTypedListener(keyTypedAction: KeyEvent => Unit): JTextFieldPlus = {
-    addKeyListener(new KeyAdapter { override def keyTyped(e: KeyEvent) { keyTypedAction(e) } })
-    this
-  }
-  def addKeyReleasedListener(keyReleasedAction: KeyEvent => Unit): JTextFieldPlus = {
-    addKeyListener(new KeyAdapter { override def keyReleased(e: KeyEvent) { keyReleasedAction(e) } })
-    this
-  }
-  def addKeyPressedListener(keyPressedAction: KeyEvent => Unit): JTextFieldPlus = {
-    addKeyListener(new KeyAdapter { override def keyPressed(e: KeyEvent) { keyPressedAction(e) } })
-    this
-  }
+    def addComponentMovedListener(action: ComponentEvent => Unit) = {
+      textField.addComponentListener(new ComponentAdapter { override def componentMoved(e: ComponentEvent) = { action(e) } })
+      textField
+    }
 
-  def addFocusLostListener(action: FocusEvent => Unit) = {
-    addFocusListener(new FocusAdapter { override def focusLost(e: FocusEvent) = { action(e) } })
-    this
-  }
+    def addComponentResizedListener(action: ComponentEvent => Unit) = {
+      textField.addComponentListener(new ComponentAdapter { override def componentResized(e: ComponentEvent) = { action(e) } })
+      textField
+    }
 
-  def onFocusLost(action: () => Unit) = {
-		  addFocusListener(new FocusAdapter { override def focusLost(e: FocusEvent) = { action() } })
-		  this
-  }
+    def onComponentResized(action: () => Unit) = {
+      textField.addComponentListener(new ComponentAdapter { override def componentResized(e: ComponentEvent) = { action() } })
+      textField
+    }
 
-  def addComponentMovedListener(action: ComponentEvent => Unit) = {
-    addComponentListener(new ComponentAdapter { override def componentMoved(e: ComponentEvent) = { action(e) } })
-    this
-  }
+    def addKeyTypedListener(keyTypedAction: KeyEvent => Unit) = {
+      textField.addKeyListener(new KeyAdapter { override def keyTyped(e: KeyEvent) { keyTypedAction(e) } })
+      textField
+    }
+    def addKeyReleasedListener(keyReleasedAction: KeyEvent => Unit) = {
+      textField.addKeyListener(new KeyAdapter { override def keyReleased(e: KeyEvent) { keyReleasedAction(e) } })
+      textField
+    }
+    def addKeyPressedListener(keyPressedAction: KeyEvent => Unit) = {
+      textField.addKeyListener(new KeyAdapter { override def keyPressed(e: KeyEvent) { keyPressedAction(e) } })
+      textField
+    }
 
-  def addComponentResizedListener(action: ComponentEvent => Unit) = {
-    addComponentListener(new ComponentAdapter { override def componentResized(e: ComponentEvent) = { action(e) } })
-    this
-  }
+    def addFocusLostListener(action: FocusEvent => Unit) = {
+      textField.addFocusListener(new FocusAdapter { override def focusLost(e: FocusEvent) = { action(e) } })
+      textField
+    }
 
-  def onComponentResized(action: () => Unit) = {
-		  addComponentListener(new ComponentAdapter { override def componentResized(e: ComponentEvent) = { action() } })
-		  this
+    def clickSelectAll = { textField.addMouseListener(AwtHelper.mouseClick { () => textField.selectAll }); textField }
   }
-  
-  def clickSelectAll = {addMouseListener(AwtHelper.mouseClick { () => this.selectAll }); this}
 }

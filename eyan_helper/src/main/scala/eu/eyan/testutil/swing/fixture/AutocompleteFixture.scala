@@ -6,13 +6,13 @@ import org.fest.swing.core.KeyPressInfo
 import org.fest.swing.exception.ComponentLookupException
 import org.fest.swing.fixture.JTextComponentFixture
 import org.fest.swing.fixture.WindowFixture
-import eu.eyan.util.swing.Autocomplete
+import eu.eyan.util.swing.JTextFieldAutocomplete
 import eu.eyan.util.swing.PopupWindow
 
 class AutocompleteFixture(frameFixture: WindowFixture[_], componentName: String) extends JTextComponentFixture(frameFixture.robot, componentName) {
-  private def autocompleteComponent = frameFixture.textBox(componentName).target.asInstanceOf[Autocomplete]
+  private def autocompleteComponent = frameFixture.textBox(componentName).target.asInstanceOf[JTextFieldAutocomplete]
   def popup = new JWindowFixture(frameFixture, PopupWindow.NAME_POPUP)
-  def list = popup.list(Autocomplete.NAME_LIST)
+  def list = popup.list(JTextFieldAutocomplete.NAME_LIST)
 
   def requirePopupNotVisible = {
     try { new JWindowFixture(frameFixture, PopupWindow.NAME_POPUP).requireNotVisible() }
@@ -28,7 +28,7 @@ class AutocompleteFixture(frameFixture: WindowFixture[_], componentName: String)
   def setNoItemsFoundText(noItemsFoundText: String) = autocompleteComponent.setNoItemsFoundText(noItemsFoundText)
 
   def requireItems(expectedItems: String*) = Assertions.assertThat(list.contents().toList).isEqualTo(expectedItems.toList)
-  def noItemsFoundText = target.asInstanceOf[Autocomplete].getNoItemsFoundText
+  def noItemsFoundText = target.asInstanceOf[JTextFieldAutocomplete].getNoItemsFoundText
 
   def pressUp = pressAndReleaseKey(KeyPressInfo.keyCode(KeyEvent.VK_UP))
   def pressDown = pressAndReleaseKey(KeyPressInfo.keyCode(KeyEvent.VK_DOWN))

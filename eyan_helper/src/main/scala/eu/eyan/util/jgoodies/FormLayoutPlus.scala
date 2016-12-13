@@ -12,21 +12,21 @@ import com.jgoodies.forms.factories.CC
 object FormLayoutPlus {
   def apply(container: Container, colSpec:String ) = {
     val ret = new FormLayoutPlus(container, colSpec)
-		container.setLayout(ret)
+    container.setLayout(ret)
     ret
   }
 
   def apply(container: Container, colSpec:String ,rowSpec:String , component:Component ) = {
-	  val ret = new FormLayoutPlus(container, colSpec)
-		container.setLayout(ret)
-		ret.appendRow(rowSpec, component)
-	  ret
+    val ret = new FormLayoutPlus(container, colSpec)
+    container.setLayout(ret)
+    ret.appendRow(rowSpec, component)
+    ret
   }
 }
 
 class FormLayoutPlus private (container: Container, colSpec:String) extends LayoutManager2 {
   val formLayout = new FormLayout(colSpec)
-	private var rows = 0
+  private var rows = 0
   
   override def hashCode() = formLayout.hashCode()
 
@@ -35,21 +35,21 @@ class FormLayoutPlus private (container: Container, colSpec:String) extends Layo
   override def toString() = formLayout.toString()
 
   def getComponent() =container 
-	
+  
   def appendRow(rowSpecs:String*):Int = {
-		for (rowSpec <- rowSpecs) { appendRow(RowSpec.decode(rowSpec)); rows += 1 }
-		rows
-	}
+    for (rowSpec <- rowSpecs) { appendRow(RowSpec.decode(rowSpec)); rows += 1 }
+    rows
+  }
   
   def appendRow(rowSpec: String , component:Component ):FormLayoutPlus = {
-		appendRow(RowSpec.decode(rowSpec))
-		rows += 1
-		if (component != null) container.add(component, CC.xy(1, rows)) 
-		this
-	}
+    appendRow(RowSpec.decode(rowSpec))
+    rows += 1
+    if (component != null) container.add(component, CC.xy(1, rows)) 
+    this
+  }
   
   def appendRow(rowSpec:String,  formLayout:FormLayoutPlus):FormLayoutPlus = appendRow(rowSpec, formLayout.getComponent())
-	 
+   
   
   /* DELEGATES */
   def getColumnCount() = formLayout.getColumnCount()

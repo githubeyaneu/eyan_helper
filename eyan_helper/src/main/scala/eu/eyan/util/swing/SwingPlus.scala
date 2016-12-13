@@ -65,7 +65,7 @@ object SwingPlus {
   def textField(columns: Int, actionListener: JTextField => Unit) = newTextFieldWithAction(columns, (tf, e) => actionListener(tf))
 
   def newTextFieldWithAction(columns: Int, actionListener: (JTextField, ActionEvent) => Unit) = {
-    val tf = new JTextFieldPlus(columns)
+    val tf = new JTextField(columns)
     tf.addActionListener(AwtHelper.newActionListener(e => actionListener(tf, e)))
     tf
   }

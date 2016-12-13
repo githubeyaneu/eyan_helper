@@ -85,7 +85,8 @@ class CachedFileLineReader extends Iterable[String] {
         longestLine = get(longestLineIndex);
         // if (fileLength != endIndex) //special characters brake the offsets
         //   println("Length: " + fileLength + " endOffset:" + endIndex + "\r\n" + "Error at loading file. There are newline problems! ")
-      } catch {
+      }
+      catch {
         case e: IOException => e.printStackTrace()
       }
     }
@@ -99,7 +100,8 @@ class CachedFileLineReader extends Iterable[String] {
       lineCache.clear
       longestLine = ""
       fileLength = 0
-    } catch {
+    }
+    catch {
       case e: IOException => e.printStackTrace()
     }
   }
@@ -111,7 +113,12 @@ class CachedFileLineReader extends Iterable[String] {
   def iterator = new Iterator[String] {
     private var index = 0
     def hasNext = lineOffsets.synchronized { index < lineOffsets.size }
-    def next = { if (lineOffsets.size != 0) Log.debug("Line " + (index + 1) + " " + (100 * (index + 1) / lineOffsets.size) + "%"); val line = get(index); index += 1; line }
+    def next = {
+      if (lineOffsets.size != 0) Log.debug("Line " + (index + 1) + " " + (100 * (index + 1) / lineOffsets.size) + "%")
+      val line = get(index) 
+      index += 1 
+      line
+    }
   }
 
   def findFirst(pattern: String) = {
@@ -123,6 +130,7 @@ class CachedFileLineReader extends Iterable[String] {
       val m = Pattern.compile(pattern).matcher(first.get.replaceAll("\r\n", ""))
       m.matches
       m
-    } else null
+    }
+    else null
   }
 }

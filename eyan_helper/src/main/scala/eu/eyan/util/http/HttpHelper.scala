@@ -33,8 +33,8 @@ object HttpHelper {
       ret.append(inputLine + "\r\n");
       inputLine = bufferedReader.readLine()
     }
-    bufferedReader.close();
+    bufferedReader.close()
 
-    return ret.toString();
+    ret.toString()
   }
 }

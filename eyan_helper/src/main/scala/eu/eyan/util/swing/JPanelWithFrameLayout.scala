@@ -1,19 +1,19 @@
 package eu.eyan.util.swing
 
-import javax.swing.JPanel
-import com.jgoodies.forms.layout.FormLayout
-import com.jgoodies.forms.factories.CC
-import com.jgoodies.forms.layout.ColumnSpec
-import com.jgoodies.forms.layout.RowSpec
-import javax.swing.JTextField
-import javax.swing.JLabel
 import java.awt.Component
 import java.awt.event.ActionEvent
-import eu.eyan.util.awt.AwtHelper._
-import javax.swing.JTextArea
-import javax.swing.JScrollPane
-import java.awt.Dimension
+
+import com.jgoodies.forms.factories.CC
+import com.jgoodies.forms.layout.ColumnSpec
+import com.jgoodies.forms.layout.FormLayout
+import com.jgoodies.forms.layout.RowSpec
+
 import eu.eyan.util.awt.AwtHelper
+import eu.eyan.util.awt.AwtHelper.newActionListener
+import javax.swing.JLabel
+import javax.swing.JPanel
+import javax.swing.JScrollPane
+import javax.swing.JTextField
 
 object JPanelWithFrameLayout {
   def apply(firstRowSpec: String = "p", firstColumnSpec: String = "p") = {

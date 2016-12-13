@@ -91,11 +91,11 @@ class CachedFileLinesReaderTest() {
 
   @Test
   def test_Size_1Line_load_twice = {
-	  writeFileLines(1, false)
-	  cflr.load(file, null)
-	  cflr.load(file, null)
-	  assertThat(cflr.size).isEqualTo(1)
-	  assertThat(cflr.get(0)).isEqualTo("line1\r\n")
+    writeFileLines(1, false)
+    cflr.load(file, null)
+    cflr.load(file, null)
+    assertThat(cflr.size).isEqualTo(1)
+    assertThat(cflr.get(0)).isEqualTo("line1\r\n")
   }
 
   @Test

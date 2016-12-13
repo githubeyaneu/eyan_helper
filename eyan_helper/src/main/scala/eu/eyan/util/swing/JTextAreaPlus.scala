@@ -11,13 +11,13 @@ class JTextAreaPlus extends JTextArea {
   }
 
   def dontScroll() = {
-	  this.getCaret().asInstanceOf[DefaultCaret].setUpdatePolicy(DefaultCaret.NEVER_UPDATE)
-	  this
+    this.getCaret().asInstanceOf[DefaultCaret].setUpdatePolicy(DefaultCaret.NEVER_UPDATE)
+    this
   }
-  
-  def appendText(text:String) = { this.append(text); this }
-  
-  def clickSelectsAll = { this.addMouseListener(AwtHelper.mouseClick { () => {this.selectAll} }); this }
-  
+
+  def appendText(text: String) = { this.append(text); this }
+
+  def clickSelectsAll = { this.addMouseListener(AwtHelper.mouseClick { () => { this.selectAll } }); this }
+
   def lines = this.getText.lines
 }

@@ -1,13 +1,14 @@
 package eu.eyan.util.string
 
 import java.io.File
-import eu.eyan.util.io.CachedFileLineReader
 import java.text.NumberFormat
-import eu.eyan.util.memory.Memory._
-import eu.eyan.util.time.Timer._
-import scala.collection.JavaConverters._
-import eu.eyan.log.Log
-import eu.eyan.util.awt.AwtHelper
+
+import scala.collection.TraversableOnce.flattenTraversableOnce
+
+import eu.eyan.util.io.CachedFileLineReader
+import eu.eyan.util.memory.Memory.printmem
+import eu.eyan.util.time.Timer.timerElapsed
+import eu.eyan.util.time.Timer.timerStart
 
 object FileIndex {
   def main(args: Array[String]): Unit = {

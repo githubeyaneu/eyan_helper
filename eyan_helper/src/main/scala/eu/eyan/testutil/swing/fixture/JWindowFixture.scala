@@ -23,7 +23,8 @@ class JWindowFixture(frame: WindowFixture[_], name: String) /*extends WindowFixt
   val driver = new FrameDriver(frame.robot)
   val robot = frame.robot
 
-  def findByName[C <: Component](name: String, t: Class[C]): C = robot.finder().findByName(target, name, t, robot.settings().componentLookupScope().requireShowing())
+  def findByName[C <: Component](name: String, t: Class[C]): C = 
+    robot.finder().findByName(target, name, t, robot.settings().componentLookupScope().requireShowing())
 
   def list(name: String): JListFixture = new JListFixture(robot, findByName(name, classOf[JList[_]]))
 
@@ -147,13 +148,11 @@ class JWindowFixture(frame: WindowFixture[_], name: String) /*extends WindowFixt
   }
 
   def showPopupMenu(): JPopupMenuFixture = {
-    return new JPopupMenuFixture(robot, driver.invokePopupMenu(target))
-    return null;
+    new JPopupMenuFixture(robot, driver.invokePopupMenu(target))
   }
 
   def showPopupMenuAt(p: Point): JPopupMenuFixture = {
-    return new JPopupMenuFixture(robot, driver.invokePopupMenu(target, p))
-    return null;
+    new JPopupMenuFixture(robot, driver.invokePopupMenu(target, p))
   }
 
   protected def show(): JWindowFixture = {

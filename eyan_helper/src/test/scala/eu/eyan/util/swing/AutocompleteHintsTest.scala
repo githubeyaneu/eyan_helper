@@ -7,8 +7,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 import eu.eyan.testutil.ScalaEclipseJunitRunner
-import org.fest.assertions.Assertions._
-import eu.eyan.util.random.RandomPlus
 
 @RunWith(classOf[ScalaEclipseJunitRunner])
 class AutocompleteHintsTest {

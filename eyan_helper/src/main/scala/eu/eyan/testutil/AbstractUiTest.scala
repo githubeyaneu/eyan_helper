@@ -18,7 +18,7 @@ import org.fest.swing.fixture.ComponentFixture
 import org.junit.After
 
 object AbstractUiTest {
-	@BeforeClass def setUpClass() = EmergencyAbortListener.registerInToolkit()
+  @BeforeClass def setUpClass() = EmergencyAbortListener.registerInToolkit()
 }
 
 /**

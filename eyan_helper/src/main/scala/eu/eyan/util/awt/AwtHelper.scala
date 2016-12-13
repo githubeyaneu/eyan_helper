@@ -50,8 +50,8 @@ object AwtHelper {
   
   def docListener(action: () => Unit) = new DocumentListener() { 
     override def insertUpdate(e: DocumentEvent) = action()
-		override def removeUpdate(e: DocumentEvent) = {}
-		override def changedUpdate(e: DocumentEvent) = action()
+    override def removeUpdate(e: DocumentEvent) = {}
+    override def changedUpdate(e: DocumentEvent) = action()
   }
 
   def positionToCenter[A<:Component](component: A):A  = {

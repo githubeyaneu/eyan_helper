@@ -1,8 +1,10 @@
 package eu.eyan.util.swing
 
-import javax.swing.JButton
 import java.awt.event.ActionEvent
-import eu.eyan.util.awt.AwtHelper._
+
+import eu.eyan.util.awt.AwtHelper.newActionListener
+import eu.eyan.util.awt.AwtHelper.runInWorker
+import javax.swing.JButton
 
 class JButtonPlus(text:String) extends JButton(text) {
   def addAction(action: ActionEvent => Unit) = {

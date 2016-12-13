@@ -1,10 +1,12 @@
 package eu.eyan.util.string
 
-import java.text.Normalizer
-import java.io.FileWriter
 import java.io.BufferedWriter
 import java.io.File
-import scala.sys.process._
+import java.io.FileWriter
+import java.text.Normalizer
+
+import scala.sys.process.stringToProcess
+
 import eu.eyan.util.io.FilePlus.FilePlus
 
 object StringPlus {

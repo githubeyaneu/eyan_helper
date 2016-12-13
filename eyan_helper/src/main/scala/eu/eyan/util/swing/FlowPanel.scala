@@ -5,9 +5,9 @@ import java.awt.LayoutManager
 import java.awt.Component
 
 class FlowPanel(layout:LayoutManager) extends JPanel(layout){
-	def withComp(comp: Component):FlowPanel = {
-		this.add(comp)
-		this.revalidate()
-		this
-	}
+  def withComp(comp: Component):FlowPanel = {
+    this.add(comp)
+    this.revalidate()
+    this
+  }
 }

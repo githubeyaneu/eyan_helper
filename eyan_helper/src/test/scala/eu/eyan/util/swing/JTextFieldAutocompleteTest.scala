@@ -1,52 +1,41 @@
 package eu.eyan.util.swing
 
+import java.awt.Dimension
+import java.awt.Point
 import java.awt.event.KeyEvent
 
-import org.fest.assertions.Assertions._
-import org.fest.swing.core.Robot
-import org.fest.swing.exception.ComponentLookupException
-import org.fest.swing.fixture.ComponentFixture
+import org.fest.assertions.Assertions.assertThat
+import org.fest.swing.core.KeyPressInfo
 import org.fest.swing.fixture.FrameFixture
-import org.fest.swing.fixture.JTextComponentFixture
-import org.fest.swing.fixture.WindowFixture
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 
 import com.jgoodies.forms.factories.CC
 import com.jgoodies.forms.layout.FormLayout
 
 import eu.eyan.testutil.AbstractUiTest
+import eu.eyan.testutil.swing.fixture.AutocompleteFixture
 import eu.eyan.testutil.video.VideoRunner
-import eu.eyan.testutil.swing.fixture.JWindowFixture
+import eu.eyan.util.random.RandomPlus
 import javax.swing.JFrame
 import javax.swing.JPanel
 import javax.swing.JTextField
-import org.fest.swing.core.KeyPressInfo
-import org.fest.swing.timing.Pause
-import eu.eyan.testutil.swing.fixture.AutocompleteFixture
-import javax.swing.JWindow
 import javax.swing.WindowConstants
-import eu.eyan.log.Log
-import scala.util.Random
-import eu.eyan.testutil.TestPlus
-import eu.eyan.util.random.RandomPlus
-import java.awt.Point
-import java.awt.Dimension
 
-class AutocompleteTest extends AbstractUiTest {
+class JTextFieldAutocompleteTest extends AbstractUiTest {
 
   var autocomplete: AutocompleteFixture = null
 
   @Before def setUp = {
-    AutocompleteTest.main(Array())
-    frame = new FrameFixture(AutocompleteTest.NAME_FRAME)
+    JTextFieldAutocompleteTest.main(Array())
+    frame = new FrameFixture(JTextFieldAutocompleteTest.NAME_FRAME)
     frame.target.toFront()
     VideoRunner.setComponentToRecord(frame.target)
 
-    autocomplete = new AutocompleteFixture(frame, AutocompleteTest.NAME_AUTOCOMPLETE)
-    componentBefore = frame.textBox(AutocompleteTest.NAME_BEFORE)
-    componentAfter = frame.textBox(AutocompleteTest.NAME_AFTER)
+    autocomplete = new AutocompleteFixture(frame, JTextFieldAutocompleteTest.NAME_AUTOCOMPLETE)
+    componentBefore = frame.textBox(JTextFieldAutocompleteTest.NAME_BEFORE)
+    componentAfter = frame.textBox(JTextFieldAutocompleteTest.NAME_AFTER)
   }
 
   @Test
@@ -56,7 +45,7 @@ class AutocompleteTest extends AbstractUiTest {
 
   @Test
   def hint_text_if_empty = {
-    val ac = new Autocomplete
+    val ac = new JTextFieldAutocomplete
     val ac2 = ac.setHintText("default")
     assertThat(ac.getHintText).isEqualTo("default")
     assertThat(ac2).isSameAs(ac)
@@ -85,7 +74,7 @@ class AutocompleteTest extends AbstractUiTest {
   }
 
   @Test
-  def popup_comes_with_all_elements = { ///
+  def popup_comes_with_all_elements = { 
     autocomplete.setAutocompleteList("a", "b", "aa", "bb")
     autocomplete.enterText("a")
     autocomplete.popup.requireVisible
@@ -408,7 +397,7 @@ class AutocompleteTest extends AbstractUiTest {
   // ...scrollbarral
 }
 
-object AutocompleteTest {
+object JTextFieldAutocompleteTest {
   val NAME_FRAME = "AutocompleteTest"
   val NAME_AUTOCOMPLETE = "AutocompleteComponent"
   val NAME_BEFORE = "AutocompleteTestComponentBefore"
@@ -425,7 +414,7 @@ object AutocompleteTest {
     panel.add(before, CC.xy(1, 1))
     before.setName(NAME_BEFORE)
 
-    val ac = new Autocomplete
+    val ac = new JTextFieldAutocomplete
     ac.setHintText("default")
     ac.setName(NAME_AUTOCOMPLETE)
     //    ac.setValues(List("a", "ba", "", "ca", "da", null, "ea", "", "aa"))

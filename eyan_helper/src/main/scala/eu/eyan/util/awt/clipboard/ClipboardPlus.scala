@@ -12,11 +12,11 @@ import java.io.PrintWriter
 object ClipboardPlus {
   def getTextFromClipboard(): String = {
     try {
-      return Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor).asInstanceOf[String]
+      Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor).asInstanceOf[String]
     } catch {
       case e: Exception => e.printStackTrace()
+      ""
     }
-    ""
   }
 
   def copyToClipboard(text: String): Unit = Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(text), null)

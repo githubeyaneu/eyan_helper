@@ -1,14 +1,10 @@
 package eu.eyan.testutil.video
 
-import org.junit.runner.RunWith
-import org.junit.Test
 import org.junit.Before
-import javax.swing.JFrame
-import javax.swing.JLabel
 import org.junit.Rule
-import sun.security.util.PropertyExpander.ExpandException
+import org.junit.Test
 import org.junit.rules.ExpectedException
-import java.util.regex.Pattern
+import org.junit.runner.RunWith
 import org.mockito.internal.matchers.Contains
 
 @RunWith(classOf[VideoRunner])

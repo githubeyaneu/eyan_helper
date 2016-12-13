@@ -9,8 +9,13 @@ object Memory {
     val maxMemory = runtime.maxMemory()
     val allocatedMemory = runtime.totalMemory()
     val freeMemory = runtime.freeMemory()
-    def f(amount:Long)= format.format(amount / 1024 / 1024) + " MB"
-    println("free: " + f(freeMemory)+", allocated: " + f(allocatedMemory)+ ", max: " + f(maxMemory)+ ", total free: " + f(freeMemory + maxMemory - allocatedMemory))
+    def f(amount: Long) = format.format(amount / 1024 / 1024) + " MB"
+    println(
+      "free: " + f(freeMemory)
+        + ", allocated: " + f(allocatedMemory)
+        + ", max: " + f(maxMemory)
+        + ", total free: "
+        + f(freeMemory + maxMemory - allocatedMemory))
     println
   }
 }
