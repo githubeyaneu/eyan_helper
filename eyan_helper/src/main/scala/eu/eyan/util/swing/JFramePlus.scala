@@ -12,7 +12,7 @@ class JFramePlus(title: String, component: Component) extends JFrame {
   setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)
   setLayout(new FormLayout("fill:pref:grow", "fill:pref:grow"))
   add(component, CC.xy(1, 1))
-  
-  def packAndSetVisible = {pack; setVisible(true); this}
+
+  def packAndSetVisible = { pack; setVisible(true); this }
   def positionToCenter = AwtHelper.positionToCenter(this)
 }

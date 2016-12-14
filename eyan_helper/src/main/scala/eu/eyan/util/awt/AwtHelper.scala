@@ -21,6 +21,8 @@ import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 
 object AwtHelper {
+  val DESKTOP_LEFT = 0
+  val DESKTOP_TOP = 0
 
   def newActionListener(action: ActionEvent => Unit) = new ActionListener() { override def actionPerformed(e: ActionEvent) = action(e) }
 
@@ -30,31 +32,31 @@ object AwtHelper {
 
   def newWindowClosingEvent(action: WindowEvent => Unit) = new WindowAdapter() { override def windowClosing(e: WindowEvent) = action(e) }
 
-  def mouseClick(action: () => Unit) = new MouseAdapter { override def mouseClicked(e: MouseEvent) = if(e.getClickCount==1)  action() }
+  def mouseClick(action: () => Unit) = new MouseAdapter { override def mouseClicked(e: MouseEvent) = if (e.getClickCount == 1) action() }
 
-  def doubleClick(action: () => Unit) = new MouseAdapter { override def mouseClicked(e: MouseEvent) = if(e.getClickCount==2)  action() }
+  def doubleClick(action: () => Unit) = new MouseAdapter { override def mouseClicked(e: MouseEvent) = if (e.getClickCount == 2) action() }
 
-  def tripleClick(action: () => Unit) = new MouseAdapter { override def mouseClicked(e: MouseEvent) = if(e.getClickCount==3)  action() }
+  def tripleClick(action: () => Unit) = new MouseAdapter { override def mouseClicked(e: MouseEvent) = if (e.getClickCount == 3) action() }
 
   def mouseReleased(action: () => Unit) = new MouseAdapter { override def mouseReleased(e: MouseEvent) = action() }
-  
+
   def mousePressed(action: () => Unit) = new MouseAdapter { override def mousePressed(e: MouseEvent) = action() }
-  
+
   def componentMoved(action: () => Unit) = new ComponentAdapter { override def componentMoved(e: ComponentEvent) = action() }
-  
-  def chooseFile(action: File => Unit, extension:String ="") = { 
+
+  def chooseFile(action: File => Unit, extension: String = "") = {
     val fc = new JFileChooser
-    if(!extension.isEmpty) fc.setFileFilter(new FileNameExtensionFilter(extension + " files", extension))
-    if(fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) action(fc.getSelectedFile) 
+    if (!extension.isEmpty) fc.setFileFilter(new FileNameExtensionFilter(extension + " files", extension))
+    if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) action(fc.getSelectedFile)
   }
-  
-  def docListener(action: () => Unit) = new DocumentListener() { 
+
+  def docListener(action: () => Unit) = new DocumentListener() {
     override def insertUpdate(e: DocumentEvent) = action()
     override def removeUpdate(e: DocumentEvent) = {}
     override def changedUpdate(e: DocumentEvent) = action()
   }
 
-  def positionToCenter[A<:Component](component: A):A  = {
+  def positionToCenter[A <: Component](component: A): A = {
     val screenSize = Toolkit.getDefaultToolkit().getScreenSize()
     val width = component.getSize().width
     val height = component.getSize().height
@@ -66,13 +68,13 @@ object AwtHelper {
   def positionToLeft(component: Component) = {
     val screenSize = Toolkit.getDefaultToolkit().getScreenSize()
     component.setSize(screenSize.width / 2, screenSize.height - 30)
-    component.setLocation(0, 0)
+    component.setLocation(DESKTOP_LEFT, DESKTOP_TOP)
   }
 
   def positionToRight(component: Component) = {
     val screenSize = Toolkit.getDefaultToolkit().getScreenSize()
     component.setSize(screenSize.width / 2, screenSize.height - 30)
-    component.setLocation(screenSize.width / 2, 0)
+    component.setLocation(screenSize.width / 2, DESKTOP_TOP)
   }
 
   def runInWorker(work: () => Unit, doAtDone: () => Unit) = {

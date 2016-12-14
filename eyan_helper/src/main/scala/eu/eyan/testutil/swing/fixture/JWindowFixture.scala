@@ -17,13 +17,13 @@ import javax.swing.JList
 import org.fest.swing.fixture.WindowFixture
 import org.fest.assertions.Assertions
 
-class JWindowFixture(frame: WindowFixture[_], name: String) /*extends WindowFixture[JWindow](frame.robot.finder().findByType(classOf[JWindow]))*/ {
+class JWindowFixture(frame: WindowFixture[_], name: String) /* extends WindowFixture[JWindow](frame.robot.finder().findByType(classOf[JWindow])) */ {
 
   val target = frame.robot.finder().findByName(name, classOf[JWindow])
   val driver = new FrameDriver(frame.robot)
   val robot = frame.robot
 
-  def findByName[C <: Component](name: String, t: Class[C]): C = 
+  def findByName[C <: Component](name: String, t: Class[C]): C =
     robot.finder().findByName(target, name, t, robot.settings().componentLookupScope().requireShowing())
 
   def list(name: String): JListFixture = new JListFixture(robot, findByName(name, classOf[JList[_]]))

@@ -1,8 +1,11 @@
 package eu.eyan.util.swing
 
-import scala.collection.mutable.MutableList
 import java.text.Normalizer
+
 import eu.eyan.util.awt.AwtHelper.newRunnable
+import eu.eyan.util.string.StringPlus.s1_containsSearch_s2_doesNot
+import eu.eyan.util.string.StringPlus.s1_startsWithSearch_s2_doesNot
+import eu.eyan.util.string.StringPlus.s2_startsWithSearch_s1_doesNot
 
 class AutocompleteHints {
   val reg = "[\\p{InCombiningDiacriticalMarks}]".r
@@ -12,48 +15,40 @@ class AutocompleteHints {
   def getAutocompleteValues = autocompleteValues.toList
   def setAutocompleteValues(values: List[String]) = {
     autocompleteValues = values.filter { _ != null }
-    new Thread(newRunnable { () => values.foreach { getNormalized(_) } }).start()
+    new Thread(newRunnable { () => values.foreach { _.normalized } }).start()
   }
 
-  def getNormalized(text: String) = {
-    def normalize(text: String) = reg.replaceAllIn(Normalizer.normalize(text, Normalizer.Form.NFD), "").replaceAll("ß", "s").toLowerCase
+  implicit class AutocompleteHintsStringPlus(val s: String) {
+    def normalized = {
+      def normalize(text: String) = reg.replaceAllIn(Normalizer.normalize(text, Normalizer.Form.NFD), "").replaceAll("ß", "s").toLowerCase
 
-    if (text == null) null
-    else {
-      normalizedautocompleteValues.synchronized {
-        if (!normalizedautocompleteValues.containsKey(text)) {
-          normalizedautocompleteValues.put(text, normalize(text))
-        }
-        normalizedautocompleteValues.get(text)
+      if (s == null) null
+      else normalizedautocompleteValues.synchronized {
+        if (!normalizedautocompleteValues.containsKey(s)) normalizedautocompleteValues.put(s, normalize(s))
+        normalizedautocompleteValues.get(s)
       }
     }
   }
 
   def sortAlgo(searchString: String) = (s1: String, s2: String) => {
-    val l1 = s1.toLowerCase
-    val l2 = s2.toLowerCase
-    val lsearch = searchString.toLowerCase
-    val s1Starts = l1.startsWith(lsearch)
-    val s2Starts = l2.startsWith(lsearch)
-    val s1Contains = l1.contains(lsearch)
-    val s2Contains = l2.contains(lsearch)
-    val s1NormalizedStarts = getNormalized(l1).startsWith(getNormalized(lsearch))
-    val s2NormalizedStarts = getNormalized(l2).startsWith(getNormalized(lsearch))
 
-    if (s1Starts && !s2Starts) true
-    else if (s2Starts && !s1Starts) false
-    else if (s1NormalizedStarts && !s2NormalizedStarts) true
-    else if (s2NormalizedStarts && !s1NormalizedStarts) false
-    else if (s1Contains && !s2Contains) true
-    else false
+    val search_lc = searchString.toLowerCase
+    lazy val s1_lc = s1.toLowerCase
+    lazy val s2_lc = s2.toLowerCase
+
+    if (s1_startsWithSearch_s2_doesNot(s1_lc, s2_lc, search_lc)) true
+    else if (s2_startsWithSearch_s1_doesNot(s1_lc, s2_lc, search_lc)) false
+    else if (s1_startsWithSearch_s2_doesNot(s1_lc.normalized, s2_lc.normalized, search_lc.normalized)) true
+    else if (s2_startsWithSearch_s1_doesNot(s1_lc.normalized, s2_lc.normalized, search_lc.normalized)) false
+    else (s1_containsSearch_s2_doesNot(s1_lc, s2_lc, search_lc))
   }
 
   def findElementsToShow(searchString: String) = {
-    val searchNormalized = getNormalized(searchString)
+    val searchNormalized = searchString.normalized
     autocompleteValues
       .filter("".ne(_))
       .distinct
-      .filter(getNormalized(_).contains(searchNormalized))
+      .filter(_.normalized.contains(searchNormalized))
       .sortWith(sortAlgo(searchString))
   }
 }

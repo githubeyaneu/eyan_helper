@@ -18,12 +18,13 @@ import javax.swing.JTextField
 
 object JTextFieldAutocomplete {
   val NAME_LIST = "_autocompleteList"
+  val TEXTFIELD_DEFAULT_SIZE = 15
 }
 /**
  * Autocomplete function to a TextField based on strings.
  * It also supports a hint text function that is shown if no text is in the textfield
  */
-class JTextFieldAutocomplete extends JTextField(10) {
+class JTextFieldAutocomplete extends JTextField(JTextFieldAutocomplete.TEXTFIELD_DEFAULT_SIZE) {
   val autocomplete = AutocompleteDecorator.decorate(this)
 
   def setHintText(hintText: String) = { autocomplete.hintTextUI.hint = hintText; repaint(); this }

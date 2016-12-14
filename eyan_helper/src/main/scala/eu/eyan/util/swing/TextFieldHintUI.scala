@@ -17,7 +17,8 @@ class HintTextFieldUI extends BasicTextFieldUI {
     if (hint != null && comp.getText.length == 0) {
       g.setColor(comp.getForeground.brighter.brighter.brighter)
       val padding = (comp.getHeight - comp.getFont.getSize) / 2
-      g.drawString(hint, 2, comp.getHeight - padding - 1)
+      val hint_x_coord = 2
+      g.drawString(hint, hint_x_coord, comp.getHeight - padding - 1)
     }
   }
 }

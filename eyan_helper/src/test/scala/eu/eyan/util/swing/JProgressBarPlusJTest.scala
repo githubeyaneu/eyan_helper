@@ -12,7 +12,7 @@ import eu.eyan.testutil.TestPlus.waitFor
 class JProgressBarPlusJTest() {
 
   @Before
-  def setUp {}
+  def setUp = {}
 
   @Test
   def test_JProgressBarPlus = {

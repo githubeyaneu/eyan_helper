@@ -27,6 +27,6 @@ class JListPlus[TYPE] extends JList[TYPE] {
     addMouseListener(new MouseAdapter { override def mouseClicked(e: MouseEvent) = if (e.getClickCount() == 2) action() })
     this
   }
-  
-  def withBorder(border: Border)= {setBorder(border); this}
+
+  def withBorder(border: Border) = { setBorder(border); this }
 }

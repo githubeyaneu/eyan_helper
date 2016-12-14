@@ -25,7 +25,7 @@ class DnD_FileDropTarget(action: File=>Unit) extends DropTarget {
           action(file);
         }
       } catch {
-        case ex: Exception => //ex.printStackTrace();
+        case ex: Exception => // ex.printStackTrace();
       }
     }
   }

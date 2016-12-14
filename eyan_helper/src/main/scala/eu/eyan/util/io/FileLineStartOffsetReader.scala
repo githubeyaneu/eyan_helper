@@ -14,9 +14,9 @@ import eu.eyan.util.collection.MapsPlus
 class CachedFileLineReader extends Iterable[String] {
 
   private val LINE_COUNT_EARLY_READ = 100
-  //FIXME dont use java
+  // FIXME dont use java
   protected var lineOffsets: java.util.List[Array[Long]] = new java.util.ArrayList()
-  //FIXME dont use java
+  // FIXME dont use java
   protected val lineCache: java.util.Map[Int, String] = MapsPlus.newMaxSizeHashMap(Runtime.getRuntime().availableProcessors() * LINE_COUNT_EARLY_READ)
 
   private var fileChannel: FileChannel = null
@@ -37,7 +37,7 @@ class CachedFileLineReader extends Iterable[String] {
     val line = lineCache.get(index)
     if (line == null) {
       try lineOffsets.synchronized {
-        for (i <- index until index + LINE_COUNT_EARLY_READ if i < lineOffsets.size) lineCache.put(i, readFromFile(i))
+        for { i <- index until index + LINE_COUNT_EARLY_READ if i < lineOffsets.size } lineCache.put(i, readFromFile(i))
       }
       catch {
         case e: IOException => Log.error(e)
@@ -46,7 +46,7 @@ class CachedFileLineReader extends Iterable[String] {
     lineCache.get(index)
   }
 
-  def load(file: File, loadFileProgressChangedEvent: Int => Unit) {
+  def load(file: File, loadFileProgressChangedEvent: Int => Unit) = {
     fileLength = file.length()
 
     Log.info("Loading " + file + " " + fileLength + " bytes")
@@ -115,8 +115,8 @@ class CachedFileLineReader extends Iterable[String] {
     def hasNext = lineOffsets.synchronized { index < lineOffsets.size }
     def next = {
       if (lineOffsets.size != 0) Log.debug("Line " + (index + 1) + " " + (100 * (index + 1) / lineOffsets.size) + "%")
-      val line = get(index) 
-      index += 1 
+      val line = get(index)
+      index += 1
       line
     }
   }

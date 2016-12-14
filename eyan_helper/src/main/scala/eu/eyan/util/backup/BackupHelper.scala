@@ -12,9 +12,11 @@ import eu.eyan.util.string.StringPlus
 class BackupException(msg: String) extends Exception(msg)
 
 object BackupHelper {
+  val DEFAULT_BUFFER_SIZE = 1024
+  val BEGINNING = 0
   @throws(classOf[BackupException])
   def zipFile(inputFile: File, to: File) = {
-    val buffer = Array.ofDim[Byte](1024)
+    val buffer = Array.ofDim[Byte](DEFAULT_BUFFER_SIZE)
     var zipOutputStream: ZipOutputStream = null
     var fileInputStream: FileInputStream = null
     try {
@@ -23,7 +25,7 @@ object BackupHelper {
       fileInputStream = new FileInputStream(inputFile)
       var len = fileInputStream.read(buffer)
       while (len > 0) {
-        zipOutputStream.write(buffer, 0, len)
+        zipOutputStream.write(buffer, BEGINNING, len)
         len = fileInputStream.read(buffer)
       }
       zipOutputStream.closeEntry()

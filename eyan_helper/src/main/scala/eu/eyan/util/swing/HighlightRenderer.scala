@@ -10,7 +10,7 @@ import eu.eyan.util.swing.HighlightRenderer.HTML_START_TAG
 import javax.swing.JTable
 import javax.swing.table.DefaultTableCellRenderer
 
-object HighlightRenderer /*extends DefaultTableCellRenderer*/ {
+object HighlightRenderer /* extends DefaultTableCellRenderer */ {
   val HIGHLIGHT_START_TAG = "<span style=\"background-color:#F2F5A9;\">"
   val HIGHLIGHT_END_TAG = "</span>"
   val HTML_START_TAG = "<html>"

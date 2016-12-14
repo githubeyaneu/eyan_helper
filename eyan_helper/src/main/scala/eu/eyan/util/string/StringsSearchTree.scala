@@ -5,7 +5,7 @@ import StringsSearchTree.allSubStrings
 object StringsSearchTree {
   def newTree[T](): StringsSearchTree[T] = new StringsSearchTree[T](None)
 
-  def allSubStrings(line: String, depth: Int) = List("") ++ (for (size <- 1 to depth) yield line.sliding(size)).flatten
+  def allSubStrings(line: String, depth: Int) = List("") ++ (for {size <- 1 to depth} yield line.sliding(size)).flatten
 }
 
 class StringsSearchTree[TYPE] private (

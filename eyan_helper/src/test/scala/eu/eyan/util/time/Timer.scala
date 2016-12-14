@@ -5,7 +5,7 @@ object Timer {
   val MINUTE = 60L * SECOND
 
   def timerStart = startTime = now
-  def timerElapsed = { val elapsed = readableTime(now - startTime); timerStart; elapsed}
+  def timerElapsed = { val elapsed = readableTime(now - startTime); timerStart; elapsed }
   def timerPrint = println(timerElapsed)
 
   private def readableTime(ms: Long) = {
@@ -13,7 +13,7 @@ object Timer {
     else if (ms < MINUTE) ms / SECOND + "s"
     else ms / MINUTE + "min"
   }
-  
+
   private def now = System.currentTimeMillis
   private var startTime = now
 }

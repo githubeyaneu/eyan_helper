@@ -11,8 +11,7 @@ object FileLineStartOffsetReader {
 }
 
 class FileLineStartOffsetReader private (file: String, bufferSize: Int) extends Closeable {
-  private val EGAL = 'x'
-
+  val EGAL = 'x'
   private var offset = 0L
 
   private val byteBuffer = new Array[Byte](bufferSize)
@@ -35,7 +34,8 @@ class FileLineStartOffsetReader private (file: String, bufferSize: Int) extends 
    */
   def readLine = {
     var ready = false
-    var result = -11L
+    val INVALID_RESULT = -11L
+    var result = INVALID_RESULT
     while (result < -1L) {
       val nextCharInt = nextChar
       if (nextCharInt == -1)

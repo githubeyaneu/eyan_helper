@@ -19,7 +19,7 @@ class SwingUtilitiesPlusTest() {
   @Test
   def test_createListContentsChangedListener = {
     var called = false
-    val listener = SwingPlus.createListContentsChangedListener( e =>  called = true )
+    val listener = SwingPlus.createListContentsChangedListener(e => called = true)
     listener.contentsChanged(null)
     listener.intervalAdded(null)
     listener.intervalRemoved(null)
@@ -36,7 +36,7 @@ class SwingUtilitiesPlusTest() {
         processKeyEvent(new KeyEvent(this, KeyEvent.KEY_TYPED, 0, KeyEvent.VK_UNDEFINED, KeyEvent.VK_UNDEFINED, KeyEvent.VK_UNDEFINED))
       }
     }
-    val listener = SwingPlus.addKeyPressedListener( textPane, e =>  called = true  ) 
+    val listener = SwingPlus.addKeyPressedListener(textPane, e => called = true)
     textPane.pressKey
     assertThat(called).isTrue
   }
@@ -50,7 +50,7 @@ class SwingUtilitiesPlusTest() {
   @Test
   def test_newCheckBoxWithAction = {
     var runned = false
-    val cb = SwingPlus.newCheckBoxWithAction("a", ()=>runned = true)
+    val cb = SwingPlus.newCheckBoxWithAction("a", () => runned = true)
     assertThat(cb.getText).isEqualTo("a")
     cb.getActionListeners()(0).actionPerformed(null)
     assertThat(runned).isTrue
@@ -59,7 +59,7 @@ class SwingUtilitiesPlusTest() {
   @Test
   def test_jCheckBox = {
     var runned = false
-    val cb = SwingPlus.checkBox("a", (cb)=>runned = true)
+    val cb = SwingPlus.checkBox("a", (cb) => runned = true)
     assertThat(cb.getText).isEqualTo("a")
     cb.getActionListeners()(0).actionPerformed(null)
     assertThat(runned).isTrue
@@ -68,7 +68,7 @@ class SwingUtilitiesPlusTest() {
   @Test
   def test_jButton = {
     var runned = false
-    val button = SwingPlus.button("a", ()=>runned = true )
+    val button = SwingPlus.button("a", () => runned = true)
     assertThat(button.getText).isEqualTo("a")
     button.getActionListeners()(0).actionPerformed(null)
     assertThat(runned).isTrue
@@ -77,7 +77,7 @@ class SwingUtilitiesPlusTest() {
   @Test
   def test_newButtonWithAction = {
     var runned = false
-    val button = SwingPlus.newButtonWithAction("a", (b,e)=>runned = true)
+    val button = SwingPlus.newButtonWithAction("a", (b, e) => runned = true)
     assertThat(button.getText).isEqualTo("a")
     button.getActionListeners()(0).actionPerformed(null)
     assertThat(runned).isTrue
@@ -95,7 +95,7 @@ class SwingUtilitiesPlusTest() {
   @Test
   def test_newTextFieldWithAction = {
     var runned = false
-    val textField = SwingPlus.newTextFieldWithAction(3, (tf,e) =>  runned = true)
+    val textField = SwingPlus.newTextFieldWithAction(3, (tf, e) => runned = true)
     assertThat(textField.getColumns).isEqualTo(3)
     textField.getActionListeners()(0).actionPerformed(null)
     assertThat(runned).isTrue

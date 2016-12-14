@@ -19,7 +19,7 @@ class FileLinesReaderTest() {
   val _folder = new TemporaryFolder
   @Rule def folder = _folder
 
-  //@Rule var folder: TemporaryFolder = new TemporaryFolder
+  // @Rule var folder: TemporaryFolder = new TemporaryFolder
 
   private var filepath: String = null
 

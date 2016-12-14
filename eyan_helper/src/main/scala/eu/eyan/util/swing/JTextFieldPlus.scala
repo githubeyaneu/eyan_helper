@@ -33,15 +33,15 @@ object JTextFieldPlus {
     }
 
     def addKeyTypedListener(keyTypedAction: KeyEvent => Unit) = {
-      textField.addKeyListener(new KeyAdapter { override def keyTyped(e: KeyEvent) { keyTypedAction(e) } })
+      textField.addKeyListener(new KeyAdapter { override def keyTyped(e: KeyEvent) = { keyTypedAction(e) } })
       textField
     }
     def addKeyReleasedListener(keyReleasedAction: KeyEvent => Unit) = {
-      textField.addKeyListener(new KeyAdapter { override def keyReleased(e: KeyEvent) { keyReleasedAction(e) } })
+      textField.addKeyListener(new KeyAdapter { override def keyReleased(e: KeyEvent) = { keyReleasedAction(e) } })
       textField
     }
     def addKeyPressedListener(keyPressedAction: KeyEvent => Unit) = {
-      textField.addKeyListener(new KeyAdapter { override def keyPressed(e: KeyEvent) { keyPressedAction(e) } })
+      textField.addKeyListener(new KeyAdapter { override def keyPressed(e: KeyEvent) = { keyPressedAction(e) } })
       textField
     }
 

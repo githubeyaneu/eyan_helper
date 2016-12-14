@@ -9,7 +9,7 @@ object RandomPlus {
   def main(args: Array[String]): Unit = {
     val reg = "[\\p{InCombiningDiacriticalMarks}]".r
     def norm(c: Char) = reg.replaceAllIn(Normalizer.normalize(c + "", Normalizer.Form.NFD), "")
-    for (i <- 0x0 to 0xFFFF) {
+    for {i <- 0x0 to 0xFFFF} {
       if (norm(i.toChar).length() > 0 && i != norm(i.toChar).charAt(0).toInt)
         println((i, i.toChar + "", norm(i.toChar), norm(i.toChar).charAt(0).toInt))
     }
@@ -20,10 +20,12 @@ object RandomPlus {
 class RandomPlus(salt: Int) extends Random(salt) {
   def randomChar = RandomPlus.chars(nextInt(RandomPlus.chars.length() - 1))
 
-  def randomReadableString(lengthFrom: Int = 1, lengthTo: Int = 20) = (for (a <- 1 to lengthFrom + nextInt(lengthTo)) yield randomChar).mkString
+  val DEFAUL_RANDOM_STRING_LENGTH = 20
+  def randomReadableString(lengthFrom: Int = 1, lengthTo: Int = DEFAUL_RANDOM_STRING_LENGTH) =
+    (for {a <- 1 to lengthFrom + nextInt(lengthTo)} yield randomChar).mkString
 
   def nextReadableStrings(number: Int, lengthFrom: Int, lengthTo: Int) =
-    for (i <- 1 to number) yield randomReadableString(lengthFrom, lengthTo)
+    for {i <- 1 to number} yield randomReadableString(lengthFrom, lengthTo)
 
-  def nextInts(number: Int, n: Int) = for (i <- 1 to number) yield nextInt(n) 
+  def nextInts(number: Int, n: Int) = for {i <- 1 to number} yield nextInt(n)
 }

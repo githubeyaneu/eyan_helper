@@ -34,8 +34,7 @@ class CachedFileLinesReaderTest() {
   def test_load = {
     writeFileLines(100)
     var expectedPercent = 1
-    cflr.load(file,  percent => { assertThat(percent).isEqualTo(expectedPercent); expectedPercent += 1 }
-    )
+    cflr.load(file, percent => { assertThat(percent).isEqualTo(expectedPercent); expectedPercent += 1 })
   }
 
   @Test
@@ -50,7 +49,7 @@ class CachedFileLinesReaderTest() {
   def test_load_1Line = {
     writeFileLines(1000)
     var expectedPercent = 1
-    cflr.load(file,  percent => { assertThat(percent).isEqualTo(expectedPercent); expectedPercent += 1 } )
+    cflr.load(file, percent => { assertThat(percent).isEqualTo(expectedPercent); expectedPercent += 1 })
   }
 
   @Test(expected = classOf[NullPointerException])
@@ -172,7 +171,7 @@ class CachedFileLinesReaderTest() {
     file = folder.newFile
     val writer: PrintWriter = new PrintWriter(file)
 
-    for (i <- 1 to numberOfLines) {
+    for {i <- 1 to numberOfLines} {
       val line = if (sameLineLength)
         "line" + "%09d".format(i) + "\r\n"
       else

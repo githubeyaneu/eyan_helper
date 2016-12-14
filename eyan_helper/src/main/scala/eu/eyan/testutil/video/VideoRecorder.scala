@@ -24,7 +24,7 @@ import java.awt.AWTException
 import eu.eyan.log.Log
 
 class VideoRecorder {
-  
+
   private var screenRecorder: ScreenRecorderToFile = null
 
   def start(component: Component, fileLocation: String, videoName: String) = {
@@ -32,7 +32,9 @@ class VideoRecorder {
       val gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration()
 
       val fileFormat = new Format(MediaTypeKey, MediaType.FILE, MimeTypeKey, MIME_AVI)
-      
+
+      val FIFTEEN = 15
+
       val screenFormat = new Format(
         MediaTypeKey,
         MediaType.VIDEO,
@@ -43,12 +45,12 @@ class VideoRecorder {
         DepthKey,
         24.asInstanceOf[Object],
         FrameRateKey,
-        Rational.valueOf(15),
+        Rational.valueOf(FIFTEEN),
         QualityKey, 1.0f.asInstanceOf[Object],
         KeyFrameIntervalKey,
         (15 * 60).asInstanceOf[Object])
 
-      val mouseFormat = new Format(MediaTypeKey, MediaType.VIDEO, EncodingKey, "black", FrameRateKey, Rational.valueOf(30))
+      val mouseFormat = new Format(MediaTypeKey, MediaType.VIDEO, EncodingKey, "black", FrameRateKey, Rational.valueOf(2 * FIFTEEN))
 
       val capture = new Rectangle(component.getLocationOnScreen(), component.getSize())
 
@@ -62,7 +64,8 @@ class VideoRecorder {
   }
 
   def stopAndSaveVideo = {
-    Pause.pause(3000)
+    val WAIT_TIME_FOR_ENDING_VIDEO_MS = 3000
+    Pause.pause(WAIT_TIME_FOR_ENDING_VIDEO_MS)
     try stop
     catch {
       case e: IOException => Log.errorOnConsoleToo(e)

@@ -27,7 +27,7 @@ object ExcelAssert {
       case e: IOException   => e.printStackTrace
     }
     finally {
-      if (workbook != null) workbook.close 
+      if (workbook != null) workbook.close
     }
   }
 }

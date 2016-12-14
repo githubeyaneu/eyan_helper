@@ -7,17 +7,19 @@ import eu.eyan.log.Log
 import java.awt.Color
 import eu.eyan.util.swing.JTextFieldPlus.JTextFieldPlusImplicit
 
-
 object AutocompleteDecorator {
-  def decorate(component: JTextComponent) = {
+  def decorate(component: JTextComponent):AutocompleteDecorator = {
     new AutocompleteDecorator(component)
   }
 }
 
 class AutocompleteDecorator(component: JTextComponent) {
-  /* FIXME private*/ val hints = new AutocompleteHints
+  val NO_SELECTION = -1
+  val FIRST_LINE = 0
+  val DFAULT_MAX_ELEMENTS_VISIBLE = 4
+  /* FIXME private */ val hints = new AutocompleteHints
 
-  /* FIXME private*/ val hintTextUI = new HintTextFieldUI
+  /* FIXME private */ val hintTextUI = new HintTextFieldUI
 
   private val autocompleteList = new JListPlus[String]
     .withName(JTextFieldAutocomplete.NAME_LIST)
@@ -27,9 +29,9 @@ class AutocompleteDecorator(component: JTextComponent) {
   private val popup = new PopupWindow(autocompleteList, component)
     .onComponentMoved(setPopupLocation)
 
-  /* FIXME private*/ var noItemsFoundText = "No items found"
+  /* FIXME private */ var noItemsFoundText = "No items found"
 
-  /* FIXME private*/ var maxElementsVisible = 4
+  /* FIXME private */ var maxElementsVisible = DFAULT_MAX_ELEMENTS_VISIBLE
 
   private var isListEnabled = false
 
@@ -53,13 +55,12 @@ class AutocompleteDecorator(component: JTextComponent) {
     event.getKeyCode match {
       case KeyEvent.VK_DOWN => event.consume
       case KeyEvent.VK_UP   => event.consume
-      case _                => { /*do nothing*/ }
+      case _                => { /* do nothing */ }
     }
   })
-  
-  
+
   private def selectTextFromList: () => Unit = () => {
-    if (popup.isVisible && isListEnabled && -1 < autocompleteList.getSelectedIndex) component.setText(autocompleteList.getSelectedValue)
+    if (popup.isVisible && isListEnabled && NO_SELECTION < autocompleteList.getSelectedIndex) component.setText(autocompleteList.getSelectedValue)
     hidePopup()
   }
 
@@ -76,11 +77,11 @@ class AutocompleteDecorator(component: JTextComponent) {
   }
 
   private def selectPreviousInList = {
-    if (isListEnabled) autocompleteList.setSelectedIndex(if (autocompleteList.getSelectedIndex < 0) -1 else autocompleteList.getSelectedIndex - 1)
+    if (isListEnabled) autocompleteList.setSelectedIndex(if (autocompleteList.getSelectedIndex < 0) NO_SELECTION else autocompleteList.getSelectedIndex - 1)
   }
 
   private def showPopUp = {
-    val oldSelectedIndex = if (autocompleteList.getSelectedIndex < 0) 0 else autocompleteList.getSelectedIndex
+    val oldSelectedIndex = if (autocompleteList.getSelectedIndex <= NO_SELECTION) FIRST_LINE else autocompleteList.getSelectedIndex
     val oldValues = autocompleteList.getValues
     val newValues = hints.findElementsToShow(component.getText).take(maxElementsVisible)
 
@@ -105,7 +106,7 @@ class AutocompleteDecorator(component: JTextComponent) {
     }
   }
 
-  /* FIXME private*/ def refreshPopup = if (popup.isVisible) showPopUp
+  /* FIXME private */ def refreshPopup:Unit = if (popup.isVisible) showPopUp
 
   private def setPopupLocation: () => Unit = () => popup.setLocation(component.getLocationOnScreen.x, component.getLocationOnScreen.y + component.getHeight)
 

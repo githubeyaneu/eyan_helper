@@ -74,7 +74,7 @@ class JTextFieldAutocompleteTest extends AbstractUiTest {
   }
 
   @Test
-  def popup_comes_with_all_elements = { 
+  def popup_comes_with_all_elements = {
     autocomplete.setAutocompleteList("a", "b", "aa", "bb")
     autocomplete.enterText("a")
     autocomplete.popup.requireVisible
@@ -391,10 +391,10 @@ class JTextFieldAutocompleteTest extends AbstractUiTest {
     autocomplete.popup.requireWidth(acWidth + 130)
   }
 
-  //nem ártana ha nagyítható lenne az egész
-  //  Ha lehet akkor decorátorral megoldani
-  //lista konfigurálható
-  // ...scrollbarral
+  // Nem ártana ha nagyítható lenne az egész
+  // Ha lehet akkor decorátorral megoldani
+  // Lista konfigurálható
+  // Scrollbarral...
 }
 
 object JTextFieldAutocompleteTest {

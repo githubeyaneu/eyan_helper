@@ -12,7 +12,7 @@ import eu.eyan.testutil.TestPlus.waitFor
 class JProgressBarPlusTest() {
 
   @Before
-  def setUp {}
+  def setUp = {}
 
   @Test
   def test_JProgressBarPlus = {
@@ -55,7 +55,7 @@ class JProgressBarPlusTest() {
     val pb = new JProgressBarPlus(0, 100, "for %d%% mat")
 
     waitFor(() => assertThat(pb.isVisible).isTrue)
-    
+
     pb.doneThenInvisible()
     waitFor(() => assertThat(pb.isVisible).isFalse)
   }

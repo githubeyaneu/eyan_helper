@@ -34,5 +34,8 @@ class AutocompleteHintsTest {
     assertThat(new AutocompleteHints().sortAlgo("de").apply("ederi", "edri")).isTrue
     assertThat(new AutocompleteHints().sortAlgo("de").apply("edri", "ederi")).isFalse
     assertThat(new AutocompleteHints().sortAlgo("de").apply("edri", "edri")).isFalse
+
+    assertThat(new AutocompleteHints().sortAlgo("ß").apply("ßb", "bß")).isTrue
+    assertThat(new AutocompleteHints().sortAlgo("s").apply("bß", "ßb")).isFalse
   }
 }

@@ -3,6 +3,7 @@ package eu.eyan.log
 import scala.collection.mutable.MutableList
 
 object Log {
+  val STACK_LEVEL = 3
   var isActive: Boolean = false
   var prevTime = System.currentTimeMillis
   type LogEntry = (LogLevel, String)
@@ -11,9 +12,9 @@ object Log {
   private def log(level: LogLevel, message: String = "") = {
     if (isActive) {
       if (level != Trace) {
-        val stack = Thread.currentThread().getStackTrace
+        val stack = Thread.currentThread().getStackTrace()(STACK_LEVEL)
         logs += ((level, message))
-        val logText = stack(3).getClassName.substring(stack(3).getClassName.lastIndexOf(".") + 1) + "." + stack(3).getMethodName + ": " + message
+        val logText = stack.getClassName.substring(stack.getClassName.lastIndexOf(".") + 1) + "." + stack.getMethodName + ": " + message
         println(level + " " + (System.currentTimeMillis - prevTime) + " " + logText)
         prevTime = System.currentTimeMillis
         LogWindow.add(logText)
@@ -43,9 +44,10 @@ object Log {
   def trace() = log(Trace)
   def trace(message: String) = log(Trace, message)
 }
-class Log {}
 
-abstract class LogLevel {}
+class Log
+
+abstract class LogLevel
 case object Error extends LogLevel
 case object Warn extends LogLevel
 case object Info extends LogLevel

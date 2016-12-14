@@ -10,13 +10,13 @@ import java.awt.Container
 import com.jgoodies.forms.factories.CC
 
 object FormLayoutPlus {
-  def apply(container: Container, colSpec:String ) = {
+  def apply(container: Container, colSpec: String) = {
     val ret = new FormLayoutPlus(container, colSpec)
     container.setLayout(ret)
     ret
   }
 
-  def apply(container: Container, colSpec:String ,rowSpec:String , component:Component ) = {
+  def apply(container: Container, colSpec: String, rowSpec: String, component: Component) = {
     val ret = new FormLayoutPlus(container, colSpec)
     container.setLayout(ret)
     ret.appendRow(rowSpec, component)
@@ -24,33 +24,32 @@ object FormLayoutPlus {
   }
 }
 
-class FormLayoutPlus private (container: Container, colSpec:String) extends LayoutManager2 {
+class FormLayoutPlus private (container: Container, colSpec: String) extends LayoutManager2 {
   val formLayout = new FormLayout(colSpec)
   private var rows = 0
-  
+
   override def hashCode() = formLayout.hashCode()
 
   override def equals(obj: Any): Boolean = formLayout.equals(obj)
 
   override def toString() = formLayout.toString()
 
-  def getComponent() =container 
-  
-  def appendRow(rowSpecs:String*):Int = {
-    for (rowSpec <- rowSpecs) { appendRow(RowSpec.decode(rowSpec)); rows += 1 }
+  def getComponent() = container
+
+  def appendRow(rowSpecs: String*): Int = {
+    for {rowSpec <- rowSpecs} { appendRow(RowSpec.decode(rowSpec)); rows += 1 }
     rows
   }
-  
-  def appendRow(rowSpec: String , component:Component ):FormLayoutPlus = {
+
+  def appendRow(rowSpec: String, component: Component): FormLayoutPlus = {
     appendRow(RowSpec.decode(rowSpec))
     rows += 1
-    if (component != null) container.add(component, CC.xy(1, rows)) 
+    if (component != null) container.add(component, CC.xy(1, rows))
     this
   }
-  
-  def appendRow(rowSpec:String,  formLayout:FormLayoutPlus):FormLayoutPlus = appendRow(rowSpec, formLayout.getComponent())
-   
-  
+
+  def appendRow(rowSpec: String, formLayout: FormLayoutPlus): FormLayoutPlus = appendRow(rowSpec, formLayout.getComponent())
+
   /* DELEGATES */
   def getColumnCount() = formLayout.getColumnCount()
 

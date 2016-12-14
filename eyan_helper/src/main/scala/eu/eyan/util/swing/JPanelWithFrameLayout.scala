@@ -8,6 +8,7 @@ import com.jgoodies.forms.layout.ColumnSpec
 import com.jgoodies.forms.layout.FormLayout
 import com.jgoodies.forms.layout.RowSpec
 
+import JPanelWithFrameLayout.PREF
 import eu.eyan.util.awt.AwtHelper
 import eu.eyan.util.awt.AwtHelper.newActionListener
 import javax.swing.JLabel
@@ -16,12 +17,14 @@ import javax.swing.JScrollPane
 import javax.swing.JTextField
 
 object JPanelWithFrameLayout {
-  def apply(firstRowSpec: String = "p", firstColumnSpec: String = "p") = {
+  val PREF = "p"
+
+  def apply(firstRowSpec: String = PREF, firstColumnSpec: String = PREF) = {
     new JPanelWithFrameLayout(firstRowSpec).newColumn(firstColumnSpec)
   }
 }
 
-class JPanelWithFrameLayout(firstRowSpec: String = "p") extends JPanel {
+class JPanelWithFrameLayout(firstRowSpec: String = PREF) extends JPanel {
   val frameLayout = new FormLayout("", firstRowSpec)
   this.setLayout(frameLayout)
   var column = 0
@@ -36,20 +39,20 @@ class JPanelWithFrameLayout(firstRowSpec: String = "p") extends JPanel {
     row += 1
   }
 
-  def newColumn:JPanelWithFrameLayout = newColumn()
-  
-  def newColumn(spec: String = "p") = {
+  def newColumn: JPanelWithFrameLayout = newColumn()
+
+  def newColumn(spec: String = PREF) = {
     if (column != 0) newColumnSeparator()
     frameLayout.appendColumn(ColumnSpec.decode(spec))
     column += 1
     this
   }
-  
+
   def nextColumn = column += 2
 
-  def newRow:JPanelWithFrameLayout = newRow()
-  
-  def newRow(comp: Component = null, spec: String = "p") = {
+  def newRow: JPanelWithFrameLayout = newRow()
+
+  def newRow(comp: Component = null, spec: String = PREF) = {
     newRowSeparator()
     frameLayout.appendRow(RowSpec.decode(spec))
     row += 1
@@ -61,7 +64,7 @@ class JPanelWithFrameLayout(firstRowSpec: String = "p") extends JPanel {
     newRowSeparator()
     frameLayout.appendRow(RowSpec.decode(spec))
     row += 1
-    column=1
+    column = 1
     this
   }
 
@@ -72,18 +75,19 @@ class JPanelWithFrameLayout(firstRowSpec: String = "p") extends JPanel {
     button
   }
 
-  def addTextField(text: String, size: Int = 15) = {
+  val TEXTFIELD_DEFAULT_SIZE = 15
+  def addTextField(text: String, size: Int = TEXTFIELD_DEFAULT_SIZE) = {
     val tf = new JTextField(text, size)
     this.add(tf, CC.xy(column, row))
     tf
   }
 
-  def addTextArea(text:String = "", documentAction: () => Unit = null) = {
+  def addTextArea(text: String = "", documentAction: () => Unit = null) = {
     val textArea = new JTextAreaPlus().appendText(text)
     val scrollPane = new JScrollPane(textArea)
     val containerPanel = JPanelWithFrameLayout("f:1px:g", "f:1px:g").add(scrollPane)
     this.add(containerPanel, CC.xy(column, row))
-    if(documentAction!=null) textArea.getDocument.addDocumentListener(AwtHelper.docListener(documentAction))
+    if (documentAction != null) textArea.getDocument.addDocumentListener(AwtHelper.docListener(documentAction))
     textArea
   }
 
@@ -93,15 +97,15 @@ class JPanelWithFrameLayout(firstRowSpec: String = "p") extends JPanel {
     label
   }
 
-  override def add(comp: Component) = add(comp,1)
-  
-  override def add(comp: Component, width:Int) = {
+  override def add(comp: Component) = add(comp, 1)
+
+  override def add(comp: Component, width: Int) = {
     if (column == 0) newColumn()
-    this.add(comp, CC.xyw(column, row, width*2-1))
+    this.add(comp, CC.xyw(column, row, width * 2 - 1))
     comp
   }
 
-  def addPanelWithFormLayout(firstRowSpec: String = "p") = {
+  def addPanelWithFormLayout(firstRowSpec: String = PREF) = {
     val panel = new JPanelWithFrameLayout(firstRowSpec)
     this.add(panel, CC.xy(column, row))
     panel

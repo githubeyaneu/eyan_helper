@@ -17,7 +17,7 @@ class AutocompleteFixture(frameFixture: WindowFixture[_], componentName: String)
   def requirePopupNotVisible = {
     try { new JWindowFixture(frameFixture, PopupWindow.NAME_POPUP).requireNotVisible() }
     catch {
-      case cle: ComponentLookupException => //ok
+      case cle: ComponentLookupException => // ok
       case t: Throwable                  => throw t
     }
   }

@@ -4,7 +4,6 @@ import java.awt.datatransfer.DataFlavor
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import java.io.File
-//import org.apache.commons.io.FileUtils
 import java.io.IOException
 import java.nio.file.Files
 import java.io.PrintWriter
