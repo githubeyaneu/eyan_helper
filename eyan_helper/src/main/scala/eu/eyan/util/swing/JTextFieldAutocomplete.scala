@@ -24,29 +24,18 @@ object JTextFieldAutocomplete {
  * Autocomplete function to a TextField based on strings.
  * It also supports a hint text function that is shown if no text is in the textfield
  */
-class JTextFieldAutocomplete extends JTextField(JTextFieldAutocomplete.TEXTFIELD_DEFAULT_SIZE) {
-  val autocomplete = AutocompleteDecorator.decorate(this)
+class JTextFieldAutocomplete() extends JTextField(JTextFieldAutocomplete.TEXTFIELD_DEFAULT_SIZE) {
+  private val autocomplete = AutocompleteDecorator.decorate(this)
 
-  def setHintText(hintText: String) = { autocomplete.hintTextUI.hint = hintText; repaint(); this }
-  def getHintText = autocomplete.hintTextUI.hint
+  def getAutocompleteList = autocomplete.getAutocompleteValues
+  def setAutocompleteList(autocompleteList: List[String]) = { Log.debug(autocompleteList.mkString("\",\"")); autocomplete.setAutocompleteValues(autocompleteList); this }
 
-  def setValues(values: List[String]) = {
-    Log.debug(values.toList.mkString("\",\""))
-    autocomplete.hints.setAutocompleteValues(values)
-    autocomplete.refreshPopup
-    this
-  }
+  def getMaxElementsVisible = autocomplete.getMaxElementsVisible
+  def setMaxElementsVisible(maxElementsVisible: Int) = { autocomplete.setMaxElementsVisible(maxElementsVisible); this }
 
-  def setMaxElementsVisible(maxElementsVisible: Int) = {
-    autocomplete.maxElementsVisible = maxElementsVisible
-    autocomplete.refreshPopup
-    this
-  }
+  def getNoItemsFoundText = autocomplete.getNoItemsFoundText
+  def setNoItemsFoundText(noItemsFoundText: String) = { autocomplete.setNoItemsFoundText(noItemsFoundText); this }
 
-  def getNoItemsFoundText = autocomplete.noItemsFoundText
-  def setNoItemsFoundText(noItemsFoundText: String) = {
-    autocomplete.noItemsFoundText = noItemsFoundText
-    autocomplete.refreshPopup
-    this
-  }
+  def setHintText(hintText: String) = { autocomplete.setHintText(hintText); repaint(); this }
+  def getHintText = autocomplete.getHintText
 }
