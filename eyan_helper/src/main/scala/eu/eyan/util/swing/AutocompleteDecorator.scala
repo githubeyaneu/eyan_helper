@@ -17,9 +17,9 @@ class AutocompleteDecorator(component: JTextComponent) {
   val NO_SELECTION = -1
   val FIRST_LINE = 0
   val DFAULT_MAX_ELEMENTS_VISIBLE = 4
-  /* FIXME private */ val hints = new AutocompleteHints
+  private val hints = new AutocompleteHints
 
-  /* FIXME private */ val hintTextUI = new HintTextFieldUI
+  private val hintTextUI = new HintTextFieldUI
 
   private val autocompleteList = new JListPlus[String]
     .withName(JTextFieldAutocomplete.NAME_LIST)
@@ -29,9 +29,9 @@ class AutocompleteDecorator(component: JTextComponent) {
   private val popup = new PopupWindow(autocompleteList, component)
     .onComponentMoved(setPopupLocation)
 
-  /* FIXME private */ var noItemsFoundText = "No items found"
+  private var noItemsFoundText = "No items found"
 
-  /* FIXME private */ var maxElementsVisible = DFAULT_MAX_ELEMENTS_VISIBLE
+  private var maxElementsVisible = DFAULT_MAX_ELEMENTS_VISIBLE
 
   private var isListEnabled = false
 
@@ -106,9 +106,22 @@ class AutocompleteDecorator(component: JTextComponent) {
     }
   }
 
-  /* FIXME private */ def refreshPopup:Unit = if (popup.isVisible) showPopUp
+  private def refreshPopup = {if (popup.isVisible) showPopUp; this}
 
   private def setPopupLocation: () => Unit = () => popup.setLocation(component.getLocationOnScreen.x, component.getLocationOnScreen.y + component.getHeight)
 
   private def setPopupWidth: () => Unit = () => popup.setWidth(component.getWidth)
+
+  def getAutocompleteValues = hints.getAutocompleteValues
+  def setAutocompleteValues(values: List[String]) = { hints.setAutocompleteValues(values); refreshPopup }
+
+  def getHintText = hintTextUI.hint
+  def setHintText(hintText: String) = hintTextUI.hint = hintText
+
+  def getNoItemsFoundText = noItemsFoundText
+  def setNoItemsFoundText(text: String) = { noItemsFoundText = text; refreshPopup }
+
+  def getMaxElementsVisible = maxElementsVisible
+  def setMaxElementsVisible(max: Int) = { maxElementsVisible = max; refreshPopup }
+
 }
