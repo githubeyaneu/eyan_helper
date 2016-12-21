@@ -2,12 +2,10 @@ package eu.eyan.util.swing
 
 import java.awt.Component
 import java.awt.event.ActionEvent
-
 import com.jgoodies.forms.factories.CC
 import com.jgoodies.forms.layout.ColumnSpec
 import com.jgoodies.forms.layout.FormLayout
 import com.jgoodies.forms.layout.RowSpec
-
 import JPanelWithFrameLayout.PREF
 import eu.eyan.util.awt.AwtHelper
 import eu.eyan.util.awt.AwtHelper.newActionListener
@@ -15,6 +13,9 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JTextField
+import com.jgoodies.forms.internal.AbstractBuilder
+import com.jgoodies.forms.FormsSetup
+import javax.swing.SwingConstants
 
 object JPanelWithFrameLayout {
   val PREF = "p"
@@ -33,10 +34,13 @@ class JPanelWithFrameLayout(firstRowSpec: String = PREF) extends JPanel {
   def newColumnSeparator(spec: String = "3dlu") = {
     frameLayout.appendColumn(ColumnSpec.decode(spec))
     column += 1
+    this
   }
+  
   def newRowSeparator(spec: String = "3dlu") = {
     frameLayout.appendRow(RowSpec.decode(spec))
     row += 1
+    this
   }
 
   def newColumn: JPanelWithFrameLayout = newColumn()
@@ -47,8 +51,8 @@ class JPanelWithFrameLayout(firstRowSpec: String = PREF) extends JPanel {
     column += 1
     this
   }
-
-  def nextColumn = column += 2
+  
+  def nextColumn = { column += 2; this }
 
   def newRow: JPanelWithFrameLayout = newRow()
 
@@ -109,5 +113,11 @@ class JPanelWithFrameLayout(firstRowSpec: String = PREF) extends JPanel {
     val panel = new JPanelWithFrameLayout(firstRowSpec)
     this.add(panel, CC.xy(column, row))
     panel
+  }
+
+  def addSeparatorWithTitle(title: String, width: Int=1) = {
+    val titledSeparator = FormsSetup.getComponentFactoryDefault.createSeparator(title, SwingConstants.LEFT)
+    add(titledSeparator, width)
+    this
   }
 }
