@@ -26,18 +26,21 @@ object JPanelWithFrameLayout {
 }
 
 class JPanelWithFrameLayout(firstRowSpec: String = PREF) extends JPanel {
-  val frameLayout = new FormLayout("", firstRowSpec)
+  private val frameLayout = new FormLayout("", firstRowSpec)
   this.setLayout(frameLayout)
-  var column = 0
-  var row = 1
+  private var column = 0
+  private var row = 1
+  private var spanColumns = 1
+  var separatorSizeBetweenColumns = "3dlu"
+  var separatorSizeBetweenRows = "3dlu"
 
-  def newColumnSeparator(spec: String = "3dlu") = {
+  def newColumnSeparator(spec: String = separatorSizeBetweenColumns) = {
     frameLayout.appendColumn(ColumnSpec.decode(spec))
     column += 1
     this
   }
-  
-  def newRowSeparator(spec: String = "3dlu") = {
+
+  def newRowSeparator(spec: String = separatorSizeBetweenRows) = {
     frameLayout.appendRow(RowSpec.decode(spec))
     row += 1
     this
@@ -51,7 +54,7 @@ class JPanelWithFrameLayout(firstRowSpec: String = PREF) extends JPanel {
     column += 1
     this
   }
-  
+
   def nextColumn = { column += 2; this }
 
   def newRow: JPanelWithFrameLayout = newRow()
@@ -61,6 +64,7 @@ class JPanelWithFrameLayout(firstRowSpec: String = PREF) extends JPanel {
     frameLayout.appendRow(RowSpec.decode(spec))
     row += 1
     if (comp != null) add(comp)
+    column = 1
     this
   }
 
@@ -74,7 +78,7 @@ class JPanelWithFrameLayout(firstRowSpec: String = PREF) extends JPanel {
 
   def addButton(text: String, action: ActionEvent => Unit = null) = {
     val button = new JButtonPlus(text)
-    this.add(button, CC.xy(column, row))
+    add(button)
     if (action != null) button.addActionListener(newActionListener(action))
     button
   }
@@ -82,7 +86,7 @@ class JPanelWithFrameLayout(firstRowSpec: String = PREF) extends JPanel {
   val TEXTFIELD_DEFAULT_SIZE = 15
   def addTextField(text: String, size: Int = TEXTFIELD_DEFAULT_SIZE) = {
     val tf = new JTextField(text, size)
-    this.add(tf, CC.xy(column, row))
+    add(tf)
     tf
   }
 
@@ -90,34 +94,41 @@ class JPanelWithFrameLayout(firstRowSpec: String = PREF) extends JPanel {
     val textArea = new JTextAreaPlus().appendText(text)
     val scrollPane = new JScrollPane(textArea)
     val containerPanel = JPanelWithFrameLayout("f:1px:g", "f:1px:g").add(scrollPane)
-    this.add(containerPanel, CC.xy(column, row))
+    add(containerPanel)
     if (documentAction != null) textArea.getDocument.addDocumentListener(AwtHelper.docListener(documentAction))
     textArea
   }
 
   def addLabel(text: String) = {
     val label = new JLabel(text)
-    this.add(label, CC.xy(column, row))
+    add(label)
     label
   }
 
-  override def add(comp: Component) = add(comp, 1)
+  //override def add(comp: Component) = add(comp, 1)
 
-  override def add(comp: Component, width: Int) = {
+  /**
+   * Changes the functionality of the int parameter, this here is not the position as in the super but the span width for the framelayout
+   */
+  override def add(comp: Component) = {
     if (column == 0) newColumn()
-    this.add(comp, CC.xyw(column, row, width * 2 - 1))
+    this.add(comp, CC.xyw(column, row, spanColumns * 2 - 1))
+    spanColumns = 1
     comp
   }
 
   def addPanelWithFormLayout(firstRowSpec: String = PREF) = {
     val panel = new JPanelWithFrameLayout(firstRowSpec)
-    this.add(panel, CC.xy(column, row))
+    add(panel)
     panel
   }
 
-  def addSeparatorWithTitle(title: String, width: Int=1) = {
+  def addSeparatorWithTitle(title: String) = {
     val titledSeparator = FormsSetup.getComponentFactoryDefault.createSeparator(title, SwingConstants.LEFT)
-    add(titledSeparator, width)
+    add(titledSeparator)
     this
   }
+  
+  def span(columns:Int) = {spanColumns = spanColumns + columns; this}
+  def span:JPanelWithFrameLayout = span(1)
 }
