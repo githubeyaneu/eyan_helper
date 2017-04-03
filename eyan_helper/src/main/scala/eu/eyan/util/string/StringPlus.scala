@@ -4,10 +4,11 @@ import java.io.BufferedWriter
 import java.io.File
 import java.io.FileWriter
 import java.text.Normalizer
-
 import scala.sys.process.stringToProcess
-
-import eu.eyan.util.io.FilePlus.FilePlus
+import eu.eyan.util.http.HttpPlus
+import eu.eyan.util.io.FilePlus
+import scala.io.Source
+import eu.eyan.util.io.FilePlus.FilePlusImplicit
 
 object StringPlus {
   lazy val reg = "[\\p{InCombiningDiacriticalMarks}]".r
@@ -18,7 +19,7 @@ object StringPlus {
   def s2_startsWithSearch_s1_doesNot(s1: String, s2: String, search: String) = !s1.startsWith(search) && s2.startsWith(search)
   def s1_containsSearch_s2_doesNot(s1: String, s2: String, search: String) = s1.contains(search) && !s2.contains(search)
 
-  implicit class StringPlus(val s: String) {
+  implicit class StringPlusImplicit(val s: String) {
     def println = System.out.println(s)
     def printlnErr = System.err.println(s)
 
@@ -34,5 +35,9 @@ object StringPlus {
     def deleteAsDir = new File(s).deleteRecursively
 
     def executeAsProcess = s.!!
+    def asUrlPost(postParams:String = "") = HttpPlus.sendPost(s, postParams)
+    def asUrlGet_responseAsStream() = HttpPlus.sendGet_responseAsStream(s)
+    
+    def linesFromFile = Source.fromFile(s).getLines
   }
 }
