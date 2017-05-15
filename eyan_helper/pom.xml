@@ -45,7 +45,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -58,7 +58,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 		</plugins>
 	</build>
 
@@ -122,7 +122,7 @@
 			<groupId>org.easytesting</groupId>
 			<artifactId>fest-swing</artifactId>
 			<version>1.2.1</version>
-<!-- 			<scope>test</scope> -->
+			<!-- <scope>test</scope> -->
 		</dependency>
 
 		<!-- Conflict with fes assert! <dependency> -->
@@ -150,6 +150,19 @@
 			<groupId>org.scalatest</groupId>
 			<artifactId>scalatest_2.11</artifactId>
 			<version>3.0.0</version>
+		</dependency>
+
+		<!-- For 7zip -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>1.13</version>
+		</dependency>
+		<!-- For 7zip -->
+		<dependency>
+			<groupId>org.tukaani</groupId>
+			<artifactId>xz</artifactId>
+			<version>1.6</version>
 		</dependency>
 
 

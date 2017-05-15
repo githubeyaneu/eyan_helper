@@ -32,6 +32,7 @@ object Log {
   def error() = log(Error)
   def error(message: String) = log(Error, message)
   def error(exception: Throwable) = log(Error, exception.getMessage + "\r\n  " + exception.getStackTrace.mkString("  \r\n"))
+  def error(message: String, exception: Throwable) = log(Error, message+" - " + exception.getMessage + "\r\n  " + exception.getStackTrace.mkString("  \r\n"))
   def errorOnConsoleToo(exception: Throwable) = {
     log(Error, exception.getMessage + "\r\n  " + exception.getStackTrace.mkString("  \r\n"))
     exception.printStackTrace
