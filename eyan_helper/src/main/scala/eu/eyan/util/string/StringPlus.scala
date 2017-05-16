@@ -7,7 +7,7 @@ import java.text.Normalizer
 
 import scala.sys.process.stringToProcess
 
-import eu.eyan.util.io.FilePlus.FilePlus
+import eu.eyan.util.io.FilePlus.FilePlusImplicit
 
 object StringPlus {
   lazy val reg = "[\\p{InCombiningDiacriticalMarks}]".r
@@ -18,7 +18,7 @@ object StringPlus {
   def s2_startsWithSearch_s1_doesNot(s1: String, s2: String, search: String) = !s1.startsWith(search) && s2.startsWith(search)
   def s1_containsSearch_s2_doesNot(s1: String, s2: String, search: String) = s1.contains(search) && !s2.contains(search)
 
-  implicit class StringPlus(val s: String) {
+  implicit class StringPlusImplicit(val s: String) {
     def println = System.out.println(s)
     def printlnErr = System.err.println(s)
 
@@ -32,6 +32,11 @@ object StringPlus {
 
     def deleteAsFile = new File(s).delete
     def deleteAsDir = new File(s).deleteRecursively
+
+    def asFile = new File(s)
+    def asDir = asFile
+    def file = asFile
+    def dir = asFile
 
     def executeAsProcess = s.!!
   }
