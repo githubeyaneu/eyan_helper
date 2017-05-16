@@ -1,26 +1,27 @@
 package eu.eyan.util.awt
 
-import java.awt.event.ActionEvent
-import java.awt.event.ActionListener
 import java.awt.Component
 import java.awt.Toolkit
-import javax.swing.SwingWorker
-import java.awt.event.WindowListener
-import java.awt.event.WindowAdapter
-import java.awt.event.WindowEvent
 import java.awt.Window
-import eu.eyan.log.Log
-import java.io.File
-import javax.swing.JFileChooser
-import javax.swing.filechooser.FileNameExtensionFilter
-import javax.swing.event.DocumentListener
-import javax.swing.event.DocumentEvent
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
+import java.awt.event.ActionEvent
+import java.awt.event.ActionListener
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
+import java.io.File
+
+import eu.eyan.log.Log
+import javax.swing.JFileChooser
+import javax.swing.SwingWorker
+import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
+import javax.swing.filechooser.FileNameExtensionFilter
 
 object AwtHelper {
+  //TODO delete Swing stuff or move it to SwingPlus
   val DESKTOP_LEFT = 0
   val DESKTOP_TOP = 0
 

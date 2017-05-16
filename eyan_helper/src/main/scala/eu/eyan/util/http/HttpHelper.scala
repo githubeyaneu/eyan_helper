@@ -1,16 +1,25 @@
 package eu.eyan.util.http;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
+import java.io.BufferedReader
+import java.io.DataOutputStream
+import java.io.IOException
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
 import java.nio.charset.Charset
+import java.net.CookieManager
+import java.net.CookieHandler
 
+/**
+ * Should be deleted, use HttpPlus instead!
+ */
+@Deprecated
 object HttpHelper {
-  @throws(classOf[Exception])
+  @Deprecated
+  @throws(classOf[Exception]) 
+  /**
+   * Should be deleted, use HttpPlus instead!
+   */
   def postUrl(request: String, urlParameters: String): String = {
     val obj = new URL(request)
     val httpURLConnection = obj.openConnection().asInstanceOf[HttpURLConnection]

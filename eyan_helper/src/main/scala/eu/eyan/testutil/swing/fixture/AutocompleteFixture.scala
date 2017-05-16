@@ -23,8 +23,8 @@ class AutocompleteFixture(frameFixture: WindowFixture[_], componentName: String)
   }
 
   def setMaxElementsVisible(maxElementsVisible: Int) = autocompleteComponent.setMaxElementsVisible(maxElementsVisible)
-  def setAutocompleteList(values: String*) = autocompleteComponent.setValues(values.toList)
-  def setAutocompleteList(list: List[String]) = autocompleteComponent.setValues(list)
+  def setAutocompleteList(values: String*) = autocompleteComponent.setAutocompleteList(values.toList)
+  def setAutocompleteList(list: List[String]) = autocompleteComponent.setAutocompleteList(list)
   def setNoItemsFoundText(noItemsFoundText: String) = autocompleteComponent.setNoItemsFoundText(noItemsFoundText)
 
   def requireItems(expectedItems: String*) = Assertions.assertThat(list.contents().toList).isEqualTo(expectedItems.toList)

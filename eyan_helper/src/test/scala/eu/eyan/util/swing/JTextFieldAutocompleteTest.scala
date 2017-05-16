@@ -418,7 +418,7 @@ object JTextFieldAutocompleteTest {
     ac.setHintText("default")
     ac.setName(NAME_AUTOCOMPLETE)
     //    ac.setValues(List("a", "ba", "", "ca", "da", null, "ea", "", "aa"))
-    ac.setValues(bigList)
+    ac.setAutocompleteList(bigList)
     panel.add(ac, CC.xy(1, 2))
 
     val after = new JTextField("after")

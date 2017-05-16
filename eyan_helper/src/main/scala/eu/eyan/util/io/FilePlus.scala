@@ -15,5 +15,15 @@ object FilePlus {
     def dirsRecursively: Stream[File] =
       if (file.exists && file.isDirectory) Stream(file) ++ file.dirs.map(_.dirsRecursively).flatten
       else Stream()
+
+    def filesWithExtension(extension: String) = file.listFiles.filter(_.getName.endsWith("." + extension))
+
+    def getFileTree: Stream[File] = FilePlus.getFileTree(file)
   }
+
+  def getFileTree(f: File): Stream[File] =
+    f #:: (
+      if (f.isDirectory) f.listFiles().toStream.flatMap(getFileTree)
+      else Stream.empty)
+
 }
