@@ -105,7 +105,7 @@ class JPanelWithFrameLayout(firstRowSpec: String = PREF) extends JPanel {
     label
   }
 
-  //override def add(comp: Component) = add(comp, 1)
+  // override def add(comp: Component) = add(comp, 1)
 
   /**
    * Changes the functionality of the int parameter, this here is not the position as in the super but the span width for the framelayout
@@ -128,7 +128,7 @@ class JPanelWithFrameLayout(firstRowSpec: String = PREF) extends JPanel {
     add(titledSeparator)
     this
   }
-  
-  def span(columns:Int) = {spanColumns = spanColumns + columns; this}
-  def span:JPanelWithFrameLayout = span(1)
+
+  def span(columns: Int) = { spanColumns = spanColumns + columns; this }
+  def span: JPanelWithFrameLayout = span(1)
 }

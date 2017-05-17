@@ -15,7 +15,11 @@ class JTextFieldAutocomplete() extends JTextField(JTextFieldAutocomplete.TEXTFIE
   private val autocomplete = AutocompleteDecorator.decorate(this)
 
   def getAutocompleteList = autocomplete.getAutocompleteValues
-  def setAutocompleteList(autocompleteList: List[String]) = { Log.debug(autocompleteList.mkString("\",\"")); autocomplete.setAutocompleteValues(autocompleteList); this }
+  def setAutocompleteList(autocompleteList: List[String]) = {
+    Log.debug(autocompleteList.mkString("\",\""))
+    autocomplete.setAutocompleteValues(autocompleteList)
+    this
+  }
 
   def getMaxElementsVisible = autocomplete.getMaxElementsVisible
   def setMaxElementsVisible(maxElementsVisible: Int) = { autocomplete.setMaxElementsVisible(maxElementsVisible); this }

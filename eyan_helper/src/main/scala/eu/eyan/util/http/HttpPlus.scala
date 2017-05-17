@@ -17,7 +17,7 @@ object HttpPlus {
 
   startSSLWorkaround
 
-  //FIXME: this is not going to stop:
+  // FIXME: this is not going to stop:
   def startSSLWorkaround = {
     val trustAllCerts = Array[TrustManager](new X509TrustManager {
       override def getAcceptedIssuers(): Array[java.security.cert.X509Certificate] = null

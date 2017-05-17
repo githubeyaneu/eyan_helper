@@ -10,13 +10,10 @@ import java.nio.charset.Charset
 import java.net.CookieManager
 import java.net.CookieHandler
 
-/**
- * Should be deleted, use HttpPlus instead!
- */
-@Deprecated
+@deprecated("Should be deleted, use HttpPlus instead!", "")
 object HttpHelper {
-  @Deprecated
-  @throws(classOf[Exception]) 
+  @deprecated("Should be deleted, use HttpPlus instead!", "")
+  @throws(classOf[Exception])
   /**
    * Should be deleted, use HttpPlus instead!
    */
