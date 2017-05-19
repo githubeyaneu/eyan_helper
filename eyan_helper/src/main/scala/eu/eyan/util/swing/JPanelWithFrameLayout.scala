@@ -120,8 +120,6 @@ class JPanelWithFrameLayout(firstRowSpec: String = PREF) extends JPanel {
     table
   }
 
-  //override def add(comp: Component) = add(comp, 1)
-
   /**
    * Changes the functionality of the int parameter, this here is not the position as in the super but the span width for the framelayout
    */

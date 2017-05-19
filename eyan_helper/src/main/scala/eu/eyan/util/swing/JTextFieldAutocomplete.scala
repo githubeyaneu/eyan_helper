@@ -1,19 +1,6 @@
 package eu.eyan.util.swing
 
-import java.awt.Color
-import java.awt.Graphics
-import java.awt.Window.Type
-import java.awt.event.ComponentAdapter
-import java.awt.event.ComponentEvent
-import java.awt.event.KeyEvent
-import com.jgoodies.forms.factories.CC
-import com.jgoodies.forms.layout.FormLayout
 import eu.eyan.log.Log
-import javax.swing.BorderFactory
-import javax.swing.JWindow
-import javax.swing.SwingUtilities
-import javax.swing.plaf.basic.BasicTextFieldUI
-import java.awt.Window
 import javax.swing.JTextField
 
 object JTextFieldAutocomplete {
@@ -28,7 +15,11 @@ class JTextFieldAutocomplete() extends JTextField(JTextFieldAutocomplete.TEXTFIE
   private val autocomplete = AutocompleteDecorator.decorate(this)
 
   def getAutocompleteList = autocomplete.getAutocompleteValues
-  def setAutocompleteList(autocompleteList: List[String]) = { Log.debug(autocompleteList.mkString("\",\"")); autocomplete.setAutocompleteValues(autocompleteList); this }
+  def setAutocompleteList(autocompleteList: List[String]) = {
+    Log.debug(autocompleteList.mkString("\",\""))
+    autocomplete.setAutocompleteValues(autocompleteList)
+    this
+  }
 
   def getMaxElementsVisible = autocomplete.getMaxElementsVisible
   def setMaxElementsVisible(maxElementsVisible: Int) = { autocomplete.setMaxElementsVisible(maxElementsVisible); this }

@@ -21,7 +21,7 @@ import javax.swing.event.DocumentListener
 import javax.swing.filechooser.FileNameExtensionFilter
 
 object AwtHelper {
-  //TODO delete Swing stuff or move it to SwingPlus
+  // TODO delete Swing stuff or move it to SwingPlus
   val DESKTOP_LEFT = 0
   val DESKTOP_TOP = 0
 

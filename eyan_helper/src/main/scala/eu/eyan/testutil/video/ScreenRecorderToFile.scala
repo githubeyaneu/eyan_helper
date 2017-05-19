@@ -14,14 +14,14 @@ import org.monte.media.Registry
  * Class that makes possible to save video files into the specified directory.
  */
 class ScreenRecorderToFile(
-  cfg: GraphicsConfiguration,
-  captureArea: Rectangle,
-  fileFormat: Format,
-  screenFormat: Format,
-  mouseFormat: Format,
-  audioFormat: Format,
-  folder: File,
-  videoName: String)
+    cfg: GraphicsConfiguration,
+    captureArea: Rectangle,
+    fileFormat: Format,
+    screenFormat: Format,
+    mouseFormat: Format,
+    audioFormat: Format,
+    folder: File,
+    videoName: String)
     extends ScreenRecorder(cfg, captureArea, fileFormat, screenFormat, mouseFormat, audioFormat, folder) {
 
   if (!folder.exists()) folder.mkdirs()

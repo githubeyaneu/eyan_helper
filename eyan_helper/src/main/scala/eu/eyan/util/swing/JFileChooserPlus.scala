@@ -9,8 +9,8 @@ object JFileChooserPlus {
 
   implicit class JFileChooserImplicit(fileChooser: JFileChooser) {
 
-	  def withCurrentDirectory(path: String) = { fileChooser.setCurrentDirectory(new File(path)); fileChooser }
-	  
+    def withCurrentDirectory(path: String) = { fileChooser.setCurrentDirectory(new File(path)); fileChooser }
+
     def withDialogTitle(title: String) = { fileChooser.setDialogTitle(title); fileChooser }
 
     def withApproveButtonText(text: String) = { fileChooser.setApproveButtonText(text); fileChooser }

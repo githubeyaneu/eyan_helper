@@ -18,6 +18,7 @@ class CachedFileLineReader extends Iterable[String] {
   protected var lineOffsets: java.util.List[Array[Long]] = new java.util.ArrayList()
   // FIXME dont use java
   protected val lineCache: java.util.Map[Int, String] = MapsPlus.newMaxSizeHashMap(Runtime.getRuntime().availableProcessors() * LINE_COUNT_EARLY_READ)
+  val NL = "\r\n"
 
   private var fileChannel: FileChannel = null
   private var fileInputStream: FileInputStream = null
@@ -83,8 +84,14 @@ class CachedFileLineReader extends Iterable[String] {
         fileInputStream = new FileInputStream(file)
         fileChannel = fileInputStream.getChannel()
         longestLine = get(longestLineIndex);
-        // if (fileLength != endIndex) //special characters brake the offsets
-        //   println("Length: " + fileLength + " endOffset:" + endIndex + "\r\n" + "Error at loading file. There are newline problems! ")
+        if (fileLength != endIndex) {
+          // special characters brake the offsets
+          val isActive = Log.isActive
+          Log.activate
+          Log.error("special characters brake the offsets: " + file.getAbsolutePath)
+          Log.error("Length: " + fileLength + " endOffset:" + endIndex + NL + "Error at loading file. There are newline problems! ")
+          if (!isActive) Log.deactivate
+        }
       }
       catch {
         case e: IOException => e.printStackTrace()
@@ -124,10 +131,10 @@ class CachedFileLineReader extends Iterable[String] {
   def findFirst(pattern: String) = {
     val matcher = Pattern.compile(pattern).matcher("")
 
-    val first = this.iterator.find(s => { matcher.reset(s.replaceAll("\r\n", "")); matcher.matches })
+    val first = this.iterator.find(s => { matcher.reset(s.replaceAll(NL, "")); matcher.matches })
 
     if (first.nonEmpty) {
-      val m = Pattern.compile(pattern).matcher(first.get.replaceAll("\r\n", ""))
+      val m = Pattern.compile(pattern).matcher(first.get.replaceAll(NL, ""))
       m.matches
       m
     }

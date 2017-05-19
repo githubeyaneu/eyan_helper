@@ -16,7 +16,7 @@ object Log {
         val stack = Thread.currentThread().getStackTrace()(STACK_LEVEL)
         logs += ((level, message))
         val logText = stack.getClassName.substring(stack.getClassName.lastIndexOf(".") + 1) + "." + stack.getMethodName + ": " + message
-        val prevTimeLog = if(isWithPrevTime) {" " + (System.currentTimeMillis - prevTime)}else ""
+        val prevTimeLog = if (isWithPrevTime) { " " + (System.currentTimeMillis - prevTime) } else ""
         println(level + prevTimeLog + " " + logText)
         prevTime = System.currentTimeMillis
         LogWindow.add(logText)
@@ -25,13 +25,14 @@ object Log {
     this
   }
 
-  def activate = {isActive = true; this}
-  def deactivate = {isActive = false; this}
-  def withPrevTime = {isWithPrevTime = true; this}
+  def activate = { isActive = true; this }
+  def deactivate = { isActive = false; this }
+  def withPrevTime = { isWithPrevTime = true; this }
 
   def error() = log(Error)
   def error(message: String) = log(Error, message)
   def error(exception: Throwable) = log(Error, exception.getMessage + "\r\n  " + exception.getStackTrace.mkString("  \r\n"))
+  def error(message: String, exception: Throwable) = log(Error, message + " - " + exception.getMessage + "\r\n  " + exception.getStackTrace.mkString("  \r\n"))
   def errorOnConsoleToo(exception: Throwable) = {
     log(Error, exception.getMessage + "\r\n  " + exception.getStackTrace.mkString("  \r\n"))
     exception.printStackTrace

@@ -7,6 +7,10 @@ import com.jgoodies.forms.factories.CC
 import eu.eyan.util.awt.AwtHelper
 import java.awt.Toolkit
 
+object JFramePlus {
+  def apply(title: String, component: Component) = new JFramePlus(title, component)
+}
+
 class JFramePlus(title: String, component: Component) extends JFrame {
   setTitle(title)
   setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE)

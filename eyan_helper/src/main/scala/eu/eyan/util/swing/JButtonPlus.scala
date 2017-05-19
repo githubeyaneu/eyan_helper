@@ -8,8 +8,8 @@ import javax.swing.AbstractButton
 import eu.eyan.util.awt.AwtHelper
 
 object JButtonPlus {
-  implicit class JButtonImplicit[TYPE <: AbstractButton] (button: TYPE) {
-    def onAction[A](action : ()=>A):TYPE = { button.addActionListener(AwtHelper.newActionListener( () => action() )); button }     
+  implicit class JButtonImplicit[TYPE <: AbstractButton](button: TYPE) {
+    def onAction[A](action: () => A): TYPE = { button.addActionListener(AwtHelper.newActionListener(() => action())); button }
   }
 }
 
