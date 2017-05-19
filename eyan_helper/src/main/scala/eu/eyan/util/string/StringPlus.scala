@@ -47,8 +47,6 @@ object StringPlus {
     def deleteAsFile = asFile.delete
     def deleteAsDir = asFile.deleteRecursively
 
-    def asFile = new File(s)
-
     def extendFileNameWith(plus: String) = {
       val dotIndex = s.lastIndexOf(".")
       if (dotIndex > -1) s.substring(0, dotIndex) + plus + s.substring(dotIndex)
