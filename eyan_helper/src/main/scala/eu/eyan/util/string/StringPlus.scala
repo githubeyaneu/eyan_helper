@@ -31,13 +31,23 @@ object StringPlus {
       bw.close
     }
 
-    def deleteAsFile = new File(s).delete
-    def deleteAsDir = new File(s).deleteRecursively
+    def appendToFile(file: File): Unit = {
+    	val bw = new BufferedWriter(new FileWriter(file, true))
+    	bw.write(s)
+    	bw.close
+    }
+
+    def deleteAsFile = asFile.delete
+    def deleteAsDir = asFile.deleteRecursively
+
+    def asFile = new File(s)
 
     def executeAsProcess = s.!!
     def asUrlPost(postParams:String = "") = HttpPlus.sendPost(s, postParams)
     def asUrlGet_responseAsStream() = HttpPlus.sendGet_responseAsStream(s)
     
     def linesFromFile = Source.fromFile(s).getLines
+    
+    def toSafeFileName = s.replaceAll(":", "").replaceAll("\\\\", "_")
   }
 }

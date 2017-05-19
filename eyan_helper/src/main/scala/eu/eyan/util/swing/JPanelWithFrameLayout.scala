@@ -16,6 +16,7 @@ import javax.swing.JTextField
 import com.jgoodies.forms.internal.AbstractBuilder
 import com.jgoodies.forms.FormsSetup
 import javax.swing.SwingConstants
+import javax.swing.JTable
 
 object JPanelWithFrameLayout {
   val PREF = "p"
@@ -47,6 +48,7 @@ class JPanelWithFrameLayout(firstRowSpec: String = PREF) extends JPanel {
   }
 
   def newColumn: JPanelWithFrameLayout = newColumn()
+  def newColumnFPG: JPanelWithFrameLayout = newColumn("f:p:g")
 
   def newColumn(spec: String = PREF) = {
     if (column != 0) newColumnSeparator()
@@ -58,6 +60,7 @@ class JPanelWithFrameLayout(firstRowSpec: String = PREF) extends JPanel {
   def nextColumn = { column += 2; this }
 
   def newRow: JPanelWithFrameLayout = newRow()
+  def newRowFPG: JPanelWithFrameLayout = newRow("f:p:g")
 
   def newRow(comp: Component = null, spec: String = PREF) = {
     newRowSeparator()
@@ -105,6 +108,18 @@ class JPanelWithFrameLayout(firstRowSpec: String = PREF) extends JPanel {
     label
   }
 
+  def addList[LIST_TYPE]() = {
+    val list = new JListPlus[LIST_TYPE]
+    add(list)
+    list
+  }
+
+  def addTable[TYPE]() = {
+    val table = new JTablePlus[TYPE]
+    add(new JScrollPane(table))
+    table
+  }
+
   //override def add(comp: Component) = add(comp, 1)
 
   /**
@@ -128,7 +143,7 @@ class JPanelWithFrameLayout(firstRowSpec: String = PREF) extends JPanel {
     add(titledSeparator)
     this
   }
-  
-  def span(columns:Int) = {spanColumns = spanColumns + columns; this}
-  def span:JPanelWithFrameLayout = span(1)
+
+  def span(columns: Int) = { spanColumns = spanColumns + columns; this }
+  def span: JPanelWithFrameLayout = span(1)
 }

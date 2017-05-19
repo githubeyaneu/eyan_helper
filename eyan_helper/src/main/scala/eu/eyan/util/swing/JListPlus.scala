@@ -6,6 +6,8 @@ import javax.swing.AbstractListModel
 import java.awt.event.MouseEvent
 import java.awt.event.MouseAdapter
 import javax.swing.border.Border
+import javax.swing.event.ListSelectionListener
+import javax.swing.event.ListSelectionEvent
 
 class JListPlus[TYPE] extends JList[TYPE] {
 
@@ -29,4 +31,8 @@ class JListPlus[TYPE] extends JList[TYPE] {
   }
 
   def withBorder(border: Border) = { setBorder(border); this }
+
+  def onSelectionChanged(action: () => Unit) = {
+    getSelectionModel.addListSelectionListener(new ListSelectionListener { override def valueChanged(e: ListSelectionEvent) = { action() } })
+  }
 }
