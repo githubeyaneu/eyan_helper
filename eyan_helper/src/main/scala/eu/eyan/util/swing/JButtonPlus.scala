@@ -19,7 +19,9 @@ class JButtonPlus(text: String) extends JButton(text) {
       setEnabled(false)
       runInWorker(() => action.apply(e), () => setEnabled(true))
     }))
+    this
   }
+
 
   def disabled = {
     this.setEnabled(false)

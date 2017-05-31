@@ -23,14 +23,14 @@ class JPanelWithFrameLayoutTest() {
 
   @Test
   def test_JPanelWithFrameLayout = {
-    val panel = new JPanelWithFrameLayoutNew
+    val panel = new JPanelWithFrameLayout
     assertThat(panel.columnCount).isEqualTo(0)
     assertThat(panel.rowCount).isEqualTo(0)
   }
 
   @Test
   def test_JPanelWithFrameLayoutRowAndCol = {
-    val panel = JPanelWithFrameLayoutNew("10dlu:g", "f:20dlu:g")
+    val panel = JPanelWithFrameLayout("10dlu:g", "f:20dlu:g")
 
     assertThat(panel.columnCount).isEqualTo(1)
     assertThat(panel.rowCount).isEqualTo(1)
@@ -41,7 +41,7 @@ class JPanelWithFrameLayoutTest() {
 
   @Test
   def test_WithoutBorders_WithoutSeparators = {
-    val panel = new JPanelWithFrameLayoutNew()
+    val panel = new JPanelWithFrameLayout()
 
     panel.newColumnFPG
     panel.assertColumnSpecs(List("p:g"))
@@ -67,7 +67,7 @@ class JPanelWithFrameLayoutTest() {
 
   @Test
   def test_WithBorders = {
-    val panel = new JPanelWithFrameLayoutNew()
+    val panel = new JPanelWithFrameLayout()
     panel.withBorders
 
     panel.newColumnFPG
@@ -94,7 +94,7 @@ class JPanelWithFrameLayoutTest() {
 
   @Test
   def test_WithBorders_AndSeparators = {
-    val panel = new JPanelWithFrameLayoutNew()
+    val panel = new JPanelWithFrameLayout()
     panel.withBorders
     panel.withSeparators
 
@@ -122,7 +122,7 @@ class JPanelWithFrameLayoutTest() {
 
   @Test
   def test_WithSeparators = {
-    val panel = new JPanelWithFrameLayoutNew()
+    val panel = new JPanelWithFrameLayout()
     panel.withSeparators
 
     panel.newColumnFPG
@@ -149,7 +149,7 @@ class JPanelWithFrameLayoutTest() {
 
   @Test
   def test_add_NoBorders_NoSeparators = {
-    val panel = new JPanelWithFrameLayoutNew()
+    val panel = new JPanelWithFrameLayout()
 
     panel.addLabel("").assertPosition(1, 1)
     panel.assertColumnSpecs(List("p"))
@@ -176,7 +176,7 @@ class JPanelWithFrameLayoutTest() {
 
   @Test
   def test_add_WithBorders_NoSeparators = {
-    val panel = new JPanelWithFrameLayoutNew()
+    val panel = new JPanelWithFrameLayout()
     panel.withBorders
 
     panel.addLabel("").assertPosition(2, 2)
@@ -208,7 +208,7 @@ class JPanelWithFrameLayoutTest() {
 
   @Test
   def test_add_NoBorders_WithSeparators = {
-    val panel = new JPanelWithFrameLayoutNew()
+    val panel = new JPanelWithFrameLayout()
     panel.withSeparators
 
     panel.addLabel("").assertPosition(1, 1)
@@ -240,7 +240,7 @@ class JPanelWithFrameLayoutTest() {
 
   @Test
   def test_add_WithBorders_AndSeparators = {
-    val panel = new JPanelWithFrameLayoutNew()
+    val panel = new JPanelWithFrameLayout()
     panel.withBorders
     panel.withSeparators
 
@@ -273,14 +273,14 @@ class JPanelWithFrameLayoutTest() {
 
   @Test
   def test_addButton = {
-    val button = new JPanelWithFrameLayoutNew().addButton("123")
+    val button = new JPanelWithFrameLayout().addButton("123")
     button.assertPosition(1, 1)
     assertThat(button.getText).isEqualTo("123")
   }
 
   @Test
   def test_addTextField = {
-    val tf = new JPanelWithFrameLayoutNew().addTextField("123", 123)
+    val tf = new JPanelWithFrameLayout().addTextField("123", 123)
     tf.assertPosition(1, 1)
     assertThat(tf.getText).isEqualTo("123")
     assertThat(tf.getColumns).isEqualTo(123)
@@ -288,13 +288,13 @@ class JPanelWithFrameLayoutTest() {
 
   @Test
   def test_addTextArea = {
-    val ta = new JPanelWithFrameLayoutNew().addTextArea("123")
+    val ta = new JPanelWithFrameLayout().addTextArea("123")
     ta.assertClass(classOf[JTextAreaPlus])
     ta.getParent.assertClass(classOf[JViewport])
     ta.getParent.getParent.assertClass(classOf[JScrollPane])
-    ta.getParent.getParent.getParent.assertClass(classOf[JPanelWithFrameLayoutNew])
+    ta.getParent.getParent.getParent.assertClass(classOf[JPanelWithFrameLayout])
 
-    // TODO why does not work: tf.getParent.getParent.getParent.getParent.assertClass(classOf[JPanelWithFrameLayoutNew])
+    // TODO why does not work: tf.getParent.getParent.getParent.getParent.assertClass(classOf[JPanelWithFrameLayout])
     //      tf.getParent.getParent.getParent.assertPosition(1, 1)
 
     assertThat(ta.getText).isEqualTo("123")
@@ -302,20 +302,20 @@ class JPanelWithFrameLayoutTest() {
 
   @Test
   def test_addLabel = {
-    val label = new JPanelWithFrameLayoutNew().addLabel("123")
+    val label = new JPanelWithFrameLayout().addLabel("123")
     label.assertPosition(1, 1)
     assertThat(label.getText).isEqualTo("123")
   }
 
   @Test
   def test_addList = {
-    val list = new JPanelWithFrameLayoutNew().addList
+    val list = new JPanelWithFrameLayout().addList
     list.assertPosition(1, 1)
   }
 
   @Test
   def test_addTable = {
-    val table = new JPanelWithFrameLayoutNew().addTable[Int]
+    val table = new JPanelWithFrameLayout().addTable[Int]
     table.assertClass(classOf[JTablePlus[String]])
     table.getParent.assertClass(classOf[JViewport])
     table.getParent.getParent.assertClass(classOf[JScrollPane])
@@ -324,16 +324,16 @@ class JPanelWithFrameLayoutTest() {
 
   @Test
   def test_addPanelWithFormLayout = {
-    val panel = new JPanelWithFrameLayoutNew().addPanelWithFormLayout
-    panel.assertClass(classOf[JPanelWithFrameLayoutNew])
-    panel.getParent.assertClass(classOf[JPanelWithFrameLayoutNew])
+    val panel = new JPanelWithFrameLayout().addPanelWithFormLayout
+    panel.assertClass(classOf[JPanelWithFrameLayout])
+    panel.getParent.assertClass(classOf[JPanelWithFrameLayout])
     panel.assertPosition(1, 1)
   }
   
   @Test
   def test_addSeparatorWithTitle = {
-    val thiss = new JPanelWithFrameLayoutNew().addSeparatorWithTitle("asd")
-    thiss.assertClass(classOf[JPanelWithFrameLayoutNew])
+    val thiss = new JPanelWithFrameLayout().addSeparatorWithTitle("asd")
+    thiss.assertClass(classOf[JPanelWithFrameLayout])
     // complicated to test asd
   }
 
@@ -341,7 +341,7 @@ class JPanelWithFrameLayoutTest() {
     def assertClass[T](clazz: Class[T]) = { assertThat(component.getClass).isEqualTo(clazz); component }
 
     def assertPosition(x: Int, y: Int, w: Int = 1, h: Int = 1) = {
-      val constraints = component.getParent.asInstanceOf[JPanelWithFrameLayoutNew].formLayout.getConstraints(component)
+      val constraints = component.getParent.asInstanceOf[JPanelWithFrameLayout].formLayout.getConstraints(component)
       assertThat(constraints.gridX).as("CC.x").isEqualTo(x)
       assertThat(constraints.gridY).as("CC.y").isEqualTo(y)
       assertThat(constraints.gridWidth).as("CC.w").isEqualTo(w)
@@ -350,7 +350,7 @@ class JPanelWithFrameLayoutTest() {
     }
   }
 
-  implicit class JPanelWithFrameLayoutPlusTest(panel: JPanelWithFrameLayoutNew) {
+  implicit class JPanelWithFrameLayoutPlusTest(panel: JPanelWithFrameLayout) {
     def formLayout = panel.getLayout.asInstanceOf[FormLayout]
 
     def columnCount = panel.formLayout.getColumnCount

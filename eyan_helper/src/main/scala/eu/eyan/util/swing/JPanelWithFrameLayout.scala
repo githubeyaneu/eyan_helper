@@ -17,72 +17,122 @@ import com.jgoodies.forms.internal.AbstractBuilder
 import com.jgoodies.forms.FormsSetup
 import javax.swing.SwingConstants
 import javax.swing.JTable
+import eu.eyan.log.Log
 
 object JPanelWithFrameLayout {
   val PREF = "p"
 
-  def apply(firstRowSpec: String = PREF, firstColumnSpec: String = PREF) = {
-    new JPanelWithFrameLayout(firstRowSpec).newColumn(firstColumnSpec)
-  }
+  def apply(firstColumnSpec: String = PREF, firstRowSpec: String = PREF) = new JPanelWithFrameLayout().newColumn(firstColumnSpec).newRow(firstRowSpec)
 }
 
-class JPanelWithFrameLayout(firstRowSpec: String = PREF) extends JPanel {
-  private val frameLayout = new FormLayout("", firstRowSpec)
+class JPanelWithFrameLayout() extends JPanel {
+  private val frameLayout = new FormLayout("", "")
   this.setLayout(frameLayout)
-  private var column = 0
-  private var row = 1
-  private var spanColumns = 1
+
   var separatorSizeBetweenColumns = "3dlu"
   var separatorSizeBetweenRows = "3dlu"
+  def withSeparators = { if (checkNotStarted("withSeparators can be used only after the constructor! Do not use after adding cols/rows/components!")) useSeparators = true; this }
+  private var useSeparators = false
+  private def appendColumnSeparator = frameLayout.appendColumn(ColumnSpec.decode(separatorSizeBetweenColumns))
+  private def appendRowSeparator = frameLayout.appendRow(RowSpec.decode(separatorSizeBetweenRows))
 
-  def newColumnSeparator(spec: String = separatorSizeBetweenColumns) = {
-    frameLayout.appendColumn(ColumnSpec.decode(spec))
-    column += 1
-    this
-  }
+  var borderSize = "6dlu"
+  def withBorders = { if (checkNotStarted("withBorders can be used only after the constructor! Do not use after adding cols/rows/components!")) useBorders = true; this }
+  private var useBorders = false
+  private def appendColumnBorder = frameLayout.appendColumn(ColumnSpec.decode(borderSize))
+  private def appendRowBorder = frameLayout.appendRow(RowSpec.decode(borderSize))
 
-  def newRowSeparator(spec: String = separatorSizeBetweenRows) = {
-    frameLayout.appendRow(RowSpec.decode(spec))
-    row += 1
-    this
-  }
+  private def checkNotStarted(msg: String) = if (0 < actualColumn || 0 < actualRow) { Log.error(msg); false } else true
 
+  private var actualColumn = 0
+  private var actualRow = 0
+
+  def span(columns: Int) = { actualSpanColumns = actualSpanColumns + columns; this }
+  def span: JPanelWithFrameLayout = span(1)
+  private var actualSpanColumns = 1
+
+  def notFirstRow = if (useBorders) actualRow >= 2 else actualRow >= 1
+  def notFirstColumn = if (useBorders) actualColumn >= 2 else actualColumn >= 1
+  def noRowYet = actualRow == 0
+  def noColumnYet = actualColumn == 0
+
+  def nextColumn = { if (useSeparators) actualColumn += 2 else actualColumn += 1; this }
   def newColumn: JPanelWithFrameLayout = newColumn()
   def newColumnFPG: JPanelWithFrameLayout = newColumn("f:p:g")
+  def newColumn(spec: String = PREF): JPanelWithFrameLayout = {
+    if (useBorders && actualColumn == 0) {
+      appendColumnBorder
+      appendColumnBorder
+      actualColumn += 1
+    }
 
-  def newColumn(spec: String = PREF) = {
-    if (column != 0) newColumnSeparator()
+    val columnCount = frameLayout.getColumnCount
+    if (useBorders) {
+      frameLayout.removeColumn(columnCount)
+    }
+
+    if (useSeparators) {
+      if (notFirstColumn) {
+        appendColumnSeparator
+        actualColumn += 1
+      }
+    }
+
     frameLayout.appendColumn(ColumnSpec.decode(spec))
-    column += 1
+    actualColumn += 1
+
+    if (useBorders) appendColumnBorder
+
     this
   }
-
-  def nextColumn = { column += 2; this }
 
   def newRow: JPanelWithFrameLayout = newRow()
   def newRowFPG: JPanelWithFrameLayout = newRow("f:p:g")
+  def newRow(spec: String = PREF): JPanelWithFrameLayout = {
 
-  def newRow(comp: Component = null, spec: String = PREF) = {
-    newRowSeparator()
+    if (useBorders && actualRow == 0) {
+      appendRowBorder
+      appendRowBorder
+      actualRow += 1
+    }
+
+    val rowCount = frameLayout.getRowCount
+    if (useBorders) {
+      frameLayout.removeRow(rowCount)
+    }
+
+    if (useSeparators) {
+      if (notFirstRow) {
+        appendRowSeparator
+        actualRow += 1
+      }
+    }
+
     frameLayout.appendRow(RowSpec.decode(spec))
-    row += 1
-    if (comp != null) add(comp)
-    column = 1
+    actualRow += 1
+
+    if (useBorders) appendRowBorder
+
+    if (notFirstColumn)
+      if (useBorders) actualColumn = 2
+      else actualColumn = 1
+
     this
   }
 
-  def newRow(spec: String) = {
-    newRowSeparator()
-    frameLayout.appendRow(RowSpec.decode(spec))
-    row += 1
-    column = 1
-    this
+  override def add(comp: Component) = {
+    if (noRowYet) newRow
+    if (noColumnYet) newColumn
+
+    val width = if (useSeparators) actualSpanColumns * 2 - 1 else actualSpanColumns
+    this.add(comp, CC.xyw(actualColumn, actualRow, width))
+    actualSpanColumns = 1
+    comp
   }
 
-  def addButton(text: String, action: ActionEvent => Unit = null) = {
+  def addButton(text: String) = {
     val button = new JButtonPlus(text)
     add(button)
-    if (action != null) button.addActionListener(newActionListener(action))
     button
   }
 
@@ -93,12 +143,11 @@ class JPanelWithFrameLayout(firstRowSpec: String = PREF) extends JPanel {
     tf
   }
 
-  def addTextArea(text: String = "", documentAction: () => Unit = null) = {
+  def addTextArea(text: String = "") = {
     val textArea = new JTextAreaPlus().appendText(text)
     val scrollPane = new JScrollPane(textArea)
     val containerPanel = JPanelWithFrameLayout("f:1px:g", "f:1px:g").add(scrollPane)
     add(containerPanel)
-    if (documentAction != null) textArea.getDocument.addDocumentListener(AwtHelper.docListener(documentAction))
     textArea
   }
 
@@ -120,18 +169,8 @@ class JPanelWithFrameLayout(firstRowSpec: String = PREF) extends JPanel {
     table
   }
 
-  /**
-   * Changes the functionality of the int parameter, this here is not the position as in the super but the span width for the framelayout
-   */
-  override def add(comp: Component) = {
-    if (column == 0) newColumn()
-    this.add(comp, CC.xyw(column, row, spanColumns * 2 - 1))
-    spanColumns = 1
-    comp
-  }
-
-  def addPanelWithFormLayout(firstRowSpec: String = PREF) = {
-    val panel = new JPanelWithFrameLayout(firstRowSpec)
+  def addPanelWithFormLayout() = {
+    val panel = new JPanelWithFrameLayout()
     add(panel)
     panel
   }
@@ -141,7 +180,4 @@ class JPanelWithFrameLayout(firstRowSpec: String = PREF) extends JPanel {
     add(titledSeparator)
     this
   }
-
-  def span(columns: Int) = { spanColumns = spanColumns + columns; this }
-  def span: JPanelWithFrameLayout = span(1)
 }
