@@ -18,6 +18,9 @@ import javax.swing.JLabel
 @RunWith(classOf[ScalaEclipseJunitRunner])
 class JPanelWithFrameLayoutTest() {
 
+  val BORDER = JPanelWithFrameLayout.DEFAULT_BORDER_SIZE
+  val SEPARATOR = JPanelWithFrameLayout.DEFAULT_SEPARATOR_SIZE
+
   @Before
   def setUp = {}
 
@@ -71,25 +74,25 @@ class JPanelWithFrameLayoutTest() {
     panel.withBorders
 
     panel.newColumnFPG
-    panel.assertColumnSpecs(List("6dlu", "p:g", "6dlu"))
+    panel.assertColumnSpecs(List(BORDER, "p:g", BORDER))
 
     panel.newColumn
-    panel.assertColumnSpecs(List("6dlu", "p:g", "p", "6dlu"))
+    panel.assertColumnSpecs(List(BORDER, "p:g", "p", BORDER))
 
     panel.newColumn("11dlu")
-    panel.assertColumnSpecs(List("6dlu", "p:g", "p", "11dlu", "6dlu"))
+    panel.assertColumnSpecs(List(BORDER, "p:g", "p", "11dlu", BORDER))
 
     panel.newRowFPG
-    panel.assertRowSpecs(List("6dlu", "f:p:g", "6dlu"))
+    panel.assertRowSpecs(List(BORDER, "f:p:g", BORDER))
 
     panel.newRow("1px")
-    panel.assertRowSpecs(List("6dlu", "f:p:g", "1px", "6dlu"))
+    panel.assertRowSpecs(List(BORDER, "f:p:g", "1px", BORDER))
 
     panel.newRow("2px")
-    panel.assertRowSpecs(List("6dlu", "f:p:g", "1px", "2px", "6dlu"))
+    panel.assertRowSpecs(List(BORDER, "f:p:g", "1px", "2px", BORDER))
 
     panel.newRow
-    panel.assertRowSpecs(List("6dlu", "f:p:g", "1px", "2px", "p", "6dlu"))
+    panel.assertRowSpecs(List(BORDER, "f:p:g", "1px", "2px", "p", BORDER))
   }
 
   @Test
@@ -99,25 +102,25 @@ class JPanelWithFrameLayoutTest() {
     panel.withSeparators
 
     panel.newColumnFPG
-    panel.assertColumnSpecs(List("6dlu", "p:g", "6dlu"))
+    panel.assertColumnSpecs(List(BORDER, "p:g", BORDER))
 
     panel.newColumn
-    panel.assertColumnSpecs(List("6dlu", "p:g", "3dlu", "p", "6dlu"))
+    panel.assertColumnSpecs(List(BORDER, "p:g", SEPARATOR, "p", BORDER))
 
     panel.newColumn("11dlu")
-    panel.assertColumnSpecs(List("6dlu", "p:g", "3dlu", "p", "3dlu", "11dlu", "6dlu"))
+    panel.assertColumnSpecs(List(BORDER, "p:g", SEPARATOR, "p", SEPARATOR, "11dlu", BORDER))
 
     panel.newRowFPG
-    panel.assertRowSpecs(List("6dlu", "f:p:g", "6dlu"))
+    panel.assertRowSpecs(List(BORDER, "f:p:g", BORDER))
 
     panel.newRow("1px")
-    panel.assertRowSpecs(List("6dlu", "f:p:g", "3dlu", "1px", "6dlu"))
+    panel.assertRowSpecs(List(BORDER, "f:p:g", SEPARATOR, "1px", BORDER))
 
     panel.newRow("2px")
-    panel.assertRowSpecs(List("6dlu", "f:p:g", "3dlu", "1px", "3dlu", "2px", "6dlu"))
+    panel.assertRowSpecs(List(BORDER, "f:p:g", SEPARATOR, "1px", SEPARATOR, "2px", BORDER))
 
     panel.newRow
-    panel.assertRowSpecs(List("6dlu", "f:p:g", "3dlu", "1px", "3dlu", "2px", "3dlu", "p", "6dlu"))
+    panel.assertRowSpecs(List(BORDER, "f:p:g", SEPARATOR, "1px", SEPARATOR, "2px", SEPARATOR, "p", BORDER))
   }
 
   @Test
@@ -129,22 +132,22 @@ class JPanelWithFrameLayoutTest() {
     panel.assertColumnSpecs(List("p:g"))
 
     panel.newColumn
-    panel.assertColumnSpecs(List("p:g", "3dlu", "p"))
+    panel.assertColumnSpecs(List("p:g", SEPARATOR, "p"))
 
     panel.newColumn("11dlu")
-    panel.assertColumnSpecs(List("p:g", "3dlu", "p", "3dlu", "11dlu"))
+    panel.assertColumnSpecs(List("p:g", SEPARATOR, "p", SEPARATOR, "11dlu"))
 
     panel.newRowFPG
     panel.assertRowSpecs(List("f:p:g"))
 
     panel.newRow("1px")
-    panel.assertRowSpecs(List("f:p:g", "3dlu", "1px"))
+    panel.assertRowSpecs(List("f:p:g", SEPARATOR, "1px"))
 
     panel.newRow("2px")
-    panel.assertRowSpecs(List("f:p:g", "3dlu", "1px", "3dlu", "2px"))
+    panel.assertRowSpecs(List("f:p:g", SEPARATOR, "1px", SEPARATOR, "2px"))
 
     panel.newRow
-    panel.assertRowSpecs(List("f:p:g", "3dlu", "1px", "3dlu", "2px", "3dlu", "p"))
+    panel.assertRowSpecs(List("f:p:g", SEPARATOR, "1px", SEPARATOR, "2px", SEPARATOR, "p"))
   }
 
   @Test
@@ -329,7 +332,7 @@ class JPanelWithFrameLayoutTest() {
     panel.getParent.assertClass(classOf[JPanelWithFrameLayout])
     panel.assertPosition(1, 1)
   }
-  
+
   @Test
   def test_addSeparatorWithTitle = {
     val thiss = new JPanelWithFrameLayout().addSeparatorWithTitle("asd")

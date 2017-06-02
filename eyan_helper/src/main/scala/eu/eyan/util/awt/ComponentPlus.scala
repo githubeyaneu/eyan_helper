@@ -8,5 +8,6 @@ object ComponentPlus {
   implicit class ComponentPlusImplicit[TYPE <: Component](component: TYPE) {
     def withName(name: String) = {component.setName(name); component}
     def withEnabled(enabled: Boolean) = {component.setEnabled(enabled); component}
+    def onDoubleClick(action: () => Unit) = {component.addMouseListener(AwtHelper.doubleClick { () => action() })}
   }
 }

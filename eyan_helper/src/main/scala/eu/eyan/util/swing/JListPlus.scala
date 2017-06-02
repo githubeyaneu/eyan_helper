@@ -8,6 +8,7 @@ import java.awt.event.MouseAdapter
 import javax.swing.border.Border
 import javax.swing.event.ListSelectionListener
 import javax.swing.event.ListSelectionEvent
+import org.fest.swing.input.MouseInfo
 
 class JListPlus[TYPE] extends JList[TYPE] {
 
@@ -26,7 +27,7 @@ class JListPlus[TYPE] extends JList[TYPE] {
   }
 
   def onDoubleClick(action: () => Unit) = {
-    addMouseListener(new MouseAdapter { override def mouseClicked(e: MouseEvent) = if (e.getClickCount() == 2) action() })
+    addMouseListener(new MouseAdapter { override def mouseClicked(e: MouseEvent) = if (e.getClickCount() == 2 && e.getButton==MouseEvent.BUTTON1) action() })
     this
   }
 

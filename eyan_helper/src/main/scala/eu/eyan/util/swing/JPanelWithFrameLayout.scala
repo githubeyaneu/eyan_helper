@@ -6,7 +6,7 @@ import com.jgoodies.forms.factories.CC
 import com.jgoodies.forms.layout.ColumnSpec
 import com.jgoodies.forms.layout.FormLayout
 import com.jgoodies.forms.layout.RowSpec
-import JPanelWithFrameLayout.PREF
+import JPanelWithFrameLayout._
 import eu.eyan.util.awt.AwtHelper
 import eu.eyan.util.awt.AwtHelper.newActionListener
 import javax.swing.JLabel
@@ -21,6 +21,8 @@ import eu.eyan.log.Log
 
 object JPanelWithFrameLayout {
   val PREF = "p"
+  val DEFAULT_SEPARATOR_SIZE = "3dlu"
+  val DEFAULT_BORDER_SIZE = "6dlu"
 
   def apply(firstColumnSpec: String = PREF, firstRowSpec: String = PREF) = new JPanelWithFrameLayout().newColumn(firstColumnSpec).newRow(firstRowSpec)
 }
@@ -29,14 +31,14 @@ class JPanelWithFrameLayout() extends JPanel {
   private val frameLayout = new FormLayout("", "")
   this.setLayout(frameLayout)
 
-  var separatorSizeBetweenColumns = "3dlu"
-  var separatorSizeBetweenRows = "3dlu"
+  var separatorSizeBetweenColumns = DEFAULT_SEPARATOR_SIZE
+  var separatorSizeBetweenRows = DEFAULT_SEPARATOR_SIZE
   def withSeparators = { if (checkNotStarted("withSeparators can be used only after the constructor! Do not use after adding cols/rows/components!")) useSeparators = true; this }
   private var useSeparators = false
   private def appendColumnSeparator = frameLayout.appendColumn(ColumnSpec.decode(separatorSizeBetweenColumns))
   private def appendRowSeparator = frameLayout.appendRow(RowSpec.decode(separatorSizeBetweenRows))
 
-  var borderSize = "6dlu"
+  var borderSize = DEFAULT_BORDER_SIZE
   def withBorders = { if (checkNotStarted("withBorders can be used only after the constructor! Do not use after adding cols/rows/components!")) useBorders = true; this }
   private var useBorders = false
   private def appendColumnBorder = frameLayout.appendColumn(ColumnSpec.decode(borderSize))

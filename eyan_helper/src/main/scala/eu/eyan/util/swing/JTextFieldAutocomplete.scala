@@ -12,7 +12,7 @@ object JTextFieldAutocomplete {
  * It also supports a hint text function that is shown if no text is in the textfield
  */
 class JTextFieldAutocomplete() extends JTextField(JTextFieldAutocomplete.TEXTFIELD_DEFAULT_SIZE) {
-  private val autocomplete = AutocompleteDecorator.decorate(this)
+  val autocomplete = AutocompleteDecorator.decorate(this)
 
   def getAutocompleteList = autocomplete.getAutocompleteValues
   def setAutocompleteList(autocompleteList: List[String]) = {
