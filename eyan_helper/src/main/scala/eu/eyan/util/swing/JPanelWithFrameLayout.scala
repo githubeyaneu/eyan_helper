@@ -8,7 +8,7 @@ import com.jgoodies.forms.layout.FormLayout
 import com.jgoodies.forms.layout.RowSpec
 import JPanelWithFrameLayout._
 import eu.eyan.util.awt.AwtHelper
-import eu.eyan.util.awt.AwtHelper.newActionListener
+import eu.eyan.util.awt.AwtHelper.onActionPerformed
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JScrollPane

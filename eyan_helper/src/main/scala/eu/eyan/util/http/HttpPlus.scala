@@ -19,11 +19,14 @@ object HttpPlus {
 
   // FIXME: this is not going to stop:
   def startSSLWorkaround = {
-    val trustAllCerts = Array[TrustManager](new X509TrustManager {
+    val trustManager =  new X509TrustManager {
       override def getAcceptedIssuers(): Array[java.security.cert.X509Certificate] = null
       override def checkClientTrusted(certs: Array[java.security.cert.X509Certificate], authType: String) = {}
       override def checkServerTrusted(certs: Array[java.security.cert.X509Certificate], authType: String) = {}
-    })
+    }
+    
+    val trustAllCerts = Array[TrustManager](trustManager)
+    
     try {
       val sc = SSLContext.getInstance("SSL")
       sc.init(null, trustAllCerts, new java.security.SecureRandom())

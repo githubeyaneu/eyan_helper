@@ -48,7 +48,7 @@ object SwingPlus {
 
   def newCheckBoxWithAction(text: String, action: (JCheckBox, ActionEvent) => Unit) = {
     val cb = new JCheckBox(text)
-    cb.addActionListener(AwtHelper.newActionListener(e => action(cb, e)))
+    cb.addActionListener(AwtHelper.onActionPerformed(e => action(cb, e)))
     cb
   }
 
@@ -57,7 +57,7 @@ object SwingPlus {
 
   def newButtonWithAction(text: String, action: (JButton, ActionEvent) => Unit) = {
     val button = new JButton(text)
-    button.addActionListener(AwtHelper.newActionListener(e => action(button, e)))
+    button.addActionListener(AwtHelper.onActionPerformed(e => action(button, e)))
     button
   }
 
@@ -66,7 +66,7 @@ object SwingPlus {
 
   def newTextFieldWithAction(columns: Int, actionListener: (JTextField, ActionEvent) => Unit) = {
     val tf = new JTextField(columns)
-    tf.addActionListener(AwtHelper.newActionListener(e => actionListener(tf, e)))
+    tf.addActionListener(AwtHelper.onActionPerformed(e => actionListener(tf, e)))
     tf
   }
 

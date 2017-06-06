@@ -8,6 +8,7 @@ import java.awt.dnd.DnDConstants
 import java.awt.datatransfer.Transferable
 import java.awt.datatransfer.DataFlavor
 
+// FIXME: move to ComponentPlus setDropTarget
 object DnD_FileDropTarget {
   def onDropFile(action: File=>Unit): DropTarget = new DnD_FileDropTarget(action)
 }

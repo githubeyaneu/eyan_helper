@@ -7,6 +7,7 @@ import eu.eyan.log.Log
 import java.awt.Color
 import eu.eyan.util.swing.JTextFieldPlus.JTextFieldPlusImplicit
 import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
+import java.awt.event.ComponentEvent
 
 object AutocompleteDecorator {
   def decorate(component: JTextComponent):AutocompleteDecorator = {
@@ -105,13 +106,13 @@ class AutocompleteDecorator(component: JTextComponent) {
       popup.showPopup
 
       setPopupWidth()
-      setPopupLocation()
+      setPopupLocation(null)
     }
   }
 
   private def refreshPopup = {if (popup.isVisible) showPopUp; this}
 
-  private def setPopupLocation: () => Unit = () => popup.setLocation(component.getLocationOnScreen.x, component.getLocationOnScreen.y + component.getHeight)
+  private def setPopupLocation: ComponentEvent => Unit = e => popup.setLocation(component.getLocationOnScreen.x, component.getLocationOnScreen.y + component.getHeight)
 
   private def setPopupWidth: () => Unit = () => popup.setWidth(component.getWidth)
 

@@ -8,7 +8,7 @@ import com.jgoodies.forms.layout.FormLayout
 import com.jgoodies.forms.layout.RowSpec
 import JPanelWithFrameLayoutOld.PREF
 import eu.eyan.util.awt.AwtHelper
-import eu.eyan.util.awt.AwtHelper.newActionListener
+import eu.eyan.util.awt.AwtHelper.onActionPerformed
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JScrollPane
@@ -82,7 +82,7 @@ class JPanelWithFrameLayoutOld(firstRowSpec: String = PREF) extends JPanel {
   def addButton(text: String, action: ActionEvent => Unit = null) = {
     val button = new JButtonPlus(text)
     add(button)
-    if (action != null) button.addActionListener(newActionListener(action))
+    if (action != null) button.addActionListener(onActionPerformed(action))
     button
   }
 

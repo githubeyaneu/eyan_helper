@@ -18,7 +18,7 @@ object PopupWindow {
 
 class PopupWindow(content: Component, owner: Component) {
   var wasCreated = false
-  private var componentAdapter: () => Unit = null
+  private var componentAdapter: ComponentEvent => Unit = null
 
   private var window: JWindow = null
 
@@ -33,7 +33,7 @@ class PopupWindow(content: Component, owner: Component) {
       window.add(content, CC.xy(1, 1))
 
       // TODO later if it is necessary: create cleanup method to solve memory leak
-      ancestor.addComponentListener(AwtHelper.componentMoved(componentAdapter))
+      ancestor.addComponentListener(AwtHelper.onComponentMoved(componentAdapter))
 
       wasCreated = true
     }
@@ -54,5 +54,5 @@ class PopupWindow(content: Component, owner: Component) {
 
   def setInvisible = { if (isVisible) window.setVisible(false); this }
 
-  def onComponentMoved(action: () => Unit) = { componentAdapter = action; this }
+  def onComponentMoved(action: ComponentEvent => Unit) = { componentAdapter = action; this }
 }
