@@ -5,6 +5,24 @@ import java.awt.Component
 import java.awt.AWTEvent
 import java.awt.event.MouseEvent
 import eu.eyan.util.swing.JFramePlus
+import java.awt.Toolkit
+import java.awt.event.HierarchyListener
+import java.awt.event.MouseWheelListener
+import java.awt.event.InputMethodEvent
+import java.awt.event.MouseWheelEvent
+import java.awt.event.MouseAdapter
+import java.awt.event.HierarchyEvent
+import java.awt.event.MouseMotionAdapter
+import java.awt.event.KeyEvent
+import java.awt.dnd.DropTargetEvent
+import java.awt.dnd.DropTargetDropEvent
+import java.awt.event.FocusEvent
+import java.awt.dnd.DropTargetDragEvent
+import java.awt.event.ComponentEvent
+import java.awt.event.HierarchyBoundsAdapter
+import java.awt.event.FocusAdapter
+import java.awt.event.ComponentAdapter
+import java.awt.event.KeyAdapter
 
 object ComponentPlus {
 
@@ -54,11 +72,102 @@ object ComponentPlus {
     def visible: TYPE = visible(true)
     def invisible = visible(false)
 
-    // TODO listeners
-    def onDoubleClick(action: => Unit) = onDoubleClickEvent { e => action }
-    def onDoubleClickEvent(action: MouseEvent => Unit) = { component.addMouseListener(AwtHelper.doubleClick(action)); component }
+    //////////////////////////////////////////    Awt Listeners     //////////////////////////////////////////
+    def onComponentResized(action: => Unit) = onComponentResizedEvent { e => action }
+    def onComponentResizedEvent(action: ComponentEvent => Unit) = { component.addComponentListener(AwtHelper.onComponentResized(action)); component }
+    def onComponentMoved(action: => Unit) = onComponentMovedEvent { e => action }
+    def onComponentMovedEvent(action: ComponentEvent => Unit) = { component.addComponentListener(AwtHelper.onComponentMoved(action)); component }
+    def onComponentShown(action: => Unit) = onComponentShownEvent { e => action }
+    def onComponentShownEvent(action: ComponentEvent => Unit) = { component.addComponentListener(AwtHelper.onComponentShown(action)); component }
+    def onComponentHidden(action: => Unit) = onComponentHiddenEvent { e => action }
+    def onComponentHiddenEvent(action: ComponentEvent => Unit) = { component.addComponentListener(AwtHelper.onComponentHidden(action)); component }
 
+    def onFocusGained(action: => Unit) = onFocusGainedEvent { e => action }
+    def onFocusGainedEvent(action: FocusEvent => Unit) = { component.addFocusListener(AwtHelper.onFocusGained(action)); component }
+    def onFocusLost(action: => Unit) = onFocusLostEvent { e => action }
+    def onFocusLostEvent(action: FocusEvent => Unit) = { component.addFocusListener(AwtHelper.onFocusLost(action)); component }
+
+    def onAncestorMoved(action: => Unit) = onAncestorMovedEvent { e => action }
+    def onAncestorMovedEvent(action: HierarchyEvent => Unit) = { component.addHierarchyBoundsListener(AwtHelper.onAncestorMoved(action)); component }
+    def onAncestorResized(action: => Unit) = onAncestorResizedEvent { e => action }
+    def onAncestorResizedEvent(action: HierarchyEvent => Unit) = { component.addHierarchyBoundsListener(AwtHelper.onAncestorResized(action)); component }
+
+    def onHierarchyChanged(action: => Unit) = onHierarchyChangedEvent { e => action }
+    def onHierarchyChangedEvent(action: HierarchyEvent => Unit) = { component.addHierarchyListener(AwtHelper.onHierarchyChanged(action)); component }
+
+    def onInputMethodTextChanged(action: => Unit) = onInputMethodTextChangedEvent { e => action }
+    def onInputMethodTextChangedEvent(action: InputMethodEvent => Unit) = { component.addInputMethodListener(AwtHelper.onInputMethodTextChanged(action)); component }
+    def onCaretPositionChanged(action: => Unit) = onCaretPositionChangedEvent { e => action }
+    def onCaretPositionChangedEvent(action: InputMethodEvent => Unit) = { component.addInputMethodListener(AwtHelper.onCaretPositionChanged(action)); component }
+
+    def onKeyTyped(action: => Unit) = onKeyTypedEvent { e => action }
+    def onKeyTypedEvent(action: KeyEvent => Unit) = { component.addKeyListener(AwtHelper.onKeyTyped(action)); component }
+    def onKeyPressed(action: => Unit) = onKeyPressedEvent { e => action }
+    def onKeyPressedEvent(action: KeyEvent => Unit) = { component.addKeyListener(AwtHelper.onKeyPressed(action)); component }
+    def onKeyReleased(action: => Unit) = onKeyReleasedEvent { e => action }
+    def onKeyReleasedEvent(action: KeyEvent => Unit) = { component.addKeyListener(AwtHelper.onKeyReleased(action)); component }
+
+    def onMouseClicked(action: => Unit, clickCount: Int = 1) = onMouseClickedEvent { e => action }
+    def onMouseClickedEvent(action: MouseEvent => Unit, clickCount: Int = 1) = { component.addMouseListener(AwtHelper.onMouseClicked(action)); component }
+    def onMousePressed(action: => Unit) = onMousePressedEvent { e => action }
+    def onMousePressedEvent(action: MouseEvent => Unit) = { component.addMouseListener(AwtHelper.onMousePressed(action)); component }
+    def onMouseReleased(action: => Unit) = onMouseReleasedEvent { e => action }
+    def onMouseReleasedEvent(action: MouseEvent => Unit) = { component.addMouseListener(AwtHelper.onMouseReleased(action)); component }
+    def onMouseEntered(action: => Unit) = onMouseEnteredEvent { e => action }
+    def onMouseEnteredEvent(action: MouseEvent => Unit) = { component.addMouseListener(AwtHelper.onMouseEntered(action)); component }
+    def onMouseExited(action: => Unit) = onMouseExitedEvent { e => action }
+    def onMouseExitedEvent(action: MouseEvent => Unit) = { component.addMouseListener(AwtHelper.onMouseExited(action)); component }
+
+    def onClicked(action: => Unit) = onClickedEvent { e => action }
+    def onClickedEvent(action: MouseEvent => Unit) = { component.addMouseListener(AwtHelper.onClicked(action)); component }
+    def onDoubleClick(action: => Unit) = onDoubleClickEvent { e => action }
+    def onDoubleClickEvent(action: MouseEvent => Unit) = { component.addMouseListener(AwtHelper.onDoubleClick(action)); component }
     def onTripleClick(action: => Unit) = onTripleClickEvent { e => action }
-    def onTripleClickEvent(action: MouseEvent => Unit) = { component.addMouseListener(AwtHelper.tripleClick(action)); component }
+    def onTripleClickEvent(action: MouseEvent => Unit) = { component.addMouseListener(AwtHelper.onTripleClick(action)); component }
+
+    def onMouseDragged(action: => Unit) = onMouseDraggedEvent { e => action }
+    def onMouseDraggedEvent(action: MouseEvent => Unit) = { component.addMouseMotionListener(AwtHelper.onMouseDragged(action)); component }
+    def onMouseMoved(action: => Unit) = onMouseMovedEvent { e => action }
+    def onMouseMovedEvent(action: MouseEvent => Unit) = { component.addMouseMotionListener(AwtHelper.onMouseMoved(action)); component }
+
+    def onMouseWheelMoved(action: => Unit) = onMouseWheelMovedEvent { e => action }
+    def onMouseWheelMovedEvent(action: MouseWheelEvent => Unit) = { component.addMouseWheelListener(AwtHelper.onMouseWheelMoved(action)); component }
+
+    //////////////////////////////////////////    Bean Listeners     //////////////////////////////////////////
+    //TODO
+//    component.addPropertyChangeListener(listener)
+//    component.addPropertyChangeListener(propertyName, listener)
+
+    //////////////////////////////////////////    DND Listeners     //////////////////////////////////////////
+    //TODO
+//    def onDragEnter(action: DropTargetDragEvent => Unit) = new DropTargetAdapter() { override def dragEnter(e: DropTargetDragEvent) = action(e) }
+//    def onDragOver(action: DropTargetDragEvent => Unit) = new DropTargetAdapter() { override def dragOver(e: DropTargetDragEvent) = action(e) }
+//    def onDropActionChanged(action: DropTargetDragEvent => Unit) = new DropTargetAdapter() { override def dropActionChanged(e: DropTargetDragEvent) = action(e) }
+//    def onDragExit(action: DropTargetEvent => Unit) = new DropTargetAdapter() { override def dragExit(e: DropTargetEvent) = action(e) }
+//    def onDrop(action: DropTargetDropEvent => Unit) = new DropTargetAdapter() { override def drop(e: DropTargetDropEvent) = action(e) }
+
+    def size = component.getSize
+    def width = size.width
+    def height = size.height
+    def screenSize = AwtHelper.screenSize
+
+    def positionToCenter = {
+      component.setSize(width, height)
+      component.setLocation((screenSize.width - width) / 2, (screenSize.height - height) / 2)
+      component
+    }
+
+    val SCREEN_LEFT = 0
+    val SCREEN_TOP = 0
+
+    def positionToLeft = {
+      component.setSize(screenSize.width / 2, screenSize.height - 30)
+      component.setLocation(SCREEN_LEFT, SCREEN_TOP)
+    }
+
+    def positionToRight = {
+      component.setSize(screenSize.width / 2, screenSize.height - 30)
+      component.setLocation(screenSize.width / 2, SCREEN_TOP)
+    }
   }
 }

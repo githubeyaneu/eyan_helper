@@ -6,6 +6,7 @@ import java.awt.Component
 import com.jgoodies.forms.factories.CC
 import eu.eyan.util.awt.AwtHelper
 import java.awt.Toolkit
+import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
 
 object JFramePlus {
   def apply(title: String, component: Component) = new JFramePlus(title, component)
@@ -18,5 +19,4 @@ class JFramePlus(title: String, component: Component) extends JFrame {
   add(component, CC.xy(1, 1))
 
   def packAndSetVisible = { pack; setVisible(true); this }
-  def positionToCenter = AwtHelper.positionToCenter(this)
 }

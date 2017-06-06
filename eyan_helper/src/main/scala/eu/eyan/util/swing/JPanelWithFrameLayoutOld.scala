@@ -98,7 +98,7 @@ class JPanelWithFrameLayoutOld(firstRowSpec: String = PREF) extends JPanel {
     val scrollPane = new JScrollPane(textArea)
     val containerPanel = JPanelWithFrameLayoutOld("f:1px:g", "f:1px:g").add(scrollPane)
     add(containerPanel)
-    if (documentAction != null) textArea.getDocument.addDocumentListener(AwtHelper.docListener(documentAction))
+    if (documentAction != null) textArea.getDocument.addDocumentListener(SwingPlus.docListener(documentAction))
     textArea
   }
 

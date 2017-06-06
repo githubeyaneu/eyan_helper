@@ -1,21 +1,20 @@
 package eu.eyan.log
 
-import javax.swing.JFrame
-import com.jgoodies.forms.layout.FormLayout
-import eu.eyan.util.swing.JPanelWithFrameLayout
-import javax.swing.WindowConstants
-import javax.swing.text.DefaultCaret
-import java.awt.Dialog.ModalExclusionType
-import eu.eyan.util.awt.AwtHelper
 import java.awt.Component
+import java.awt.Dialog.ModalExclusionType
+
+import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
+import eu.eyan.util.swing.JPanelWithFrameLayout
+import javax.swing.JFrame
+import javax.swing.WindowConstants
 
 object LogWindow {
   val window = new LogWindow
 
   def show(origin: Component = null) = {
     window.frame.setVisible(true)
-    AwtHelper.positionToRight(window.frame)
-    if (origin != null) AwtHelper.positionToLeft(origin)
+    window.frame.positionToRight
+    if (origin != null) origin.positionToLeft  
   }
 
   def add(text: String) = {

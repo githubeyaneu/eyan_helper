@@ -1,24 +1,31 @@
 package eu.eyan.util.swing
 
 import java.awt.Component
+import java.awt.FlowLayout
 import java.awt.event.ActionEvent
+import java.awt.event.KeyAdapter
+import java.awt.event.KeyEvent
+import java.io.File
+
 import com.jgoodies.forms.factories.CC
+
 import eu.eyan.util.awt.AwtHelper
 import eu.eyan.util.jgoodies.FormLayoutPlus
+import javax.swing.JButton
+import javax.swing.JCheckBox
+import javax.swing.JFileChooser
 import javax.swing.JLabel
 import javax.swing.JOptionPane
 import javax.swing.JPanel
 import javax.swing.JTextField
-import javax.swing.SwingUtilities
-import javax.swing.JButton
-import javax.swing.JCheckBox
-import java.awt.FlowLayout
 import javax.swing.JTextPane
-import java.awt.event.KeyListener
-import java.awt.event.KeyEvent
-import java.awt.event.KeyAdapter
-import javax.swing.event.ListDataListener
+import javax.swing.SwingUtilities
+import javax.swing.SwingWorker
+import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
 import javax.swing.event.ListDataEvent
+import javax.swing.event.ListDataListener
+import javax.swing.filechooser.FileNameExtensionFilter
 
 object SwingPlus {
   def showErrorDialog(msg: String, e: Throwable, shown: Set[Throwable] = Set()): Unit = {
@@ -89,5 +96,24 @@ object SwingPlus {
     layout.getComponent().add(col1Comp, CC.xy(1, 1))
     layout.getComponent().add(col2Comp, CC.xy(1 + 1, 1))
     layout.getComponent()
+  }
+
+  def chooseFile(action: File => Unit, extension: String = "") = {
+    val fc = new JFileChooser
+    if (!extension.isEmpty) fc.setFileFilter(new FileNameExtensionFilter(extension + " files", extension))
+    if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) action(fc.getSelectedFile)
+  }
+
+  def docListener(action: () => Unit) = new DocumentListener() {
+    override def insertUpdate(e: DocumentEvent) = action()
+    override def removeUpdate(e: DocumentEvent) = {}
+    override def changedUpdate(e: DocumentEvent) = action()
+  }
+
+  def runInWorker(work: () => Unit, doAtDone: () => Unit) = {
+    new SwingWorker[Void, Void]() {
+      override def doInBackground() = { work.apply(); null }
+      override def done() = doAtDone.apply()
+    }.execute()
   }
 }

@@ -50,6 +50,6 @@ object JTextFieldPlus {
       textField
     }
 
-    def clickSelectAll = { textField.addMouseListener(AwtHelper.mouseClick { () => textField.selectAll }); textField }
+    def clickSelectAll = { textField.addMouseListener(AwtHelper.onClicked { e => textField.selectAll }); textField }
   }
 }

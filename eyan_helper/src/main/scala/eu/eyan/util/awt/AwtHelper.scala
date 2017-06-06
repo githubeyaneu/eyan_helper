@@ -1,37 +1,49 @@
 package eu.eyan.util.awt
 
+import java.awt.AWTEvent
 import java.awt.Component
 import java.awt.Toolkit
 import java.awt.Window
+import java.awt.dnd.DropTargetDragEvent
+import java.awt.dnd.DropTargetDropEvent
+import java.awt.dnd.DropTargetEvent
+import java.awt.event.AWTEventListener
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
+import java.awt.event.AdjustmentEvent
+import java.awt.event.AdjustmentListener
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
+import java.awt.event.ContainerAdapter
+import java.awt.event.ContainerEvent
+import java.awt.event.FocusAdapter
+import java.awt.event.FocusEvent
+import java.awt.event.HierarchyBoundsAdapter
+import java.awt.event.HierarchyEvent
+import java.awt.event.HierarchyListener
+import java.awt.event.InputMethodEvent
+import java.awt.event.InputMethodListener
+import java.awt.event.ItemEvent
+import java.awt.event.ItemListener
+import java.awt.event.KeyAdapter
+import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.awt.event.MouseMotionAdapter
+import java.awt.event.MouseWheelEvent
+import java.awt.event.MouseWheelListener
+import java.awt.event.TextEvent
+import java.awt.event.TextListener
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.io.File
 
 import eu.eyan.log.Log
 
-// TODO delete Swing stuff or move it to SwingPlus
-import javax.swing.JFileChooser
-import javax.swing.SwingWorker
-import javax.swing.event.DocumentEvent
-import javax.swing.event.DocumentListener
-import javax.swing.filechooser.FileNameExtensionFilter
-import java.awt.event.ItemListener
-import java.awt.event.ItemEvent
-import java.awt.dnd.DropTargetDragEvent
-import java.awt.dnd.DropTargetDropEvent
-import java.awt.dnd.DropTargetEvent
-
 object AwtHelper {
-  val DESKTOP_LEFT = 0
-  val DESKTOP_TOP = 0
-
+  
   //DropTargetListener
+  //TODO move to dndPlus
   class DropTargetAdapter extends java.awt.dnd.DropTargetAdapter { def drop(e: DropTargetDropEvent) = {} }
   def onDragEnter(action: DropTargetDragEvent => Unit) = new DropTargetAdapter() { override def dragEnter(e: DropTargetDragEvent) = action(e) }
   def onDragOver(action: DropTargetDragEvent => Unit) = new DropTargetAdapter() { override def dragOver(e: DropTargetDragEvent) = action(e) }
@@ -43,7 +55,10 @@ object AwtHelper {
   def onActionPerformed(action: ActionEvent => Unit) = new ActionListener() { override def actionPerformed(e: ActionEvent) = action(e) }
 
   //AdjustmentListener
+  def onAdjustmentValueChanged(action: AdjustmentEvent => Unit) = new AdjustmentListener() { override def adjustmentValueChanged(e: AdjustmentEvent) = action(e) }
+
   //AWTEventListener
+  def onEventDispatched(action: AWTEvent => Unit) = new AWTEventListener() { override def eventDispatched(e: AWTEvent) = action(e) }
 
   //ComponentAdapter
   //ComponentListener
@@ -54,80 +69,81 @@ object AwtHelper {
 
   //ContainerAdapter
   //ContainerListener
+  def onComponentAdded(action: ContainerEvent => Unit) = new ContainerAdapter { override def componentAdded(e: ContainerEvent) = action(e) }
+  def onComponentRemoved(action: ContainerEvent => Unit) = new ContainerAdapter { override def componentRemoved(e: ContainerEvent) = action(e) }
+
   //FocusAdapter
   //FocusListener
+  def onFocusGained(action: FocusEvent => Unit) = new FocusAdapter { override def focusGained(e: FocusEvent) = action(e) }
+  def onFocusLost(action: FocusEvent => Unit) = new FocusAdapter { override def focusLost(e: FocusEvent) = action(e) }
+
   //HierarchyBoundsAdapter
   //HierarchyBoundsListener
+  def onAncestorMoved(action: HierarchyEvent => Unit) = new HierarchyBoundsAdapter { override def ancestorMoved(e: HierarchyEvent) = action(e) }
+  def onAncestorResized(action: HierarchyEvent => Unit) = new HierarchyBoundsAdapter { override def ancestorResized(e: HierarchyEvent) = action(e) }
+
   //HierarchyListener
+  def onHierarchyChanged(action: HierarchyEvent => Unit) = new HierarchyListener { override def hierarchyChanged(e: HierarchyEvent) = action(e) }
+
   //InputMethodListener
+  abstract class InputMethodAdapter extends InputMethodListener {
+    override def inputMethodTextChanged(e: InputMethodEvent) = {}
+    override def caretPositionChanged(e: InputMethodEvent) = {}
+  }
+  def onInputMethodTextChanged(action: InputMethodEvent => Unit) = new InputMethodAdapter { override def inputMethodTextChanged(e: InputMethodEvent) = action(e) }
+  def onCaretPositionChanged(action: InputMethodEvent => Unit) = new InputMethodAdapter { override def caretPositionChanged(e: InputMethodEvent) = action(e) }
 
   //ItemListener
   def onItemStateChanged(action: ItemEvent => Unit) = new ItemListener() { override def itemStateChanged(e: ItemEvent) = action(e) }
 
   //KeyAdapter
   //KeyListener
+  def onKeyTyped(action: KeyEvent => Unit) = new KeyAdapter { override def keyTyped(e: KeyEvent) = action(e) }
+  def onKeyPressed(action: KeyEvent => Unit) = new KeyAdapter { override def keyPressed(e: KeyEvent) = action(e) }
+  def onKeyReleased(action: KeyEvent => Unit) = new KeyAdapter { override def keyReleased(e: KeyEvent) = action(e) }
+
   //MouseAdapter
   //MouseListener
-  def mouseClick(action: () => Unit) = new MouseAdapter { override def mouseClicked(e: MouseEvent) = if (e.getClickCount == 1) action() }
-  def doubleClick(action: MouseEvent => Unit) = new MouseAdapter { override def mouseClicked(e: MouseEvent) = if (e.getClickCount == 2) action(e) }
-  def tripleClick(action: MouseEvent => Unit) = new MouseAdapter { override def mouseClicked(e: MouseEvent) = if (e.getClickCount == 3) action(e) }
-  def mouseReleased(action: () => Unit) = new MouseAdapter { override def mouseReleased(e: MouseEvent) = action() }
-  def mousePressed(action: () => Unit) = new MouseAdapter { override def mousePressed(e: MouseEvent) = action() }
+  def onMouseClicked(action: MouseEvent => Unit, clickCount: Int = 1) = new MouseAdapter { override def mouseClicked(e: MouseEvent) = if (e.getClickCount == clickCount) action(e) }
+  def onMousePressed(action: MouseEvent => Unit) = new MouseAdapter { override def mousePressed(e: MouseEvent) = action(e) }
+  def onMouseReleased(action: MouseEvent => Unit) = new MouseAdapter { override def mouseReleased(e: MouseEvent) = action(e) }
+  def onMouseEntered(action: MouseEvent => Unit) = new MouseAdapter { override def mouseEntered(e: MouseEvent) = action(e) }
+  def onMouseExited(action: MouseEvent => Unit) = new MouseAdapter { override def mouseExited(e: MouseEvent) = action(e) }
+
+  def onClicked(action: MouseEvent => Unit) = onMouseClicked(action, 1)
+  def onDoubleClick(action: MouseEvent => Unit) = onMouseClicked(action, 2)
+  def onTripleClick(action: MouseEvent => Unit) = onMouseClicked(action, 3)
 
   //MouseMotionAdapter
   //MouseMotionListener
+  def onMouseDragged(action: MouseEvent => Unit) = new MouseMotionAdapter { override def mouseDragged(e: MouseEvent) = action(e) }
+  def onMouseMoved(action: MouseEvent => Unit) = new MouseMotionAdapter { override def mouseMoved(e: MouseEvent) = action(e) }
+
   //MouseWheelListener
-  //TextEvent
+  def onMouseWheelMoved(action: MouseWheelEvent => Unit) = new MouseWheelListener { override def mouseWheelMoved(e: MouseWheelEvent) = action(e) }
+
   //TextListener
+  def onTextValueChanged(action: TextEvent => Unit) = new TextListener { override def textValueChanged(e: TextEvent) = action(e) }
 
   //WindowAdapter
   //WindowListener
-  def newWindowClosingEvent(action: WindowEvent => Unit) = new WindowAdapter() { override def windowClosing(e: WindowEvent) = action(e) }
-
   //WindowFocusListener
   //WindowStateListener
+  def onWindowOpened(action: WindowEvent => Unit) = new WindowAdapter { override def windowOpened(e: WindowEvent) = action(e) }
+  def onWindowClosing(action: WindowEvent => Unit) = new WindowAdapter { override def windowClosing(e: WindowEvent) = action(e) }
+  def onWindowClosed(action: WindowEvent => Unit) = new WindowAdapter { override def windowClosed(e: WindowEvent) = action(e) }
+  def onWindowIconified(action: WindowEvent => Unit) = new WindowAdapter { override def windowIconified(e: WindowEvent) = action(e) }
+  def onWindowDeiconified(action: WindowEvent => Unit) = new WindowAdapter { override def windowDeiconified(e: WindowEvent) = action(e) }
+  def onWindowActivated(action: WindowEvent => Unit) = new WindowAdapter { override def windowActivated(e: WindowEvent) = action(e) }
+  def onWindowDeactivated(action: WindowEvent => Unit) = new WindowAdapter { override def windowDeactivated(e: WindowEvent) = action(e) }
+  def onWindowStateChanged(action: WindowEvent => Unit) = new WindowAdapter { override def windowStateChanged(e: WindowEvent) = action(e) }
+  def onWindowGainedFocus(action: WindowEvent => Unit) = new WindowAdapter { override def windowGainedFocus(e: WindowEvent) = action(e) }
+  def onWindowLostFocus(action: WindowEvent => Unit) = new WindowAdapter { override def windowLostFocus(e: WindowEvent) = action(e) }
 
+  def screenSize = Toolkit.getDefaultToolkit.getScreenSize
+  
+  
   def newRunnable(runnable: () => Unit) = new Runnable() { override def run() = runnable() }
-
-  def chooseFile(action: File => Unit, extension: String = "") = {
-    val fc = new JFileChooser
-    if (!extension.isEmpty) fc.setFileFilter(new FileNameExtensionFilter(extension + " files", extension))
-    if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) action(fc.getSelectedFile)
-  }
-
-  def docListener(action: () => Unit) = new DocumentListener() {
-    override def insertUpdate(e: DocumentEvent) = action()
-    override def removeUpdate(e: DocumentEvent) = {}
-    override def changedUpdate(e: DocumentEvent) = action()
-  }
-
-  def positionToCenter[A <: Component](component: A): A = {
-    val screenSize = Toolkit.getDefaultToolkit().getScreenSize()
-    val width = component.getSize().width
-    val height = component.getSize().height
-    component.setSize(width, height)
-    component.setLocation((screenSize.width - width) / 2, (screenSize.height - height) / 2)
-    component
-  }
-
-  def positionToLeft(component: Component) = {
-    val screenSize = Toolkit.getDefaultToolkit().getScreenSize()
-    component.setSize(screenSize.width / 2, screenSize.height - 30)
-    component.setLocation(DESKTOP_LEFT, DESKTOP_TOP)
-  }
-
-  def positionToRight(component: Component) = {
-    val screenSize = Toolkit.getDefaultToolkit().getScreenSize()
-    component.setSize(screenSize.width / 2, screenSize.height - 30)
-    component.setLocation(screenSize.width / 2, DESKTOP_TOP)
-  }
-
-  def runInWorker(work: () => Unit, doAtDone: () => Unit) = {
-    new SwingWorker[Void, Void]() {
-      override def doInBackground() = { work.apply(); null }
-      override def done() = doAtDone.apply()
-    }.execute()
-  }
 
   def tryToEnlargeWindow(window: Window) = {
     val screenSize = Toolkit.getDefaultToolkit().getScreenSize()
