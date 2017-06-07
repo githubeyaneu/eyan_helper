@@ -34,6 +34,9 @@ import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 
 import eu.eyan.log.Log
+import java.awt.event.WindowFocusListener
+import java.awt.event.WindowStateListener
+import java.awt.event.WindowListener
 
 // TODO: rename to AwtPlus...
 // TODO: set private[awt]
@@ -114,18 +117,18 @@ object AwtHelper {
 
   //WindowAdapter
   //WindowListener
-  //WindowFocusListener
   //WindowStateListener
-  def onWindowOpened(action: WindowEvent => Unit) = new WindowAdapter { override def windowOpened(e: WindowEvent) = action(e) }
-  def onWindowClosing(action: WindowEvent => Unit) = new WindowAdapter { override def windowClosing(e: WindowEvent) = action(e) }
-  def onWindowClosed(action: WindowEvent => Unit) = new WindowAdapter { override def windowClosed(e: WindowEvent) = action(e) }
-  def onWindowIconified(action: WindowEvent => Unit) = new WindowAdapter { override def windowIconified(e: WindowEvent) = action(e) }
-  def onWindowDeiconified(action: WindowEvent => Unit) = new WindowAdapter { override def windowDeiconified(e: WindowEvent) = action(e) }
-  def onWindowActivated(action: WindowEvent => Unit) = new WindowAdapter { override def windowActivated(e: WindowEvent) = action(e) }
-  def onWindowDeactivated(action: WindowEvent => Unit) = new WindowAdapter { override def windowDeactivated(e: WindowEvent) = action(e) }
-  def onWindowStateChanged(action: WindowEvent => Unit) = new WindowAdapter { override def windowStateChanged(e: WindowEvent) = action(e) }
-  def onWindowGainedFocus(action: WindowEvent => Unit) = new WindowAdapter { override def windowGainedFocus(e: WindowEvent) = action(e) }
-  def onWindowLostFocus(action: WindowEvent => Unit) = new WindowAdapter { override def windowLostFocus(e: WindowEvent) = action(e) }
+  //WindowFocusListener
+  def onWindowOpened(action: WindowEvent => Unit):WindowListener = new WindowAdapter { override def windowOpened(e: WindowEvent) = action(e) }
+  def onWindowClosing(action: WindowEvent => Unit):WindowListener = new WindowAdapter { override def windowClosing(e: WindowEvent) = action(e) }
+  def onWindowClosed(action: WindowEvent => Unit):WindowListener = new WindowAdapter { override def windowClosed(e: WindowEvent) = action(e) }
+  def onWindowIconified(action: WindowEvent => Unit):WindowListener = new WindowAdapter { override def windowIconified(e: WindowEvent) = action(e) }
+  def onWindowDeiconified(action: WindowEvent => Unit):WindowListener = new WindowAdapter { override def windowDeiconified(e: WindowEvent) = action(e) }
+  def onWindowActivated(action: WindowEvent => Unit):WindowListener = new WindowAdapter { override def windowActivated(e: WindowEvent) = action(e) }
+  def onWindowDeactivated(action: WindowEvent => Unit):WindowListener = new WindowAdapter { override def windowDeactivated(e: WindowEvent) = action(e) }
+  def onWindowStateChanged(action: WindowEvent => Unit):WindowStateListener = new WindowAdapter { override def windowStateChanged(e: WindowEvent) = action(e) }
+  def onWindowGainedFocus(action: WindowEvent => Unit):WindowFocusListener = new WindowAdapter { override def windowGainedFocus(e: WindowEvent) = action(e) }
+  def onWindowLostFocus(action: WindowEvent => Unit):WindowFocusListener = new WindowAdapter { override def windowLostFocus(e: WindowEvent) = action(e) }
 
   def screenSize = Toolkit.getDefaultToolkit.getScreenSize
   
