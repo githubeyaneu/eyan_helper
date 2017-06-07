@@ -23,10 +23,44 @@ import java.awt.event.HierarchyBoundsAdapter
 import java.awt.event.FocusAdapter
 import java.awt.event.ComponentAdapter
 import java.awt.event.KeyAdapter
+import eu.eyan.util.java.beans.BeansPlus
+import java.beans.PropertyChangeEvent
+import eu.eyan.util.awt.dnd.DndPlus
+import java.awt.dnd.DropTarget
+import eu.eyan.util.awt.dnd.DnD_FileDropTarget
+import java.io.File
+import java.awt.dnd.DnDConstants
+import java.awt.datatransfer.DataFlavor
+import eu.eyan.log.Log
 
 object ComponentPlus {
 
   implicit class ComponentPlusImplicit[TYPE <: Component](component: TYPE) {
+    def size = component.getSize
+    def width = size.width
+    def height = size.height
+    def screenSize = AwtHelper.screenSize
+
+    def positionToCenter = {
+      component.setSize(width, height)
+      component.setLocation((screenSize.width - width) / 2, (screenSize.height - height) / 2)
+      component
+    }
+
+    val SCREEN_LEFT = 0
+    val SCREEN_TOP = 0
+
+    def positionToLeft = {
+      component.setSize(screenSize.width / 2, screenSize.height - 30)
+      component.setLocation(SCREEN_LEFT, SCREEN_TOP)
+    }
+
+    def positionToRight = {
+      component.setSize(screenSize.width / 2, screenSize.height - 30)
+      component.setLocation(screenSize.width / 2, SCREEN_TOP)
+    }
+
+    ////////////////////   METHODS   //////////////////////////
     //  setAutoFocusTransferOnDisposal(boolean)
     //  setBackground(Color)
     //  setBounds(int, int, int, int)
@@ -134,40 +168,46 @@ object ComponentPlus {
     def onMouseWheelMovedEvent(action: MouseWheelEvent => Unit) = { component.addMouseWheelListener(AwtHelper.onMouseWheelMoved(action)); component }
 
     //////////////////////////////////////////    Bean Listeners     //////////////////////////////////////////
-    //TODO
-//    component.addPropertyChangeListener(listener)
-//    component.addPropertyChangeListener(propertyName, listener)
+    def onPropertyChange(action: => Unit) = onPropertyChangeEvent { e => action }
+    def onPropertyChangeEvent(action: PropertyChangeEvent => Unit) = { component.addPropertyChangeListener(BeansPlus.onPropertyChange(action)); component }
+    def onPropertyChange(propertyName: String, action: => Unit) = onPropertyChangeEvent(propertyName, { e => action })
+    def onPropertyChangeEvent(propertyName: String, action: PropertyChangeEvent => Unit) = { component.addPropertyChangeListener(propertyName, BeansPlus.onPropertyChange(action)); component }
 
     //////////////////////////////////////////    DND Listeners     //////////////////////////////////////////
-    //TODO
-//    def onDragEnter(action: DropTargetDragEvent => Unit) = new DropTargetAdapter() { override def dragEnter(e: DropTargetDragEvent) = action(e) }
-//    def onDragOver(action: DropTargetDragEvent => Unit) = new DropTargetAdapter() { override def dragOver(e: DropTargetDragEvent) = action(e) }
-//    def onDropActionChanged(action: DropTargetDragEvent => Unit) = new DropTargetAdapter() { override def dropActionChanged(e: DropTargetDragEvent) = action(e) }
-//    def onDragExit(action: DropTargetEvent => Unit) = new DropTargetAdapter() { override def dragExit(e: DropTargetEvent) = action(e) }
-//    def onDrop(action: DropTargetDropEvent => Unit) = new DropTargetAdapter() { override def drop(e: DropTargetDropEvent) = action(e) }
+    def onDragEnter(action: => Unit) = onDragEnterEvent { e => action }
+    def onDragEnterEvent(action: DropTargetDragEvent => Unit) = { DndPlus.onDragEnter(component, action); component }
 
-    def size = component.getSize
-    def width = size.width
-    def height = size.height
-    def screenSize = AwtHelper.screenSize
+    def onDragOver(action: => Unit) = onDragOverEvent { e => action }
+    def onDragOverEvent(action: DropTargetDragEvent => Unit) = { DndPlus.onDragOver(component, action); component }
 
-    def positionToCenter = {
-      component.setSize(width, height)
-      component.setLocation((screenSize.width - width) / 2, (screenSize.height - height) / 2)
+    def onDropActionChanged(action: => Unit) = onDropActionChangedEvent { e => action }
+    def onDropActionChangedEvent(action: DropTargetDragEvent => Unit) = { DndPlus.onDropActionChanged(component, action); component }
+
+    def onDragExit(action: => Unit) = onDragExitEvent { e => action }
+    def onDragExitEvent(action: DropTargetEvent => Unit) = { DndPlus.onDragExit(component, action); component }
+
+    def onDrop(action: => Unit) = onDropEvent { e => action }
+    def onDropEvent(action: DropTargetDropEvent => Unit) = { DndPlus.onDrop(component, action); component }
+
+    def onDropFile(action: File => Unit) = {
+      onDropEvent { evt =>
+        this.synchronized {
+          try {
+            evt.acceptDrop(DnDConstants.ACTION_COPY)
+            val transferable = evt.getTransferable()
+            val transferData = transferable.getTransferData(DataFlavor.javaFileListFlavor)
+            val droppedFiles = transferData.asInstanceOf[java.util.List[File]]
+            if (droppedFiles != null && !droppedFiles.isEmpty()) {
+              val file = droppedFiles.get(droppedFiles.size() - 1);
+              action(file);
+            }
+          }
+          catch {
+            case ex: Exception => Log.error(ex); ex.printStackTrace
+          }
+        }
+      }
       component
-    }
-
-    val SCREEN_LEFT = 0
-    val SCREEN_TOP = 0
-
-    def positionToLeft = {
-      component.setSize(screenSize.width / 2, screenSize.height - 30)
-      component.setLocation(SCREEN_LEFT, SCREEN_TOP)
-    }
-
-    def positionToRight = {
-      component.setSize(screenSize.width / 2, screenSize.height - 30)
-      component.setLocation(screenSize.width / 2, SCREEN_TOP)
     }
   }
 }

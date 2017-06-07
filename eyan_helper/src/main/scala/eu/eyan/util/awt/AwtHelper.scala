@@ -1,12 +1,8 @@
 package eu.eyan.util.awt
 
 import java.awt.AWTEvent
-import java.awt.Component
 import java.awt.Toolkit
 import java.awt.Window
-import java.awt.dnd.DropTargetDragEvent
-import java.awt.dnd.DropTargetDropEvent
-import java.awt.dnd.DropTargetEvent
 import java.awt.event.AWTEventListener
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
@@ -36,21 +32,12 @@ import java.awt.event.TextEvent
 import java.awt.event.TextListener
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
-import java.io.File
 
 import eu.eyan.log.Log
 
+// TODO: rename to AwtPlus...
+// TODO: set private[awt]
 object AwtHelper {
-  
-  //DropTargetListener
-  //TODO move to dndPlus
-  class DropTargetAdapter extends java.awt.dnd.DropTargetAdapter { def drop(e: DropTargetDropEvent) = {} }
-  def onDragEnter(action: DropTargetDragEvent => Unit) = new DropTargetAdapter() { override def dragEnter(e: DropTargetDragEvent) = action(e) }
-  def onDragOver(action: DropTargetDragEvent => Unit) = new DropTargetAdapter() { override def dragOver(e: DropTargetDragEvent) = action(e) }
-  def onDropActionChanged(action: DropTargetDragEvent => Unit) = new DropTargetAdapter() { override def dropActionChanged(e: DropTargetDragEvent) = action(e) }
-  def onDragExit(action: DropTargetEvent => Unit) = new DropTargetAdapter() { override def dragExit(e: DropTargetEvent) = action(e) }
-  def onDrop(action: DropTargetDropEvent => Unit) = new DropTargetAdapter() { override def drop(e: DropTargetDropEvent) = action(e) }
-
   //ActionListener
   def onActionPerformed(action: ActionEvent => Unit) = new ActionListener() { override def actionPerformed(e: ActionEvent) = action(e) }
 

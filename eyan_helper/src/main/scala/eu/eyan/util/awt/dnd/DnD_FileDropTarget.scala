@@ -10,24 +10,10 @@ import java.awt.datatransfer.DataFlavor
 
 // FIXME: move to ComponentPlus setDropTarget
 object DnD_FileDropTarget {
-  def onDropFile(action: File=>Unit): DropTarget = new DnD_FileDropTarget(action)
+  
 }
 
+// TODO use listeners instead overriding
 class DnD_FileDropTarget(action: File=>Unit) extends DropTarget {
-  override def drop(evt: DropTargetDropEvent): Unit = {
-    this.synchronized {
-      try {
-        evt.acceptDrop(DnDConstants.ACTION_COPY)
-        val transferable = evt.getTransferable()
-        val transferData = transferable.getTransferData(DataFlavor.javaFileListFlavor)
-        val droppedFiles = transferData.asInstanceOf[java.util.List[File]]
-        if (droppedFiles != null && !droppedFiles.isEmpty()) {
-          val file = droppedFiles.get(droppedFiles.size() - 1);
-          action(file);
-        }
-      } catch {
-        case ex: Exception => // ex.printStackTrace();
-      }
-    }
-  }
+  
 }
