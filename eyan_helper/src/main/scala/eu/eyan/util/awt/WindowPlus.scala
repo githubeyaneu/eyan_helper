@@ -29,5 +29,7 @@ object WindowPlus {
     def onWindowGainedFocusEvent(action: WindowEvent => Unit) = { window.addWindowFocusListener(AwtHelper.onWindowGainedFocus(action)); window }
     def onWindowLostFocus(action: => Unit) = onWindowLostFocusEvent { e => action }
     def onWindowLostFocusEvent(action: WindowEvent => Unit) = { window.addWindowFocusListener(AwtHelper.onWindowLostFocus(action)); window }
+
+    def packAndSetVisible = { window.pack; window.visible; window }
   }
 }
