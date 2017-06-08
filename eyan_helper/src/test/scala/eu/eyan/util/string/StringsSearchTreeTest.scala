@@ -3,14 +3,14 @@ package eu.eyan.util.string
 import org.fest.assertions.Assertions.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitSuite
+//import org.scalatest.junit.JUnitSuite
 
 import StringsSearchTree.newTree
 import eu.eyan.testutil.ScalaEclipseJunitRunner
 import eu.eyan.util.random.RandomPlus
 
 @RunWith(classOf[ScalaEclipseJunitRunner])
-class StringsSearchTreeTest extends JUnitSuite {
+class StringsSearchTreeTest /*extends JUnitSuite */{
 
   @Test def empty = assertThat(newTree[Int].get("").isEmpty).isTrue
 

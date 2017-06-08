@@ -3,12 +3,12 @@ package eu.eyan.util.collection
 import org.fest.assertions.Assertions.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.scalatest.junit.JUnitSuite
+//import org.scalatest.junit.JUnitSuite
 
 import eu.eyan.testutil.ScalaEclipseJunitRunner
 
 @RunWith(classOf[ScalaEclipseJunitRunner])
-class MapsPlusTest extends JUnitSuite {
+class MapsPlusTest /*extends JUnitSuite */{
 
 //  @Test def empty = assertThat(MapsPlus.newMap()).hasSize(0)
 //
