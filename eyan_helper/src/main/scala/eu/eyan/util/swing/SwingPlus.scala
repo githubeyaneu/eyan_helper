@@ -28,6 +28,10 @@ import javax.swing.event.ListDataListener
 import javax.swing.filechooser.FileNameExtensionFilter
 
 object SwingPlus {
+  
+  //FIXME: if ready delete all methods that starts with "with" if it is no boolean parameter.
+  
+  
   def showErrorDialog(msg: String, e: Throwable, shown: Set[Throwable] = Set()): Unit = {
     if (e.getCause != null && !shown.contains(e.getCause))
       showErrorDialog(msg + ", " + e.getLocalizedMessage, e.getCause, shown + e)

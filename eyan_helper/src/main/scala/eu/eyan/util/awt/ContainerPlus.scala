@@ -10,5 +10,16 @@ object ContainerPlus {
     def onComponentAddedEvent(action: ContainerEvent => Unit) = { container.addContainerListener(AwtHelper.onComponentAdded(action)); container }
     def onComponentRemoved(action: => Unit) = onComponentRemovedEvent { e => action }
     def onComponentRemovedEvent(action: ContainerEvent => Unit) = { container.addContainerListener(AwtHelper.onComponentRemoved(action)); container }
+
+    // TODO
+    //applyComponentOrientation(ComponentOrientation)
+    //setComponentZOrder(Component, int)
+    //setFocusCycleRoot(boolean)
+    ////TODO
+    ////setFocusTraversalKeys(int, Set<? extends AWTKeyStroke>)
+    //setFocusTraversalPolicy(FocusTraversalPolicy)
+    //setFocusTraversalPolicyProvider(boolean)
+    //setFont(Font)
+    //setLayout(LayoutManager)
   }
 }

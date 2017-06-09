@@ -3,6 +3,7 @@ package eu.eyan.util.awt
 import java.awt.Window
 import eu.eyan.util.awt.ContainerPlus.ContainerPlusImplicit
 import java.awt.event.WindowEvent
+import java.awt.Dialog.ModalExclusionType
 
 object WindowPlus {
   implicit class WindowPlusImplicit[TYPE <: Window](window: TYPE) extends ContainerPlusImplicit(window) {
@@ -31,5 +32,9 @@ object WindowPlus {
     def onWindowLostFocusEvent(action: WindowEvent => Unit) = { window.addWindowFocusListener(AwtHelper.onWindowLostFocus(action)); window }
 
     def packAndSetVisible = { window.pack; window.visible; window }
+    
+    def setModalExclusion_NoExclude = {window.setModalExclusionType(ModalExclusionType.NO_EXCLUDE); window}
+    def setModalExclusion_ApplicationExclude = {window.setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE); window}
+    def setModalExclusion_ToolkitExclude = {window.setModalExclusionType(ModalExclusionType.TOOLKIT_EXCLUDE); window}
   }
 }

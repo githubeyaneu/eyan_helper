@@ -72,5 +72,7 @@ object StringPlus {
     def toSafeFileName = s.replaceAll(":", "").replaceAll("\\\\", "_")
 
     def asDateTime(format: DateTimeFormatter, zoneId: ZoneId = ZoneOffset.UTC) = LocalDateTime.parse(s, format).atZone(zoneId).toInstant
+    
+    def toIntOr(orElse: Int) = try{s.toInt} catch {case nfe:NumberFormatException => orElse}
   }
 }
