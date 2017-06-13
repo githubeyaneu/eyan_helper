@@ -16,13 +16,13 @@ object DialogPlus {
     def modality_ApplicationModal = { dialog.setModalityType(ModalityType.APPLICATION_MODAL); dialog }
     def modality_ToolkitModal = { dialog.setModalityType(ModalityType.TOOLKIT_MODAL); dialog }
 
-    def opacity(opacity: Float) = { dialog.setOpacity(opacity); dialog }
+    override def opacity(opacity: Float) = { dialog.setOpacity(opacity); dialog }
 
     def resizeable = withResizeable(true)
     def notResizeable = withResizeable(false)
     def withResizeable(resizeable:Boolean) = { dialog.setResizable(resizeable); dialog }
 
-    def shape(shape: Shape) = { dialog.setShape(shape); dialog }
+    override def shape(shape: Shape) = { dialog.setShape(shape); dialog }
 
     def title(title: String) = { dialog.setTitle(title); dialog }
 

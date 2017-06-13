@@ -4,10 +4,22 @@ import java.awt.Window
 import eu.eyan.util.awt.ContainerPlus.ContainerPlusImplicit
 import java.awt.event.WindowEvent
 import java.awt.Dialog.ModalExclusionType
+import java.awt.BufferCapabilities
+import java.awt.Color
+import java.awt.Rectangle
+import java.awt.Cursor
+import java.awt.Image
+import scala.collection.JavaConverters._
+import java.awt.Component
+import java.awt.Dimension
+import java.awt.Dialog
+import java.awt.Shape
+import java.awt.Window.Type
 
 object WindowPlus {
   implicit class WindowPlusImplicit[TYPE <: Window](window: TYPE) extends ContainerPlusImplicit(window) {
 
+    // Listeners
     def onWindowOpened(action: => Unit) = onWindowOpenedEvent { e => action }
     def onWindowOpenedEvent(action: WindowEvent => Unit) = { window.addWindowListener(AwtHelper.onWindowOpened(action)); window }
     def onWindowClosing(action: => Unit) = onWindowClosingEvent { e => action }
@@ -31,10 +43,39 @@ object WindowPlus {
     def onWindowLostFocus(action: => Unit) = onWindowLostFocusEvent { e => action }
     def onWindowLostFocusEvent(action: WindowEvent => Unit) = { window.addWindowFocusListener(AwtHelper.onWindowLostFocus(action)); window }
 
+    // setters
+    def bufferStrategy(numBuffers: Int) = { window.createBufferStrategy(numBuffers); window }
+    def bufferStrategy(numBuffers: Int, capa: BufferCapabilities) = { window.createBufferStrategy(numBuffers, capa); window }
+    def pack = { window.pack(); window }
+    def alwaysOnTop(enabled: Boolean) = { window.setAlwaysOnTop(enabled); window }
+    def alwaysOnTop: TYPE = alwaysOnTop(true)
+    def alwaysOnTopDisabled = alwaysOnTop(false)
+    def autoRequestFocus(enabled: Boolean) = { window.setAutoRequestFocus(enabled); window }
+    def autoRequestFocus: TYPE = autoRequestFocus(true)
+    def autoRequestFocusDiasabled = autoRequestFocus(false)
+    def background(color: Color) = { window.setBackground(color); window }
+    override def bounds(x: Int, y: Int, width: Int, height: Int) = { window.setBounds(x, y, width, height); window }
+    override def bounds(rect: Rectangle) = { window.setBounds(rect); window }
+    override def cursor(cursor: Cursor) = { window.setCursor(cursor); window }
+    def focusableWindowState(enabled: Boolean) = { window.setFocusableWindowState(enabled); window }
+    def focusableWindowState: TYPE = focusableWindowState(true)
+    def focusableWindowStateDisabled = focusableWindowState(false)
+    def iconImage(image: Image) = { window.setIconImage(image); window }
+    def iconImages(images: List[Image]) = { window.setIconImages(images.asJava); window }
+    def locationByPlatform(enabled: Boolean) = { window.setLocationByPlatform(enabled); window }
+    def locationByPlatform: TYPE = locationByPlatform(true)
+    def locationByPlatformDisabled = locationByPlatform(false)
+    def locationRelativeTo(component: Component) = { window.setLocationRelativeTo(component); window }
+    override def minimumSize(dimension: Dimension) = { window.setMinimumSize(dimension); window }
+    def modalExclusionType(modalExclusionType: ModalExclusionType) = { window.setModalExclusionType(modalExclusionType); window }
+    def modalExclusionType_NoExclude = modalExclusionType(Dialog.ModalExclusionType.NO_EXCLUDE)
+    def modalExclusionType_ApplicationExclude = modalExclusionType(Dialog.ModalExclusionType.APPLICATION_EXCLUDE)
+    def modalExclusionType_ToolkitExclude = modalExclusionType(Dialog.ModalExclusionType.TOOLKIT_EXCLUDE)
+    def opacity(opacity:Float) = {window.setOpacity(opacity); window}
+    def shape(shape:Shape) = {window.setShape(shape); window}
+    def typee(typee: Type) = {window.setType(typee); window}
+
+    // own
     def packAndSetVisible = { window.pack; window.visible; window }
-    
-    def setModalExclusion_NoExclude = {window.setModalExclusionType(ModalExclusionType.NO_EXCLUDE); window}
-    def setModalExclusion_ApplicationExclude = {window.setModalExclusionType(ModalExclusionType.APPLICATION_EXCLUDE); window}
-    def setModalExclusion_ToolkitExclude = {window.setModalExclusionType(ModalExclusionType.TOOLKIT_EXCLUDE); window}
   }
 }
