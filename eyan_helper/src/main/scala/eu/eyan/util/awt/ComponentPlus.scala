@@ -40,6 +40,8 @@ import java.awt.Font
 import java.util.Locale
 import java.awt.Point
 import java.awt.Dimension
+import java.awt.AWTKeyStroke
+import scala.collection.JavaConverters._
 
 object ComponentPlus {
 
@@ -85,11 +87,9 @@ object ComponentPlus {
     def focusable: TYPE = focusable(true)
     def notFocusable = focusable(false)
 
-    // TODO understand and implemment
-    //    setFocusTraversalKeys(int, Set<? extends AWTKeyStroke>)
-    //    def focusTraversalKeys(id: Int, : ) = { component.(); component }
-
+    def focusTraversalKeys(id: Int, keystrokes: Set[AWTKeyStroke]) = { component.setFocusTraversalKeys(id, keystrokes.asJava); component }
     def focusTraversalKeysEnabled(enabled: Boolean) = { component.setFocusTraversalKeysEnabled(enabled); component }
+    
     def font(font: Font) = { component.setFont(font); component }
     def foreground(color: Color) = { component.setForeground(color); component }
     def ignoreRepaint(ignore: Boolean) = { component.setIgnoreRepaint(ignore); component }
