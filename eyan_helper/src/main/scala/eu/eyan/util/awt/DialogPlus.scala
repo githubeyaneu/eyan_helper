@@ -4,12 +4,14 @@ import java.awt.Dialog
 import eu.eyan.util.awt.WindowPlus.WindowPlusImplicit
 import java.awt.Dialog.ModalityType
 import java.awt.Shape
+import java.awt.Color
 
 object DialogPlus {
   implicit class DialogPlusImplicit[TYPE <: Dialog](dialog: TYPE) extends WindowPlusImplicit(dialog) {
+    override def backgroundColor(color: Color) = { dialog.setBackground(color); dialog }
     def modal = withModal(true)
     def notModal = withModal(false)
-    def withModal(modal:Boolean) = { dialog.setModal(modal); dialog }
+    def withModal(modal: Boolean) = { dialog.setModal(modal); dialog }
 
     def modality_Modeless = { dialog.setModalityType(ModalityType.MODELESS); dialog }
     def modality_DocumentModal = { dialog.setModalityType(ModalityType.DOCUMENT_MODAL); dialog }
@@ -20,7 +22,7 @@ object DialogPlus {
 
     def resizeable = withResizeable(true)
     def notResizeable = withResizeable(false)
-    def withResizeable(resizeable:Boolean) = { dialog.setResizable(resizeable); dialog }
+    def withResizeable(resizeable: Boolean) = { dialog.setResizable(resizeable); dialog }
 
     override def shape(shape: Shape) = { dialog.setShape(shape); dialog }
 
@@ -28,6 +30,6 @@ object DialogPlus {
 
     def undecorated = withUndecorated(true)
     def notUndecorated = withUndecorated(false)
-    def withUndecorated(undecorated:Boolean) = { dialog.setUndecorated(undecorated); dialog }
+    def withUndecorated(undecorated: Boolean) = { dialog.setUndecorated(undecorated); dialog }
   }
 }
