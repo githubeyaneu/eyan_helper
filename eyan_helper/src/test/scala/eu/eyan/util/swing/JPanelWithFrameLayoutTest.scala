@@ -353,7 +353,7 @@ class JPanelWithFrameLayoutTest() {
     }
   }
 
-  implicit class JPanelWithFrameLayoutPlusTest(panel: JPanelWithFrameLayout) {
+  implicit class JPanelWithFrameLayoutTestImplicit(panel: JPanelWithFrameLayout) {
     def formLayout = panel.getLayout.asInstanceOf[FormLayout]
 
     def columnCount = panel.formLayout.getColumnCount

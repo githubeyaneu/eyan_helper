@@ -18,6 +18,14 @@ import com.jgoodies.forms.FormsSetup
 import javax.swing.SwingConstants
 import javax.swing.JTable
 import eu.eyan.log.Log
+import eu.eyan.util.swing.JComponentPlus2.JComponentImplicit2
+import javax.swing.plaf.PanelUI
+
+object JPanelPlus {
+  implicit class JPanelImplicit[TYPE <: JPanel](jPanel: JPanel) extends JComponentImplicit2(jPanel) {
+    def ui(ui: PanelUI) = { jPanel.setUI(ui); jPanel }
+  }
+}
 
 object JPanelWithFrameLayout {
   val PREF = "p"
@@ -27,6 +35,7 @@ object JPanelWithFrameLayout {
   def apply(firstColumnSpec: String = PREF, firstRowSpec: String = PREF) = new JPanelWithFrameLayout().newColumn(firstColumnSpec).newRow(firstRowSpec)
 }
 
+//TODO Rename to JPanelPlus...
 class JPanelWithFrameLayout() extends JPanel {
   private val frameLayout = new FormLayout("", "")
   this.setLayout(frameLayout)
