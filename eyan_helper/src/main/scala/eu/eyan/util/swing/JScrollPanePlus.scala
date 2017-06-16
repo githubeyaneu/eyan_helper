@@ -1,7 +1,7 @@
 package eu.eyan.util.swing
 
 import javax.swing.JScrollPane
-import eu.eyan.util.swing.JComponentPlus2.JComponentImplicit2
+import eu.eyan.util.swing.JComponentPlus.JComponentImplicit
 import javax.swing.JViewport
 import java.awt.Component
 import java.awt.ComponentOrientation
@@ -12,7 +12,7 @@ import javax.swing.plaf.ScrollPaneUI
 import javax.swing.border.Border
 
 object JScrollPanePlus {
-  implicit class JScrollPaneImplicit[TYPE <: JScrollPane](jScrollPane: TYPE) extends JComponentImplicit2(jScrollPane) {
+  implicit class JScrollPaneImplicit[TYPE <: JScrollPane](jScrollPane: TYPE) extends JComponentImplicit(jScrollPane) {
     def horizontalScrollBar = { jScrollPane.createHorizontalScrollBar(); jScrollPane }
     def verticalScrollBar = { jScrollPane.createVerticalScrollBar; jScrollPane }
     def columnHeader(columnHeader: JViewport) = { jScrollPane.setColumnHeader(columnHeader); jScrollPane }

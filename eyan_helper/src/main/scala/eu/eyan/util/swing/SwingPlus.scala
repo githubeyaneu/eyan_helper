@@ -26,10 +26,26 @@ import javax.swing.event.DocumentListener
 import javax.swing.event.ListDataEvent
 import javax.swing.event.ListDataListener
 import javax.swing.filechooser.FileNameExtensionFilter
+import javax.swing.event.AncestorEvent
+import javax.swing.event.AncestorListener
 
 object SwingPlus {
   
   //FIXME: if ready delete all methods that starts with "with" if it is no boolean parameter.
+  
+  
+  
+  
+  
+  class AncestorAdapter extends AncestorListener{
+    override def ancestorAdded(e: AncestorEvent) = {}
+    override def ancestorRemoved(e: AncestorEvent) = {}
+    override def ancestorMoved(e: AncestorEvent) = {}
+  }
+  def onAncestorAdded(action: AncestorEvent => Unit) = new AncestorAdapter() { override def ancestorAdded(e: AncestorEvent) = action(e) }
+  def onAncestorRemoved(action: AncestorEvent => Unit) = new AncestorAdapter() { override def ancestorRemoved(e: AncestorEvent) = action(e) }
+  def onAncestorMoved(action: AncestorEvent => Unit) = new AncestorAdapter() { override def ancestorMoved(e: AncestorEvent) = action(e) }
+  
   
   
   def showErrorDialog(msg: String, e: Throwable, shown: Set[Throwable] = Set()): Unit = {

@@ -124,10 +124,10 @@ object ComponentPlus {
     def onFocusLost(action: => Unit) = onFocusLostEvent { e => action }
     def onFocusLostEvent(action: FocusEvent => Unit) = { component.addFocusListener(AwtHelper.onFocusLost(action)); component }
 
-    def onAncestorMoved(action: => Unit) = onAncestorMovedEvent { e => action }
-    def onAncestorMovedEvent(action: HierarchyEvent => Unit) = { component.addHierarchyBoundsListener(AwtHelper.onAncestorMoved(action)); component }
-    def onAncestorResized(action: => Unit) = onAncestorResizedEvent { e => action }
-    def onAncestorResizedEvent(action: HierarchyEvent => Unit) = { component.addHierarchyBoundsListener(AwtHelper.onAncestorResized(action)); component }
+    def onHierarchyBoundsAncestorMoved(action: => Unit) = onHierarchyBoundsAncestorMovedEvent { e => action }
+    def onHierarchyBoundsAncestorMovedEvent(action: HierarchyEvent => Unit) = { component.addHierarchyBoundsListener(AwtHelper.onAncestorMoved(action)); component }
+    def onHierarchyBoundsAncestorResized(action: => Unit) = onHierarchyBoundsAncestorResizedEvent { e => action }
+    def onHierarchyBoundsAncestorResizedEvent(action: HierarchyEvent => Unit) = { component.addHierarchyBoundsListener(AwtHelper.onAncestorResized(action)); component }
 
     def onHierarchyChanged(action: => Unit) = onHierarchyChangedEvent { e => action }
     def onHierarchyChangedEvent(action: HierarchyEvent => Unit) = { component.addHierarchyListener(AwtHelper.onHierarchyChanged(action)); component }

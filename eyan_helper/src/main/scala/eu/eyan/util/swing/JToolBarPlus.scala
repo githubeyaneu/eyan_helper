@@ -1,7 +1,7 @@
 package eu.eyan.util.swing
 
 import javax.swing.JToolBar
-import eu.eyan.util.swing.JComponentPlus2.JComponentImplicit2
+import eu.eyan.util.swing.JComponentPlus.JComponentImplicit
 import javax.swing.Action
 import java.awt.Dimension
 import java.awt.LayoutManager
@@ -10,7 +10,7 @@ import javax.swing.SwingConstants
 import javax.swing.plaf.ToolBarUI
 
 object JToolBarPlus {
-  implicit class JToolBarImplicit[TYPE <: JToolBar](jToolBar: TYPE) extends JComponentImplicit2(jToolBar){
+  implicit class JToolBarImplicit[TYPE <: JToolBar](jToolBar: TYPE) extends JComponentImplicit(jToolBar){
     def addAction(action: Action) = {jToolBar.add(action); jToolBar}
     def addSeparator = {jToolBar.addSeparator(); jToolBar}
     def addSeparator(size: Dimension) = {jToolBar.addSeparator(size); jToolBar}

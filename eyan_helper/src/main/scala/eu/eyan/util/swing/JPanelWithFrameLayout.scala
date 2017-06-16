@@ -18,11 +18,11 @@ import com.jgoodies.forms.FormsSetup
 import javax.swing.SwingConstants
 import javax.swing.JTable
 import eu.eyan.log.Log
-import eu.eyan.util.swing.JComponentPlus2.JComponentImplicit2
+import eu.eyan.util.swing.JComponentPlus.JComponentImplicit
 import javax.swing.plaf.PanelUI
 
 object JPanelPlus {
-  implicit class JPanelImplicit[TYPE <: JPanel](jPanel: JPanel) extends JComponentImplicit2(jPanel) {
+  implicit class JPanelImplicit[TYPE <: JPanel](jPanel: JPanel) extends JComponentImplicit(jPanel) {
     def ui(ui: PanelUI) = { jPanel.setUI(ui); jPanel }
   }
 }
