@@ -4,25 +4,17 @@ import java.awt.event.ActionEvent
 import javax.swing.JButton
 import javax.swing.AbstractButton
 import eu.eyan.util.awt.AwtHelper.onActionPerformed
+import eu.eyan.util.swing.AbstractButtonPlus.AbstractButtonImplicit
 
 object JButtonPlus {
-  implicit class JButtonImplicit[TYPE <: AbstractButton](button: TYPE) {
-    def onAction[A](action: () => A): TYPE = { button.addActionListener(onActionPerformed(e => action())); button }
+  implicit class JButtonImplicit[TYPE <: JButton](jButton: TYPE) extends AbstractButtonImplicit(jButton) {
+    //removeNotify()
+    //setDefaultCapable(boolean)
+    //updateUI()    
   }
 }
 
 class JButtonPlus(text: String) extends JButton(text) {
-  def addAction(action: ActionEvent => Unit) = {
-    this.addActionListener(onActionPerformed(e => {
-      setEnabled(false)
-      SwingPlus.runInWorker(() => action.apply(e), () => setEnabled(true))
-    }))
-    this
-  }
+  
 
-
-  def disabled = {
-    this.setEnabled(false)
-    this
-  }
 }

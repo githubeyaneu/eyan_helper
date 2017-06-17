@@ -9,7 +9,44 @@ import javax.swing.border.Border
 import javax.swing.event.ListSelectionListener
 import javax.swing.event.ListSelectionEvent
 import org.fest.swing.input.MouseInfo
+import eu.eyan.util.swing.JComponentPlus.JComponentImplicit
 
+object JListPlus{
+  implicit class JListImplicit[ITEM, TYPE <: JList[ITEM]](jList: TYPE) extends JComponentImplicit(jList){
+    //addListSelectionListener(ListSelectionListener)
+    //addSelectionInterval(int, int)
+    //clearSelection()
+    //ensureIndexIsVisible(int)
+    //indexToLocation(int)
+    //isSelectedIndex(int)
+    //isSelectionEmpty()
+    //locationToIndex(Point)
+    //removeListSelectionListener(ListSelectionListener)
+    //removeSelectionInterval(int, int)
+    //setCellRenderer(ListCellRenderer<? super E>)
+    //setDragEnabled(boolean)
+    //setDropMode(DropMode)
+    //setFixedCellHeight(int)
+    //setFixedCellWidth(int)
+    //setLayoutOrientation(int)
+    //setListData(E[])
+    //setListData(Vector<? extends E>)
+    //setModel(ListModel<E>)
+    //setPrototypeCellValue(E)
+    //setSelectedIndex(int)
+    //setSelectedIndices(int[])
+    //setSelectedValue(Object, boolean)
+    //setSelectionBackground(Color)
+    //setSelectionForeground(Color)
+    //setSelectionInterval(int, int)
+    //setSelectionMode(int)
+    //setSelectionModel(ListSelectionModel)
+    //setUI(ListUI)
+    //setValueIsAdjusting(boolean)
+    //setVisibleRowCount(int)
+    //updateUI()    
+  }
+}
 class JListPlus[TYPE] extends JList[TYPE] {
 
   private var values = List[TYPE]()

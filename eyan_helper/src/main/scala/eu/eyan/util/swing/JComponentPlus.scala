@@ -34,7 +34,6 @@ object JComponentPlus {
     def onVetoableChange(action: => Unit) = onVetoableChangeEvent { e => action }
     def onVetoableChangeEvent(action: PropertyChangeEvent => Unit) = { jComponent.addVetoableChangeListener(BeansPlus.onVetoableChange(action)); jComponent }
 
-
     def grabFocus = { jComponent.grabFocus(); jComponent }
     def clientProperty(key: Object, value: Object) = { jComponent.putClientProperty(key, value); jComponent }
     def keyboardAction(action: ActionListener, command: String, key: KeyStroke, condition: Int) = { jComponent.registerKeyboardAction(action, command, key, condition); jComponent }

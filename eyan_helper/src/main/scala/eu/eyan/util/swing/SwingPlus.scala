@@ -28,16 +28,49 @@ import javax.swing.event.ListDataListener
 import javax.swing.filechooser.FileNameExtensionFilter
 import javax.swing.event.AncestorEvent
 import javax.swing.event.AncestorListener
+import javax.swing.event.TableModelEvent
+import javax.swing.event.InternalFrameEvent
+import javax.swing.event.ListSelectionEvent
+import javax.swing.event.TreeExpansionEvent
+import javax.swing.event.RowSorterEvent
+import javax.swing.event.PopupMenuEvent
+import javax.swing.event.MenuEvent
+import javax.swing.event.TreeSelectionEvent
+import javax.swing.event.TreeModelEvent
+import javax.swing.event.ChangeEvent
+import javax.swing.event.TableColumnModelEvent
+import javax.swing.event.UndoableEditEvent
+import javax.swing.event.MenuDragMouseEvent
+import javax.swing.event.MenuKeyEvent
+import javax.swing.event.HyperlinkEvent
+import javax.swing.event.CaretEvent
+import javax.swing.event.TreeModelListener
+import javax.swing.event.InternalFrameListener
+import javax.swing.event.CellEditorListener
+import javax.swing.event.MenuListener
+import javax.swing.event.CaretListener
+import javax.swing.event.UndoableEditListener
+import javax.swing.event.TableColumnModelListener
+import javax.swing.event.MenuDragMouseListener
+import javax.swing.event.HyperlinkListener
+import javax.swing.event.TreeSelectionListener
+import javax.swing.event.RowSorterListener
+import javax.swing.event.TreeExpansionListener
+import javax.swing.event.MenuKeyListener
+import javax.swing.event.TableModelListener
+import javax.swing.event.ListSelectionListener
+import javax.swing.event.TreeWillExpandListener
+import javax.swing.event.PopupMenuListener
+import javax.swing.event.ChangeListener
+import javax.swing.event.InternalFrameAdapter
 
 object SwingPlus {
-  
+
   //FIXME: if ready delete all methods that starts with "with" if it is no boolean parameter.
-  
-  
-  
-  
-  
-  class AncestorAdapter extends AncestorListener{
+
+  //  AncestorEvent
+  //  AncestorListener
+  class AncestorAdapter extends AncestorListener {
     override def ancestorAdded(e: AncestorEvent) = {}
     override def ancestorRemoved(e: AncestorEvent) = {}
     override def ancestorMoved(e: AncestorEvent) = {}
@@ -45,8 +78,176 @@ object SwingPlus {
   def onAncestorAdded(action: AncestorEvent => Unit) = new AncestorAdapter() { override def ancestorAdded(e: AncestorEvent) = action(e) }
   def onAncestorRemoved(action: AncestorEvent => Unit) = new AncestorAdapter() { override def ancestorRemoved(e: AncestorEvent) = action(e) }
   def onAncestorMoved(action: AncestorEvent => Unit) = new AncestorAdapter() { override def ancestorMoved(e: AncestorEvent) = action(e) }
-  
-  
+
+  //  CaretEvent
+  //  CaretListener
+  def onCaretUpdate(action: CaretEvent => Unit) = new CaretListener() { override def caretUpdate(e: CaretEvent) = action(e) }
+
+  //  ChangeEvent
+  //  CellEditorListener
+  class CellEditorAdapter extends CellEditorListener {
+    override def editingStopped(e: ChangeEvent) = {}
+    override def editingCanceled(e: ChangeEvent) = {}
+  }
+  def onEditingStopped(action: ChangeEvent => Unit) = new CellEditorAdapter() { override def editingStopped(e: ChangeEvent) = action(e) }
+  def onEditingCanceled(action: ChangeEvent => Unit) = new CellEditorAdapter() { override def editingCanceled(e: ChangeEvent) = action(e) }
+  //  ChangeListener
+  def onStateChanged(action: ChangeEvent => Unit) = new ChangeListener() { override def stateChanged(e: ChangeEvent) = action(e) }
+
+  //  DocumentEvent
+  //  DocumentListener
+  class DocumentAdapter extends DocumentListener {
+    override def insertUpdate(e: DocumentEvent) = {}
+    override def removeUpdate(e: DocumentEvent) = {}
+    override def changedUpdate(e: DocumentEvent) = {}
+  }
+  def onInsertUpdate(action: DocumentEvent => Unit) = new DocumentAdapter() { override def insertUpdate(e: DocumentEvent) = action(e) }
+  def onRemoveUpdate(action: DocumentEvent => Unit) = new DocumentAdapter() { override def removeUpdate(e: DocumentEvent) = action(e) }
+  def onChangedUpdate(action: DocumentEvent => Unit) = new DocumentAdapter() { override def changedUpdate(e: DocumentEvent) = action(e) }
+
+  //  HyperlinkEvent
+  //  HyperlinkListener
+  def onHyperlinkUpdate(action: HyperlinkEvent => Unit) = new HyperlinkListener() { override def hyperlinkUpdate(e: HyperlinkEvent) = action(e) }
+
+  //  InternalFrameAdapter
+  //  InternalFrameEvent
+  //  InternalFrameListener
+  def onInternalFrameOpened(action: InternalFrameEvent => Unit) = new InternalFrameAdapter() { override def internalFrameOpened(e: InternalFrameEvent) = action(e) }
+  def onInternalFrameClosing(action: InternalFrameEvent => Unit) = new InternalFrameAdapter() { override def internalFrameClosing(e: InternalFrameEvent) = action(e) }
+  def onInternalFrameClosed(action: InternalFrameEvent => Unit) = new InternalFrameAdapter() { override def internalFrameClosed(e: InternalFrameEvent) = action(e) }
+  def onInternalFrameIconified(action: InternalFrameEvent => Unit) = new InternalFrameAdapter() { override def internalFrameIconified(e: InternalFrameEvent) = action(e) }
+  def onInternalFrameDeiconified(action: InternalFrameEvent => Unit) = new InternalFrameAdapter() { override def internalFrameDeiconified(e: InternalFrameEvent) = action(e) }
+  def onInternalFrameActivated(action: InternalFrameEvent => Unit) = new InternalFrameAdapter() { override def internalFrameActivated(e: InternalFrameEvent) = action(e) }
+  def onInternalFrameDeactivated(action: InternalFrameEvent => Unit) = new InternalFrameAdapter() { override def internalFrameDeactivated(e: InternalFrameEvent) = action(e) }
+
+  //  ListDataEvent
+  //  ListDataListener
+  class ListDataAdapter extends ListDataListener {
+    override def intervalAdded(e: ListDataEvent) = {}
+    override def intervalRemoved(e: ListDataEvent) = {}
+    override def contentsChanged(e: ListDataEvent) = {}
+  }
+  def onIntervalAdded(action: ListDataEvent => Unit) = new ListDataAdapter() { override def intervalAdded(e: ListDataEvent) = action(e) }
+  def onIntervalRemoved(action: ListDataEvent => Unit) = new ListDataAdapter() { override def intervalRemoved(e: ListDataEvent) = action(e) }
+  def onContentsChanged(action: ListDataEvent => Unit) = new ListDataAdapter() { override def contentsChanged(e: ListDataEvent) = action(e) }
+
+  //  ListSelectionEvent
+  //  ListSelectionListener
+  def onValueChanged(action: ListSelectionEvent => Unit) = new ListSelectionListener() { override def valueChanged(e: ListSelectionEvent) = action(e) }
+
+  //  MenuDragMouseEvent
+  //  MenuDragMouseListener
+  class MenuDragMouseAdapter extends MenuDragMouseListener {
+    override def menuDragMouseEntered(e: MenuDragMouseEvent) = {}
+    override def menuDragMouseExited(e: MenuDragMouseEvent) = {}
+    override def menuDragMouseDragged(e: MenuDragMouseEvent) = {}
+    override def menuDragMouseReleased(e: MenuDragMouseEvent) = {}
+  }
+  def onMenuDragMouseEntered(action: MenuDragMouseEvent => Unit) = new MenuDragMouseAdapter() { override def menuDragMouseEntered(e: MenuDragMouseEvent) = action(e) }
+  def onMenuDragMouseExited(action: MenuDragMouseEvent => Unit) = new MenuDragMouseAdapter() { override def menuDragMouseExited(e: MenuDragMouseEvent) = action(e) }
+  def onMenuDragMouseDragged(action: MenuDragMouseEvent => Unit) = new MenuDragMouseAdapter() { override def menuDragMouseDragged(e: MenuDragMouseEvent) = action(e) }
+  def onMenuDragMouseReleased(action: MenuDragMouseEvent => Unit) = new MenuDragMouseAdapter() { override def menuDragMouseReleased(e: MenuDragMouseEvent) = action(e) }
+
+  //  MenuKeyEvent
+  //  MenuKeyListener
+  class MenuKeyAdapter extends MenuKeyListener {
+    override def menuKeyTyped(e: MenuKeyEvent) = {}
+    override def menuKeyPressed(e: MenuKeyEvent) = {}
+    override def menuKeyReleased(e: MenuKeyEvent) = {}
+  }
+  def onMenuKeyTyped(action: MenuKeyEvent => Unit) = new MenuKeyAdapter() { override def menuKeyTyped(e: MenuKeyEvent) = action(e) }
+  def onMenuKeyPressed(action: MenuKeyEvent => Unit) = new MenuKeyAdapter() { override def menuKeyPressed(e: MenuKeyEvent) = action(e) }
+  def onMenuKeyReleased(action: MenuKeyEvent => Unit) = new MenuKeyAdapter() { override def menuKeyReleased(e: MenuKeyEvent) = action(e) }
+
+  //  MenuEvent
+  //  MenuListener
+  class MenuAdapter extends MenuListener {
+    override def menuSelected(e: MenuEvent) = {}
+    override def menuDeselected(e: MenuEvent) = {}
+    override def menuCanceled(e: MenuEvent) = {}
+  }
+  def onMenuSelected(action: MenuEvent => Unit) = new MenuAdapter() { override def menuSelected(e: MenuEvent) = action(e) }
+  def onMenuDeselected(action: MenuEvent => Unit) = new MenuAdapter() { override def menuDeselected(e: MenuEvent) = action(e) }
+  def onMenuCanceled(action: MenuEvent => Unit) = new MenuAdapter() { override def menuCanceled(e: MenuEvent) = action(e) }
+
+  //  MouseInputAdapter
+  //  MouseInputListener
+
+  //  PopupMenuEvent
+  //  PopupMenuListener
+  class PopupMenuAdapter extends PopupMenuListener {
+    override def popupMenuWillBecomeVisible(e: PopupMenuEvent) = {}
+    override def popupMenuWillBecomeInvisible(e: PopupMenuEvent) = {}
+    override def popupMenuCanceled(e: PopupMenuEvent) = {}
+  }
+  def onPopupMenuWillBecomeVisible(action: PopupMenuEvent => Unit) = new PopupMenuAdapter() { override def popupMenuWillBecomeVisible(e: PopupMenuEvent) = action(e) }
+  def onPopupMenuWillBecomeInvisible(action: PopupMenuEvent => Unit) = new PopupMenuAdapter() { override def popupMenuWillBecomeInvisible(e: PopupMenuEvent) = action(e) }
+  def onPopupMenuCanceled(action: PopupMenuEvent => Unit) = new PopupMenuAdapter() { override def popupMenuCanceled(e: PopupMenuEvent) = action(e) }
+
+  //  RowSorterEvent
+  //  RowSorterListener
+  def onSorterChanged(action: RowSorterEvent => Unit) = new RowSorterListener() { override def sorterChanged(e: RowSorterEvent) = action(e) }
+
+  //  TableColumnModelEvent
+  //  TableColumnModelListener
+  class TableColumnModelAdapter extends TableColumnModelListener {
+    override def columnAdded(e: TableColumnModelEvent) = {}
+    override def columnRemoved(e: TableColumnModelEvent) = {}
+    override def columnMoved(e: TableColumnModelEvent) = {}
+    override def columnMarginChanged(e: ChangeEvent) = {}
+    override def columnSelectionChanged(e: ListSelectionEvent) = {}
+  }
+  def onColumnAdded(action: TableColumnModelEvent => Unit) = new TableColumnModelAdapter() { override def columnAdded(e: TableColumnModelEvent) = action(e) }
+  def onColumnRemoved(action: TableColumnModelEvent => Unit) = new TableColumnModelAdapter() { override def columnRemoved(e: TableColumnModelEvent) = action(e) }
+  def onColumnMoved(action: TableColumnModelEvent => Unit) = new TableColumnModelAdapter() { override def columnMoved(e: TableColumnModelEvent) = action(e) }
+  def onColumnMarginChanged(action: ChangeEvent => Unit) = new TableColumnModelAdapter() { override def columnMarginChanged(e: ChangeEvent) = action(e) }
+  def onColumnSelectionChanged(action: ListSelectionEvent => Unit) = new TableColumnModelAdapter() { override def columnSelectionChanged(e: ListSelectionEvent) = action(e) }
+
+  //  TableModelEvent
+  //  TableModelListener
+  def onTableChanged(action: TableModelEvent => Unit) = new TableModelListener() { override def tableChanged(e: TableModelEvent) = action(e) }
+
+  //  TreeExpansionEvent
+  //  TreeExpansionListener
+  class TreeExpansionAdapter extends TreeExpansionListener {
+    override def treeExpanded(e: TreeExpansionEvent) = {}
+    override def treeCollapsed(e: TreeExpansionEvent) = {}
+  }
+  def onTreeExpanded(action: TreeExpansionEvent => Unit) = new TreeExpansionAdapter() { override def treeExpanded(e: TreeExpansionEvent) = action(e) }
+  def onTreeCollapsed(action: TreeExpansionEvent => Unit) = new TreeExpansionAdapter() { override def treeCollapsed(e: TreeExpansionEvent) = action(e) }
+
+  //  TreeModelEvent
+  //  TreeModelListener
+  class TreeModelAdapter extends TreeModelListener {
+    override def treeNodesChanged(e: TreeModelEvent) = {}
+    override def treeNodesInserted(e: TreeModelEvent) = {}
+    override def treeNodesRemoved(e: TreeModelEvent) = {}
+    override def treeStructureChanged(e: TreeModelEvent) = {}
+  }
+  def onTreeNodesChanged(action: TreeModelEvent => Unit) = new TreeModelAdapter() { override def treeNodesChanged(e: TreeModelEvent) = action(e) }
+  def onTreeNodesInserted(action: TreeModelEvent => Unit) = new TreeModelAdapter() { override def treeNodesInserted(e: TreeModelEvent) = action(e) }
+  def onTreeNodesRemoved(action: TreeModelEvent => Unit) = new TreeModelAdapter() { override def treeNodesRemoved(e: TreeModelEvent) = action(e) }
+  def onTreeStructureChanged(action: TreeModelEvent => Unit) = new TreeModelAdapter() { override def treeStructureChanged(e: TreeModelEvent) = action(e) }
+
+  //  TreeSelectionEvent
+  //  TreeSelectionListener
+  def onValueChanged(action: TreeSelectionEvent => Unit) = new TreeSelectionListener() { override def valueChanged(e: TreeSelectionEvent) = action(e) }
+
+  //  TreeWillExpandListener
+  class TreeWillExpandAdapter extends TreeWillExpandListener {
+    override def treeWillExpand(e: TreeExpansionEvent) = {}
+    override def treeWillCollapse(e: TreeExpansionEvent) = {}
+  }
+  def onTreeWillExpand(action: TreeExpansionEvent => Unit) = new TreeWillExpandAdapter() { override def treeWillExpand(e: TreeExpansionEvent) = action(e) }
+  def onTreeWillCollapse(action: TreeExpansionEvent => Unit) = new TreeWillExpandAdapter() { override def treeWillCollapse(e: TreeExpansionEvent) = action(e) }
+
+  //  UndoableEditEvent
+  //  UndoableEditListener
+  def onUndoableEditHappened(action: UndoableEditEvent => Unit) = new UndoableEditListener() { override def undoableEditHappened(e: UndoableEditEvent) = action(e) }
+
+  //////////////////////////////////////////////////////////////////
+
+  //FIXME: delete the listeners under
   
   def showErrorDialog(msg: String, e: Throwable, shown: Set[Throwable] = Set()): Unit = {
     if (e.getCause != null && !shown.contains(e.getCause))
@@ -130,10 +331,10 @@ object SwingPlus {
     override def changedUpdate(e: DocumentEvent) = action()
   }
 
-  def runInWorker(work: () => Unit, doAtDone: () => Unit) = {
+  def runInWorker(work: => Unit, doAtDone: => Unit) = {
     new SwingWorker[Void, Void]() {
-      override def doInBackground() = { work.apply(); null }
-      override def done() = doAtDone.apply()
+      override def doInBackground() = { work; null }
+      override def done() = doAtDone
     }.execute()
   }
 }

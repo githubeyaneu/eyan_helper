@@ -37,7 +37,7 @@ class LogWindow {
   val buttons = content.addPanelWithFormLayout().newColumn()
   val textArea = content.newRow("f:1px:g").addTextArea().alwaysScrollDown()
 
-  buttons.addButton("Clear").addAction(e => textArea.setText(""))
+  buttons.addButton("Clear").onAction_Parallel_Disabled(textArea.setText(""))
 
   val frame = new JFrame("Debug")
   frame.add(content)

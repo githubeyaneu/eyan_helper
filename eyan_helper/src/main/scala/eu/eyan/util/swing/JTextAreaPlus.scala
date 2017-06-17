@@ -4,8 +4,23 @@ import javax.swing.JTextArea
 import javax.swing.text.DefaultCaret
 import eu.eyan.util.awt.AwtHelper
 import javax.swing.event.DocumentEvent
+import eu.eyan.util.swing.JTextComponentPlus.JTextComponentImplicit
 
+object JTextAreaPlus{
+  implicit class JTextAreaImplicit[TYPE <: JTextArea](jTextArea: TYPE) extends JTextComponentImplicit(jTextArea){
+    //append(String)
+    //insert(String, int)
+    //replaceRange(String, int, int)
+    //setColumns(int)
+    //setFont(Font)
+    //setLineWrap(boolean)
+    //setRows(int)
+    //setTabSize(int)
+    //setWrapStyleWord(boolean)    
+  }
+}
 class JTextAreaPlus extends JTextArea {
+ 
   def alwaysScrollDown() = {
     this.getCaret().asInstanceOf[DefaultCaret].setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE)
     this

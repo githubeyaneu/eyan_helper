@@ -5,12 +5,12 @@ import java.awt.event.KeyEvent
 import javax.swing.BorderFactory
 import eu.eyan.log.Log
 import java.awt.Color
-import eu.eyan.util.swing.JTextFieldPlus.JTextFieldPlusImplicit
+import eu.eyan.util.swing.JTextComponentPlus.JTextComponentImplicit
 import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
 import java.awt.event.ComponentEvent
 
 object AutocompleteDecorator {
-  def decorate(component: JTextComponent):AutocompleteDecorator = {
+  def decorate(component: JTextComponent): AutocompleteDecorator = {
     new AutocompleteDecorator(component)
   }
 }
@@ -37,24 +37,24 @@ class AutocompleteDecorator(component: JTextComponent) {
 
   private var isListEnabled = false
 
-  component.setUI(hintTextUI)
-  component.onFocusLost(hidePopup)
-  component.onComponentResized(setPopupWidth)
+  component setUI hintTextUI
+  component onFocusLost hidePopup
+  component onComponentResized setPopupWidth
 
-  component.addKeyReleasedListener(event => {
+  component.onKeyReleasedEvent(event => {
     Log.debug("addKeyReleasedListener: " + component.getName + " " + event.getKeyChar)
     event.getKeyCode match {
       case KeyEvent.VK_DOWN   => selectNextInList
       case KeyEvent.VK_UP     => selectPreviousInList
       case KeyEvent.VK_ENTER  => selectTextFromList()
-      case KeyEvent.VK_ESCAPE => hidePopup()
+      case KeyEvent.VK_ESCAPE => hidePopup
       case _                  => showPopUp
     }
   })
-  
-  component.onDoubleClick { () => {if (popup.isInvisible) showPopUp} }
 
-  component.addKeyPressedListener(event => {
+  component.onDoubleClick { () => { if (popup.isInvisible) showPopUp } }
+
+  component.onKeyPressedEvent(event => {
     Log.debug("addKeyPressedListener: " + component.getName + " " + event.getKeyChar)
     event.getKeyCode match {
       case KeyEvent.VK_DOWN => event.consume
@@ -65,19 +65,15 @@ class AutocompleteDecorator(component: JTextComponent) {
 
   private def selectTextFromList: () => Unit = () => {
     if (popup.isVisible && isListEnabled && NO_SELECTION < autocompleteList.getSelectedIndex) component.setText(autocompleteList.getSelectedValue)
-    hidePopup()
+    hidePopup
   }
 
-  private def hidePopup: () => Unit = () => {
-    autocompleteList.clearSelection
-    popup.setInvisible
-  }
+  private def hidePopup = { autocompleteList.clearSelection; popup.setInvisible }
 
   private def selectNextInList = {
     if (popup.isVisible) {
       if (isListEnabled) autocompleteList.setSelectedIndex(autocompleteList.getSelectedIndex + 1)
-    }
-    else showPopUp
+    } else showPopUp
   }
 
   private def selectPreviousInList = {
@@ -95,8 +91,7 @@ class AutocompleteDecorator(component: JTextComponent) {
       if (newValues.isEmpty) {
         autocompleteList.withValues(List(noItemsFoundText))
         isListEnabled = false
-      }
-      else {
+      } else {
         autocompleteList.withValues(newValues)
         isListEnabled = true
         autocompleteList.setSelectedIndex(oldSelectedIndex)
@@ -105,16 +100,16 @@ class AutocompleteDecorator(component: JTextComponent) {
 
       popup.showPopup
 
-      setPopupWidth()
+      setPopupWidth
       setPopupLocation(null)
     }
   }
 
-  private def refreshPopup = {if (popup.isVisible) showPopUp; this}
+  private def refreshPopup = { if (popup.isVisible) showPopUp; this }
 
   private def setPopupLocation: ComponentEvent => Unit = e => popup.setLocation(component.getLocationOnScreen.x, component.getLocationOnScreen.y + component.getHeight)
 
-  private def setPopupWidth: () => Unit = () => popup.setWidth(component.getWidth)
+  private def setPopupWidth = popup.setWidth(component.getWidth)
 
   def getAutocompleteValues = hints.getAutocompleteValues
   def setAutocompleteValues(values: List[String]) = { hints.setAutocompleteValues(values); refreshPopup }
@@ -127,5 +122,4 @@ class AutocompleteDecorator(component: JTextComponent) {
 
   def getMaxElementsVisible = maxElementsVisible
   def setMaxElementsVisible(max: Int) = { maxElementsVisible = max; refreshPopup }
-
 }
