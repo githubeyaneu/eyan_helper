@@ -10,49 +10,55 @@ import javax.swing.event.ListSelectionListener
 import javax.swing.event.ListSelectionEvent
 import org.fest.swing.input.MouseInfo
 import eu.eyan.util.swing.JComponentPlus.JComponentImplicit
+import javax.swing.DropMode
+import javax.swing.ListSelectionModel
+import javax.swing.plaf.ListUI
+import java.awt.Color
+import javax.swing.ListCellRenderer
+import java.awt.Point
 
-object JListPlus{
-  implicit class JListImplicit[ITEM, TYPE <: JList[ITEM]](jList: TYPE) extends JComponentImplicit(jList){
-    //addListSelectionListener(ListSelectionListener)
-    //addSelectionInterval(int, int)
-    //clearSelection()
-    //ensureIndexIsVisible(int)
-    //indexToLocation(int)
-    //isSelectedIndex(int)
-    //isSelectionEmpty()
-    //locationToIndex(Point)
-    //removeListSelectionListener(ListSelectionListener)
-    //removeSelectionInterval(int, int)
-    //setCellRenderer(ListCellRenderer<? super E>)
-    //setDragEnabled(boolean)
-    //setDropMode(DropMode)
-    //setFixedCellHeight(int)
-    //setFixedCellWidth(int)
-    //setLayoutOrientation(int)
-    //setListData(E[])
-    //setListData(Vector<? extends E>)
-    //setModel(ListModel<E>)
-    //setPrototypeCellValue(E)
-    //setSelectedIndex(int)
-    //setSelectedIndices(int[])
-    //setSelectedValue(Object, boolean)
-    //setSelectionBackground(Color)
-    //setSelectionForeground(Color)
-    //setSelectionInterval(int, int)
-    //setSelectionMode(int)
-    //setSelectionModel(ListSelectionModel)
-    //setUI(ListUI)
-    //setValueIsAdjusting(boolean)
-    //setVisibleRowCount(int)
-    //updateUI()    
+object JListPlus {
+  implicit class JListImplicit[TYPE <: JList[E], E](jList: TYPE) extends JComponentImplicit(jList) {
+    //    ListSelectionListener
+    def onSelectionChanged(action: => Unit) = onValueChangedEvent(e => action)
+    def onSelectionChangedEvent(action: ListSelectionEvent => Unit) = onValueChangedEvent(action)
+    def onValueChanged(action: => Unit) = onValueChangedEvent(e => action)
+    def onValueChangedEvent(action: ListSelectionEvent => Unit) = { jList.getSelectionModel.addListSelectionListener(SwingPlus.onValueChanged(action)); jList }
+
+    def addSelectionInterval(anchor: Int, lead: Int) = { jList.addSelectionInterval(anchor, lead); jList }
+    def clearSelection = { jList.clearSelection(); jList }
+    def ensureIndexIsVisible(index: Int) = { jList.ensureIndexIsVisible(index); jList }
+    def locationToIndex(location: Point) = { jList.locationToIndex(location); jList }
+    def cellRenderer(cellRenderer: ListCellRenderer[E]) = { jList.setCellRenderer(cellRenderer); jList }
+    def dragEnabled(b: Boolean) = { jList.setDragEnabled(b); jList }
+    def dragEnabled :TYPE = dragEnabled(true)
+		def dragDisabled:TYPE = dragEnabled(false)
+    def dropMode(dropMode: DropMode) = { jList.setDropMode(dropMode); jList }//TODO
+    def fixedCellHeight(height: Int) = { jList.setFixedCellHeight(height); jList }
+    def fixedCellWidth(width: Int) = { jList.setFixedCellWidth(width); jList }
+    def layoutOrientation(layoutOrientation: Int) = { jList.setLayoutOrientation(layoutOrientation); jList }
+    def listData(array: Array[E with Object]): TYPE = { jList.setListData(array); jList }
+    def listData(listData: java.util.Vector[_ <: E]) = {jList.setListData(listData);jList}
+    def model(model: ListModel[E]) = { jList.setModel(model); jList }
+    def prototypeCellValue(prototypeCellValue: E) = { jList.setPrototypeCellValue(prototypeCellValue); jList }
+    def selectedIndex(index: Int) = { jList.setSelectedIndex(index); jList }
+    def selectedIndices(array: Array[Int]) = { jList.setSelectedIndices(array); jList }
+    def selectedValue(anObject: Object, shouldScroll: Boolean) = { jList.setSelectedValue(anObject, shouldScroll); jList }
+    def selectionBackground(selectionBackground: Color) = { jList.setSelectionBackground(selectionBackground); jList }
+    def selectionForeground(selectionForeground: Color) = { jList.setSelectionForeground(selectionForeground); jList }
+    def selectionInterval(anchor: Int, lead: Int) = { jList.setSelectionInterval(anchor, lead); jList }
+    def selectionMode(selectionMode: Int) = { jList.setSelectionMode(selectionMode); jList }//TODO
+    def selectionModel(selectionModel: ListSelectionModel) = { jList.setSelectionModel(selectionModel); jList }
+    def uI(ui: ListUI) = { jList.setUI(ui); jList }
+    def valueIsAdjusting(b: Boolean) = { jList.setValueIsAdjusting(b); jList }
+    def visibleRowCount(visibleRowCount: Int) = { jList.setVisibleRowCount(visibleRowCount); jList }
+    def updateUI = { jList.updateUI(); jList }
   }
 }
 class JListPlus[TYPE] extends JList[TYPE] {
 
   private var values = List[TYPE]()
   def getValues = values
-
-  def withName(name: String): JListPlus[TYPE] = { setName(name); this }
 
   def withValues(values: List[TYPE]): JListPlus[TYPE] = {
     this.values = values.toList
@@ -61,16 +67,5 @@ class JListPlus[TYPE] extends JList[TYPE] {
       def getElementAt(i: Int) = values(i)
     })
     this
-  }
-
-  def onDoubleClick(action: () => Unit) = {
-    addMouseListener(new MouseAdapter { override def mouseClicked(e: MouseEvent) = if (e.getClickCount() == 2 && e.getButton==MouseEvent.BUTTON1) action() })
-    this
-  }
-
-  def withBorder(border: Border) = { setBorder(border); this }
-
-  def onSelectionChanged(action: () => Unit) = {
-    getSelectionModel.addListSelectionListener(new ListSelectionListener { override def valueChanged(e: ListSelectionEvent) = { action() } })
   }
 }

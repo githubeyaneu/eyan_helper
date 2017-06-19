@@ -47,6 +47,7 @@ object JComponentPlus {
     def autoscrolls: TYPE = autoscrolls(true)
     def autoscrollsDisabled: TYPE = autoscrolls(false)
     def background(color: Color) = { jComponent.setBackground(color); jComponent }
+    //TODO default borders
     def border(border: Border) = {jComponent.setBorder(border); jComponent}
     def popupMenu(popup: JPopupMenu) = {jComponent.setComponentPopupMenu(popup); jComponent}
     def debugGraphicsOptions(debugOptions: Int) = {jComponent.setDebugGraphicsOptions(debugOptions); jComponent}

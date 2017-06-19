@@ -6,8 +6,11 @@ import javax.swing.BorderFactory
 import eu.eyan.log.Log
 import java.awt.Color
 import eu.eyan.util.swing.JTextComponentPlus.JTextComponentImplicit
-import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
 import java.awt.event.ComponentEvent
+import eu.eyan.util.swing.JListPlus.JListImplicit
+import javax.swing.JList
+import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
+import eu.eyan.util.swing.JComponentPlus.JComponentImplicit
 
 object AutocompleteDecorator {
   def decorate(component: JTextComponent): AutocompleteDecorator = {
@@ -24,9 +27,9 @@ class AutocompleteDecorator(component: JTextComponent) {
   private val hintTextUI = new HintTextFieldUI
 
   val autocompleteList = new JListPlus[String]
-    .withName(JTextFieldAutocomplete.NAME_LIST)
+    .name(JTextFieldAutocomplete.NAME_LIST)
     .onDoubleClick(selectTextFromList)
-    .withBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY))
+    .border(BorderFactory.createLineBorder(Color.LIGHT_GRAY))
 
   private val popup = new PopupWindow(autocompleteList, component)
     .onComponentMoved(setPopupLocation)

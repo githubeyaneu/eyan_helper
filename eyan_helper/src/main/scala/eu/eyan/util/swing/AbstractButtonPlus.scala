@@ -9,7 +9,7 @@ object AbstractButtonPlus {
   implicit class AbstractButtonImplicit[TYPE <: AbstractButton](abstractButton: TYPE) extends JComponentImplicit(abstractButton) {
     //addActionListener(ActionListener)
     //??
-    def onAction[A](action: () => A): TYPE = { abstractButton.addActionListener(AwtHelper.onActionPerformed(e => action())); abstractButton }
+    def onAction[A](action:  => A): TYPE = { abstractButton.addActionListener(AwtHelper.onActionPerformed(e => action)); abstractButton }
     def onAction_Parallel_Disabled(action: => Unit) = onActionEvent_Parallel_Disabled { e => action }
     def onActionEvent_Parallel_Disabled(action: ActionEvent => Unit) = {
       abstractButton.addActionListener(AwtHelper.onActionPerformed(e => {
