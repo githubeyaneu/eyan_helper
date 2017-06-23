@@ -7,6 +7,7 @@ import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
 import eu.eyan.util.swing.JPanelWithFrameLayout
 import javax.swing.JFrame
 import javax.swing.WindowConstants
+import eu.eyan.util.swing.JTextAreaPlus.JTextAreaImplicit
 
 object LogWindow {
   val window = new LogWindow
@@ -35,7 +36,7 @@ class LogWindow {
 
   val content = new JPanelWithFrameLayout().newColumn("f:1px:g")
   val buttons = content.addPanelWithFormLayout().newColumn()
-  val textArea = content.newRow("f:1px:g").addTextArea().alwaysScrollDown()
+  val textArea = content.newRow("f:1px:g").addTextArea().alwaysScrollDown
 
   buttons.addButton("Clear").onAction_Parallel_Disabled(textArea.setText(""))
 

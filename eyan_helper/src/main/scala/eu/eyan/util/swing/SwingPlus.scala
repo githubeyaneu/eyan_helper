@@ -325,10 +325,10 @@ object SwingPlus {
     if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) action(fc.getSelectedFile)
   }
 
-  def docListener(action: () => Unit) = new DocumentListener() {
-    override def insertUpdate(e: DocumentEvent) = action()
+  def docListener(action: => Unit) = new DocumentListener() {
+    override def insertUpdate(e: DocumentEvent) = action
     override def removeUpdate(e: DocumentEvent) = {}
-    override def changedUpdate(e: DocumentEvent) = action()
+    override def changedUpdate(e: DocumentEvent) = action
   }
 
   def runInWorker(work: => Unit, doAtDone: => Unit) = {
