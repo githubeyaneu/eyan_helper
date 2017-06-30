@@ -9,15 +9,13 @@ object AbstractButtonPlus {
   implicit class AbstractButtonImplicit[TYPE <: AbstractButton](abstractButton: TYPE) extends JComponentImplicit(abstractButton) {
     //addActionListener(ActionListener)
     //??
-    def onAction[A](action:  => A): TYPE = { abstractButton.addActionListener(AwtHelper.onActionPerformed(e => action)); abstractButton }
-    def onAction_Parallel_Disabled(action: => Unit) = onActionEvent_Parallel_Disabled { e => action }
-    def onActionEvent_Parallel_Disabled(action: ActionEvent => Unit) = {
-      abstractButton.addActionListener(AwtHelper.onActionPerformed(e => {
-        abstractButton.disabled
-        SwingPlus.runInWorker(action(e), abstractButton.enabled)
-      }))
-      this
-    }
+    def onActionPerformedEvent(action: ActionEvent => Unit) = { abstractButton.addActionListener(AwtHelper.onActionPerformed(action)); abstractButton }
+    def onActionPerformed(action: => Unit) = onActionPerformedEvent { e => action }
+    def onAction(action: => Unit) = onActionPerformedEvent { e => action }
+
+    def onActionEvent_EnableDisable(action: ActionEvent => Unit) = onActionPerformedEvent { e => abstractButton.disabled; SwingPlus.runInWorker(action(e), abstractButton.enabled) }
+    def onAction_disableEnable(action: => Unit) = onActionEvent_EnableDisable { e => action }
+
     //addChangeListener(ChangeListener)
     //addItemListener(ItemListener)
     //doClick()
