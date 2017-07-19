@@ -36,5 +36,8 @@ object JFramePlus {
     override def layout(manager: LayoutManager) = { jFrame.setLayout(manager); jFrame }
     def transferHandler(newHandler: TransferHandler) = { jFrame.setTransferHandler(newHandler); jFrame }
     override def iconImage(image: Image) = { jFrame.setIconImage(image); jFrame }
+
+    
+    def withComponent(c: Component) = component(c)
   }
 }
