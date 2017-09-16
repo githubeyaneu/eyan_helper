@@ -47,7 +47,7 @@ class PopupWindow(content: Component, owner: Component) {
 
   def setLocation(x: Int, y: Int) = { if (wasCreated) window.setLocation(x, y); this }
 
-  def setWidth(width: Int) = { if (wasCreated) { window.setSize(width, window.getHeight); window.validate }; this }
+  def setWidth(width: Int) = {if (wasCreated) { window.setSize(width, window.getHeight); window.validate }; this }
 
   def isVisible = wasCreated && window.isVisible
   def isInvisible = !isVisible

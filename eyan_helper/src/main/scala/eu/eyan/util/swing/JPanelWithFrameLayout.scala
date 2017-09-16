@@ -18,6 +18,16 @@ import com.jgoodies.forms.FormsSetup
 import javax.swing.SwingConstants
 import javax.swing.JTable
 import eu.eyan.log.Log
+import eu.eyan.util.swing.JComponentPlus.JComponentImplicit
+import javax.swing.plaf.PanelUI
+import eu.eyan.util.swing.JTextAreaPlus.JTextAreaImplicit
+import javax.swing.JTextArea
+
+object JPanelPlus {
+  implicit class JPanelImplicit[TYPE <: JPanel](jPanel: JPanel) extends JComponentImplicit(jPanel) {
+    def ui(ui: PanelUI) = { jPanel.setUI(ui); jPanel }
+  }
+}
 
 object JPanelWithFrameLayout {
   val PREF = "p"
@@ -27,6 +37,7 @@ object JPanelWithFrameLayout {
   def apply(firstColumnSpec: String = PREF, firstRowSpec: String = PREF) = new JPanelWithFrameLayout().newColumn(firstColumnSpec).newRow(firstRowSpec)
 }
 
+//TODO Rename to JPanelPlus...
 class JPanelWithFrameLayout() extends JPanel {
   private val frameLayout = new FormLayout("", "")
   this.setLayout(frameLayout)
@@ -146,7 +157,7 @@ class JPanelWithFrameLayout() extends JPanel {
   }
 
   def addTextArea(text: String = "") = {
-    val textArea = new JTextAreaPlus().appendText(text)
+    val textArea = new JTextArea().appendText(text)
     val scrollPane = new JScrollPane(textArea)
     val containerPanel = JPanelWithFrameLayout("f:1px:g", "f:1px:g").add(scrollPane)
     add(containerPanel)

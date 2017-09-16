@@ -32,6 +32,16 @@ import java.io.File
 import java.awt.dnd.DnDConstants
 import java.awt.datatransfer.DataFlavor
 import eu.eyan.log.Log
+import java.awt.Color
+import java.awt.Rectangle
+import java.awt.ComponentOrientation
+import java.awt.Cursor
+import java.awt.Font
+import java.util.Locale
+import java.awt.Point
+import java.awt.Dimension
+import java.awt.AWTKeyStroke
+import scala.collection.JavaConverters._
 
 object ComponentPlus {
 
@@ -61,47 +71,40 @@ object ComponentPlus {
     }
 
     ////////////////////   METHODS   //////////////////////////
-    //  setAutoFocusTransferOnDisposal(boolean)
-    //  setBackground(Color)
-    //  setBounds(int, int, int, int)
-    //  setBounds(Rectangle)
-    //  setBoundsOp(int)
-    //  setComponentOrientation(ComponentOrientation)
-    //  setCursor(Cursor)
-    //  setDropTarget(DropTarget)
+    def backgroundColor(color: Color) = { component.setBackground(color); component }
+    def bounds(x: Int, y: Int, width: Int, height: Int) = { component.setBounds(x, y, width, height); component }
+    def bounds(rectangle: Rectangle) = { component.setBounds(rectangle); component }
+    def componentOrientation(orientation: ComponentOrientation) = { component.setComponentOrientation(orientation); component }
+    def cursor(cursor: Cursor) = { component.setCursor(cursor); component }
 
-    //  setEnabled(boolean)
+    def dropTarget(dropTarget: DropTarget) = { component.setDropTarget(dropTarget); component }
+
     def enabled(enabled: Boolean) = { component.setEnabled(enabled); component }
     def enabled: TYPE = enabled(true)
     def disabled = enabled(false)
 
-    //  setFocusable(boolean)
     def focusable(focusable: Boolean) = { component.setFocusable(focusable); component }
     def focusable: TYPE = focusable(true)
     def notFocusable = focusable(false)
 
-    //  setFocusTraversalKeys(int, Set<? extends AWTKeyStroke>)
-    //  setFocusTraversalKeys_NoIDCheck(int, Set<? extends AWTKeyStroke>)
-    //  setFocusTraversalKeysEnabled(boolean)
-    //  setFont(Font)
-    //  setForeground(Color)
-    //  setGraphicsConfiguration(GraphicsConfiguration)
-    //  setIgnoreRepaint(boolean)
-    //  setLocale(Locale)
-    //  setLocation(int, int)
-    //  setLocation(Point)
-    //  setMaximumSize(Dimension)
-    //  setMinimumSize(Dimension)
+    def focusTraversalKeys(id: Int, keystrokes: Set[AWTKeyStroke]) = { component.setFocusTraversalKeys(id, keystrokes.asJava); component }
+    def focusTraversalKeysEnabled(enabled: Boolean) = { component.setFocusTraversalKeysEnabled(enabled); component }
+    
+    def font(font: Font) = { component.setFont(font); component }
+    def foreground(color: Color) = { component.setForeground(color); component }
+    def ignoreRepaint(ignore: Boolean) = { component.setIgnoreRepaint(ignore); component }
+    def locale(locale: Locale) = { component.setLocale(locale); component }
+    def location(x: Int, y: Int) = { component.setLocation(x, y); component }
+    def location(point: Point) = { component.setLocation(point); component }
+    def maximumSize(dimension: Dimension) = { component.setMaximumSize(dimension); component }
+    def minimumSize(dimension: Dimension) = { component.setMinimumSize(dimension); component }
 
-    //  setName(String)
     def name(name: String) = { component.setName(name); component }
-    def withName(name: String) = this.name(name)
 
-    //  setPreferredSize(Dimension)
-    //  setSize(int, int)
-    //  setSize(Dimension)
+    def preferredSize(dimension: Dimension) = { component.setPreferredSize(dimension); component }
+    def size(width: Int, height: Int) = { component.setSize(width, height); component }
+    def size(dimension: Dimension) = { component.setSize(dimension); component }
 
-    //  setVisible(boolean)
     def visible(visible: Boolean) = { component.setVisible(visible); component }
     def visible: TYPE = visible(true)
     def invisible = visible(false)
@@ -121,10 +124,10 @@ object ComponentPlus {
     def onFocusLost(action: => Unit) = onFocusLostEvent { e => action }
     def onFocusLostEvent(action: FocusEvent => Unit) = { component.addFocusListener(AwtHelper.onFocusLost(action)); component }
 
-    def onAncestorMoved(action: => Unit) = onAncestorMovedEvent { e => action }
-    def onAncestorMovedEvent(action: HierarchyEvent => Unit) = { component.addHierarchyBoundsListener(AwtHelper.onAncestorMoved(action)); component }
-    def onAncestorResized(action: => Unit) = onAncestorResizedEvent { e => action }
-    def onAncestorResizedEvent(action: HierarchyEvent => Unit) = { component.addHierarchyBoundsListener(AwtHelper.onAncestorResized(action)); component }
+    def onHierarchyBoundsAncestorMoved(action: => Unit) = onHierarchyBoundsAncestorMovedEvent { e => action }
+    def onHierarchyBoundsAncestorMovedEvent(action: HierarchyEvent => Unit) = { component.addHierarchyBoundsListener(AwtHelper.onAncestorMoved(action)); component }
+    def onHierarchyBoundsAncestorResized(action: => Unit) = onHierarchyBoundsAncestorResizedEvent { e => action }
+    def onHierarchyBoundsAncestorResizedEvent(action: HierarchyEvent => Unit) = { component.addHierarchyBoundsListener(AwtHelper.onAncestorResized(action)); component }
 
     def onHierarchyChanged(action: => Unit) = onHierarchyChangedEvent { e => action }
     def onHierarchyChangedEvent(action: HierarchyEvent => Unit) = { component.addHierarchyListener(AwtHelper.onHierarchyChanged(action)); component }
@@ -201,13 +204,15 @@ object ComponentPlus {
               val file = droppedFiles.get(droppedFiles.size() - 1);
               action(file);
             }
-          }
-          catch {
+          } catch {
             case ex: Exception => Log.error(ex); ex.printStackTrace
           }
         }
       }
       component
     }
+    
+    // TODO implement file list and...
+    //TODO implement other DND Flavors...
   }
 }
