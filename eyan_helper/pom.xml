@@ -59,6 +59,23 @@
 				</executions>
 			</plugin>
 
+			<!-- For scalatest -->
+			<plugin>
+				<groupId>net.alchim31.maven</groupId>
+				<artifactId>scala-maven-plugin</artifactId>
+				<configuration>
+					<compilerPlugins>
+						<compilerPlugin>
+							<groupId>com.artima.supersafe</groupId>
+							<artifactId>supersafe_2.12.7</artifactId>
+							<version>1.1.2</version>
+						</compilerPlugin>
+					</compilerPlugins>
+				</configuration>
+				<executions>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
 
@@ -68,6 +85,13 @@
 			<id>scala-tools.org</id>
 			<name>Scala-tools Maven2 Repository</name>
 			<url>http://scala-tools.org/repo-releases</url>
+		</repository>
+
+		<!-- For scalatest -->
+		<repository>
+			<id>artima</id>
+			<name>Artima Maven Repository</name>
+			<url>http://repo.artima.com/releases</url>
 		</repository>
 	</repositories>
 
@@ -151,12 +175,17 @@
 			<version>2.6.12</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.scalatest/scalatest_2.11 -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.scalatest</groupId> -->
-		<!-- <artifactId>scalatest_2.11</artifactId> -->
-		<!-- <version>3.0.0</version> -->
-		<!-- </dependency> -->
+		<dependency>
+			<groupId>org.scalactic</groupId>
+			<artifactId>scalactic_2.12</artifactId>
+			<version>3.0.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.scalatest</groupId>
+			<artifactId>scalatest_2.12</artifactId>
+			<version>3.0.4</version>
+			<scope>test</scope>
+		</dependency>
 
 		<!-- For 7zip -->
 		<dependency>

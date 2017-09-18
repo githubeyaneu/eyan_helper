@@ -4,6 +4,7 @@ import java.io.File
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
 import java.security.MessageDigest
 import java.io.FileInputStream
+import scala.io.Source
 
 object FilePlus {
 
@@ -24,6 +25,10 @@ object FilePlus {
     def filesWithExtension(extension: String) = file.listFiles.filter(_.getName.endsWith("." + extension))
 
     def getFileTree: Stream[File] = FilePlus.getFileTree(file)
+    
+    def getFile(subFilename: String): File = new File(file.getAbsolutePath + File.separator + subFilename)
+    
+    def lines = Source.fromFile(file).getLines 
 
     def hash = {
 			if (file.isFile()) {
