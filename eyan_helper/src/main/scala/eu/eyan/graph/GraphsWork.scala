@@ -4,7 +4,7 @@ import eu.eyan.util.string.StringPlus.StringPlusImplicit
 
 
 
-object Graphs extends App {
+object GraphsWork extends App {
   println("xx")
 
   new GraphValuedSets().addNode("A").addNode("B").addEdge("A", "B", 1).mkString.println

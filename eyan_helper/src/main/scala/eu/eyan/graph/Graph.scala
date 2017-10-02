@@ -216,10 +216,10 @@ import eu.eyan.graph.impl.GraphImplSimple
  *   - ...
  */
 
-trait GraphEdgeDirection
-case object GraphDirectionUndirected extends GraphEdgeDirection
-case object GraphDirectionDirected extends GraphEdgeDirection
-case object GraphDirectionMixed extends GraphEdgeDirection
+trait GraphDirection
+case object GraphDirectionUndirected extends GraphDirection
+case object GraphDirectionDirected extends GraphDirection
+case object GraphDirectionMixed extends GraphDirection
 
 class GraphUndirectedEdgeNotSupported extends Exception
 class GraphDirectedEdgeNotSupported extends Exception
@@ -229,18 +229,24 @@ trait Graph[VERTEX, EDGE] {
 
   /** Syntactic sugar: the type of this trait. */
   type GRAPH = Graph[VERTEX, EDGE]
+  
+  /** Syntactic sugar: the type of more vertices. */
+  type VERTICES = Iterable[VERTEX]
+
+  /** Syntactic sugar: the type of more edges. */
+  type EDGES = Iterable[GraphEdge[VERTEX]]
 
   /** Returns all the vertices of the graph. */
   def vertices: Iterable[VERTEX]
 
   /** Returns all the edges of the graph. */
-  def edges: Iterable[GraphEdge[VERTEX]]
+  def edges: EDGES
 
   /** Adds a vertex to the graph. If the vertex was already in the graph nothing happens. */
   def add(vertex: VERTEX): GRAPH
 
   /** Returns the direction type of the graph: Undirected, directed or mixed*/
-  def direction: GraphEdgeDirection
+  def direction: GraphDirection
   
   /** true if the graph supports undirected edges */
   def undirected = direction == GraphDirectionUndirected || direction == GraphDirectionMixed
@@ -262,8 +268,14 @@ trait Graph[VERTEX, EDGE] {
 
   /** Syntactic sugar for creating a directed edge. */
   @throws(classOf[GraphDirectedEdgeNotSupported])
-  @deprecated("Write tests for it") def addDirectedEdge(vertex1: VERTEX, vertex2: VERTEX): GRAPH
+  def addDirectedEdge(vertex1: VERTEX, vertex2: VERTEX): GRAPH
 
+  /** Returns all the edges of the vertex in the graph. */
+  def edges(vertex: VERTEX): EDGES
+		  
+  /** Returns all the edges of the vertex in the graph. */
+  def edges(vertices: VERTICES): EDGES
+  
   /** The order of a graph is its number of vertices. */
   @deprecated("Write tests for it") def order: Int
 
@@ -272,8 +284,6 @@ trait Graph[VERTEX, EDGE] {
 
   /** The degree or valency of a node is the number of edges that connect to it, where an edge that connects to the node at both ends (a loop) is counted twice. */
   @deprecated("Write tests for it") def degree(node: VERTEX): Int
-  
-  
 }
 
 

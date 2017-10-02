@@ -19,11 +19,25 @@ object AssertPlus {
       })
     }
 
+    def shouldBeEmpty = {
+      assertThat(obj, new BaseMatcher[Iterable[_]] {
+        def matches(set: Any): Boolean = set.asInstanceOf[Iterable[_]].size == 0
+        def describeTo(d: Description): Unit = d.appendText("empty")
+      })
+    }
+
     def shouldContain(that: Any) = {
       assertThat(obj, new BaseMatcher[Iterable[_]] {
         def matches(set: Any): Boolean = set.asInstanceOf[Iterable[_]].exists(f => f == that)
         def describeTo(d: Description): Unit = d.appendText("contains " + that)
       })
+    }
+
+    def shouldNotContain(that: Any) = {
+      assertThat(obj, not(new BaseMatcher[Iterable[_]] {
+        def matches(set: Any): Boolean = set.asInstanceOf[Iterable[_]].exists(f => f == that)
+        def describeTo(d: Description): Unit = d.appendText("contains " + that)
+      }))
     }
   }
 
