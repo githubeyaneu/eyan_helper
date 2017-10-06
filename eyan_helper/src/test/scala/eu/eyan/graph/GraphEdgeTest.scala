@@ -69,4 +69,23 @@ class GraphEdgeTest {
 
     GraphEdgeSimple(GraphEdgeDirectionDirected).directed shouldBeTrue
   }
+
+  @Test def testPredecessor = {
+    //predecessor - vertices
+    GraphEdgeSimple(GraphEdgeDirectionDirected, "A", "B").predecessor shouldBeEqualTo "A"
+    GraphEdgeSimple(GraphEdgeDirectionDirected, "B", "A").predecessor shouldBeEqualTo "B"
+
+    //predecessor - direction
+    expectException(classOf[GraphUndirectedEdgeNotSupported], GraphEdgeSimple(GraphEdgeDirectionUndirected, "A", "B").predecessor)
+  }
+
+  @Test def testSuccessor = {
+    //successor - vertices
+    GraphEdgeSimple(GraphEdgeDirectionDirected, "A", "B").successor shouldBeEqualTo "B"
+    GraphEdgeSimple(GraphEdgeDirectionDirected, "B", "A").successor shouldBeEqualTo "A"
+
+    //successor - direction
+    expectException(classOf[GraphUndirectedEdgeNotSupported], GraphEdgeSimple(GraphEdgeDirectionUndirected, "A", "B").successor)
+  }
+
 }

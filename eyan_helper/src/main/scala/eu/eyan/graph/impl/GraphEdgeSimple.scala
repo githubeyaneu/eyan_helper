@@ -4,11 +4,12 @@ import eu.eyan.graph.GraphEdge
 import eu.eyan.graph.GraphEdgeDirection
 import eu.eyan.graph.GraphEdgeDirectionDirected
 import eu.eyan.graph.GraphEdgeDirectionUndirected
+import eu.eyan.graph.GraphUndirectedEdgeNotSupported
 
 object GraphEdgeSimple {
   def apply[VERTEX](direction: GraphEdgeDirection, vertices: VERTEX*) = new GraphEdgeSimple(direction, vertices.toList)
-
 }
+
 class GraphEdgeSimple[VERTEX](val direction: GraphEdgeDirection, val vertices: List[VERTEX]) extends GraphEdge[VERTEX] {
 
   def undirected: Boolean = direction == GraphEdgeDirectionUndirected
@@ -27,7 +28,7 @@ class GraphEdgeSimple[VERTEX](val direction: GraphEdgeDirection, val vertices: L
   
   override def hashCode: Int = vertices.map(_.hashCode*31).sum // FIXME this can be much better
   
-  def predecessor = vertices(0)
+  def predecessor = if(direction==GraphEdgeDirectionDirected) vertices(0) else throw new GraphUndirectedEdgeNotSupported
 
-  def successor = vertices(1)
+  def successor = if(direction==GraphEdgeDirectionDirected) vertices(1) else throw new GraphUndirectedEdgeNotSupported
 }

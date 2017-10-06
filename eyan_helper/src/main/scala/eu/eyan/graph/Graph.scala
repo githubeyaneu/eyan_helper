@@ -223,6 +223,7 @@ case object GraphDirectionMixed extends GraphDirection
 
 class GraphUndirectedEdgeNotSupported extends Exception
 class GraphDirectedEdgeNotSupported extends Exception
+class GraphVertexNotFound extends Exception
 
 /** This is the trait for a simple (undirected) graph. */
 trait Graph[VERTEX, EDGE] {
@@ -276,14 +277,19 @@ trait Graph[VERTEX, EDGE] {
   /** Returns all the edges of the vertex in the graph. */
   def edges(vertices: VERTICES): EDGES
   
+  /** Adds more edge to the graph according the properties of the graph. */
+  @throws(classOf[GraphUndirectedEdgeNotSupported])
+  @throws(classOf[GraphDirectedEdgeNotSupported])
+  def addAll(edges: EDGES): GRAPH
+  
   /** The order of a graph is its number of vertices. */
-  @deprecated("Write tests for it") def order: Int
+  def order: Int
 
   /** The size of a graph is its number of edges. */
-  @deprecated("Write tests for it") def size: Int
+  def size: Int
 
   /** The degree or valency of a node is the number of edges that connect to it, where an edge that connects to the node at both ends (a loop) is counted twice. */
-  @deprecated("Write tests for it") def degree(node: VERTEX): Int
+  def degree(node: VERTEX): Int
 }
 
 

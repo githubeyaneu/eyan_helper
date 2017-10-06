@@ -193,7 +193,7 @@ class GraphTest {
 
     // directed
     val undirected = GraphImplSimple[String](GraphDirectionUndirected)
-    expectException(classOf[GraphDirectedEdgeNotSupported],undirected.addDirectedEdge("A", "B"))
+    expectException(classOf[GraphDirectedEdgeNotSupported], undirected.addDirectedEdge("A", "B"))
 
     val directed = GraphImplSimple[String](GraphDirectionDirected)
     expectNoException(directed.addDirectedEdge("A", "B"))
@@ -216,80 +216,138 @@ class GraphTest {
 
     val AB = GraphImplSimple[String](GraphDirectionMixed).addUndirectedEdge("A", "B")
     AB.edges("C") shouldBeEmpty
-    
+
     AB.edges("B") shouldHaveSize 1
-    AB.edges("B") shouldContain(GraphEdgeUndirected("A","B"))
-    
+    AB.edges("B") shouldContain (GraphEdgeUndirected("A", "B"))
+
     val graph = GraphImplSimple[String](GraphDirectionMixed).addUndirectedEdge("A", "B").addUndirectedEdge("C", "D").addDirectedEdge("A", "C").addDirectedEdge("C", "A")
     graph.edges("A") shouldHaveSize 3
-    graph.edges("A") shouldContain(GraphEdgeUndirected("A","B"))
-    graph.edges("A") shouldContain(GraphEdgeDirected("A","C"))
-    graph.edges("A") shouldContain(GraphEdgeDirected("C","A"))
-    
+    graph.edges("A") shouldContain (GraphEdgeUndirected("A", "B"))
+    graph.edges("A") shouldContain (GraphEdgeDirected("A", "C"))
+    graph.edges("A") shouldContain (GraphEdgeDirected("C", "A"))
+
     graph.edges("B") shouldHaveSize 1
-    graph.edges("B") shouldContain(GraphEdgeUndirected("A","B"))
-    
+    graph.edges("B") shouldContain (GraphEdgeUndirected("A", "B"))
+
     graph.edges("C") shouldHaveSize 3
-    graph.edges("C") shouldContain(GraphEdgeUndirected("C","D"))
-    graph.edges("C") shouldContain(GraphEdgeDirected("A","C"))
-    graph.edges("C") shouldContain(GraphEdgeDirected("C","A"))
-    
+    graph.edges("C") shouldContain (GraphEdgeUndirected("C", "D"))
+    graph.edges("C") shouldContain (GraphEdgeDirected("A", "C"))
+    graph.edges("C") shouldContain (GraphEdgeDirected("C", "A"))
+
     graph.edges("D") shouldHaveSize 1
-    graph.edges("D") shouldContain(GraphEdgeUndirected("C","D"))
+    graph.edges("D") shouldContain (GraphEdgeUndirected("C", "D"))
+  }
+
+  @Test def testEdgesOfVertices() = {
+    val emptyGraph = GraphImplSimple[String](GraphDirectionMixed)
+    emptyGraph.edges(List("A", "B")) shouldBeEmpty
+
+    val AB = GraphImplSimple[String](GraphDirectionMixed).addUndirectedEdge("A", "B")
+    AB.edges(List("C", "D")) shouldBeEmpty
+
+    AB.edges(List("A", "B")) shouldHaveSize 1
+    AB.edges(List("A", "B")) shouldContain (GraphEdgeUndirected("A", "B"))
+
+    val graph = GraphImplSimple[String](GraphDirectionMixed).addUndirectedEdge("A", "B").addUndirectedEdge("C", "D").addDirectedEdge("A", "C").addDirectedEdge("C", "A")
+    graph.edges(List("A", "B")) shouldHaveSize 3
+    graph.edges(List("A", "B")) shouldContain (GraphEdgeUndirected("A", "B"))
+    graph.edges(List("A", "B")) shouldContain (GraphEdgeDirected("A", "C"))
+    graph.edges(List("A", "B")) shouldContain (GraphEdgeDirected("C", "A"))
+    graph.edges(List("A", "B")) shouldBeEqualTo graph.edges(List("B", "A"))
+
+    graph.edges(List("A", "C")) shouldHaveSize 4
+    graph.edges(List("A", "C")) shouldContain (GraphEdgeUndirected("A", "B"))
+    graph.edges(List("A", "C")) shouldContain (GraphEdgeUndirected("C", "D"))
+    graph.edges(List("A", "C")) shouldContain (GraphEdgeDirected("A", "C"))
+    graph.edges(List("A", "C")) shouldContain (GraphEdgeDirected("C", "A"))
+
+    graph.edges(List("A", "D")) shouldHaveSize 4
+    graph.edges(List("A", "D")) shouldContain (GraphEdgeUndirected("A", "B"))
+    graph.edges(List("A", "D")) shouldContain (GraphEdgeUndirected("C", "D"))
+    graph.edges(List("A", "D")) shouldContain (GraphEdgeDirected("A", "C"))
+    graph.edges(List("A", "D")) shouldContain (GraphEdgeDirected("C", "A"))
+
+    graph.edges(List("B", "C")) shouldHaveSize 4
+    graph.edges(List("B", "C")) shouldContain (GraphEdgeUndirected("A", "B"))
+    graph.edges(List("B", "C")) shouldContain (GraphEdgeUndirected("C", "D"))
+    graph.edges(List("B", "C")) shouldContain (GraphEdgeDirected("A", "C"))
+    graph.edges(List("B", "C")) shouldContain (GraphEdgeDirected("C", "A"))
+
+    graph.edges(List("B", "D")) shouldHaveSize 2
+    graph.edges(List("B", "D")) shouldContain (GraphEdgeUndirected("A", "B"))
+    graph.edges(List("B", "D")) shouldContain (GraphEdgeUndirected("C", "D"))
+
+    graph.edges(List("C", "D")) shouldHaveSize 3
+    graph.edges(List("C", "D")) shouldContain (GraphEdgeUndirected("C", "D"))
+    graph.edges(List("C", "D")) shouldContain (GraphEdgeDirected("A", "C"))
+    graph.edges(List("C", "D")) shouldContain (GraphEdgeDirected("C", "A"))
+
   }
   
-  @Test def testEdgesOfVertices() = {
-		  val emptyGraph = GraphImplSimple[String](GraphDirectionMixed)
-		  emptyGraph.edges(List("A","B")) shouldBeEmpty
-		  
-		  val AB = GraphImplSimple[String](GraphDirectionMixed).addUndirectedEdge("A", "B")
-		  AB.edges(List("C","D")) shouldBeEmpty
-		  
-		  AB.edges(List("A","B")) shouldHaveSize 1
-		  AB.edges(List("A","B")) shouldContain(GraphEdgeUndirected("A","B"))
-		  
-		  val graph = GraphImplSimple[String](GraphDirectionMixed).addUndirectedEdge("A", "B").addUndirectedEdge("C", "D").addDirectedEdge("A", "C").addDirectedEdge("C", "A")
-		  graph.edges(List("A","B")) shouldHaveSize 3
-		  graph.edges(List("A","B")) shouldContain(GraphEdgeUndirected("A","B"))
-		  graph.edges(List("A","B")) shouldContain(GraphEdgeDirected("A","C"))
-		  graph.edges(List("A","B")) shouldContain(GraphEdgeDirected("C","A"))
-		  graph.edges(List("A","B")) shouldBeEqualTo graph.edges(List("B","A"))
-		  
-		  graph.edges(List("A","C")) shouldHaveSize 4
-		  graph.edges(List("A","C")) shouldContain(GraphEdgeUndirected("A","B"))
-		  graph.edges(List("A","C")) shouldContain(GraphEdgeUndirected("C","D"))
-		  graph.edges(List("A","C")) shouldContain(GraphEdgeDirected("A","C"))
-		  graph.edges(List("A","C")) shouldContain(GraphEdgeDirected("C","A"))
-		  
-		  graph.edges(List("A","D")) shouldHaveSize 4
-		  graph.edges(List("A","D")) shouldContain(GraphEdgeUndirected("A","B"))
-		  graph.edges(List("A","D")) shouldContain(GraphEdgeUndirected("C","D"))
-		  graph.edges(List("A","D")) shouldContain(GraphEdgeDirected("A","C"))
-		  graph.edges(List("A","D")) shouldContain(GraphEdgeDirected("C","A"))
-		  
-		  graph.edges(List("B","C")) shouldHaveSize 4
-		  graph.edges(List("B","C")) shouldContain(GraphEdgeUndirected("A","B"))
-		  graph.edges(List("B","C")) shouldContain(GraphEdgeUndirected("C","D"))
-		  graph.edges(List("B","C")) shouldContain(GraphEdgeDirected("A","C"))
-		  graph.edges(List("B","C")) shouldContain(GraphEdgeDirected("C","A"))
-		  
-		  graph.edges(List("B","D")) shouldHaveSize 2
-		  graph.edges(List("B","D")) shouldContain(GraphEdgeUndirected("A","B"))
-		  graph.edges(List("B","D")) shouldContain(GraphEdgeUndirected("C","D"))
-		  
-		  graph.edges(List("C","D")) shouldHaveSize 3
-		  graph.edges(List("C","D")) shouldContain(GraphEdgeUndirected("C","D"))
-		  graph.edges(List("C","D")) shouldContain(GraphEdgeDirected("A","C"))
-		  graph.edges(List("C","D")) shouldContain(GraphEdgeDirected("C","A"))
-		  
+  @Test def testAddAllEdges() = {
+    val e = GraphImplSimple[String]()
+    val AB = GraphEdgeUndirected("A", "B")
+    val ab_all = e.addAll(List(AB, AB))
+    val ab = e.add(AB)
+    ab_all shouldBeEqualTo ab
+    
+    val CD = GraphEdgeUndirected("C", "D")
+    e.addAll(List(AB, CD)) shouldBeEqualTo e.add(AB).add(CD)
+
+    val undirected = GraphImplSimple[String](GraphDirectionUndirected)
+    expectNoException(undirected.addAll(List(AB)))
+    expectException(classOf[GraphDirectedEdgeNotSupported], undirected.addAll(List(GraphEdgeDirected("A", "B"))))
+
+    val directed = GraphImplSimple[String](GraphDirectionDirected)
+    expectException(classOf[GraphUndirectedEdgeNotSupported], directed.addAll(List(GraphEdgeUndirected("A", "B"))))
+    expectNoException(directed.addAll(List(GraphEdgeDirected("A", "B"))))
+
+    val mixed = GraphImplSimple[String](GraphDirectionMixed)
+    expectNoException(mixed.addAll(List(GraphEdgeUndirected("A", "B"))))
+    expectNoException(mixed.addAll(List(GraphEdgeDirected("A", "B"))))
   }
 
   @Test def testOrder() = {
+    val emptyGraph = GraphImplSimple[String](GraphDirectionMixed)
+    emptyGraph.order shouldBeEqualTo 0
+
+    val AB = GraphImplSimple[String](GraphDirectionMixed).addUndirectedEdge("A", "B")
+    AB.order shouldBeEqualTo 2
+
+    val graph = GraphImplSimple[String](GraphDirectionMixed).addUndirectedEdge("A", "B").addUndirectedEdge("C", "D").addDirectedEdge("A", "C").addDirectedEdge("C", "A")
+    graph.order shouldBeEqualTo 4
   }
 
   @Test def testSize() = {
+    val emptyGraph = GraphImplSimple[String](GraphDirectionMixed)
+    emptyGraph.size shouldBeEqualTo 0
+
+    val AB = GraphImplSimple[String](GraphDirectionMixed).addUndirectedEdge("A", "B")
+    AB.size shouldBeEqualTo 1
+
+    val graph = GraphImplSimple[String](GraphDirectionMixed).addUndirectedEdge("A", "B").addUndirectedEdge("C", "D").addDirectedEdge("A", "C").addDirectedEdge("C", "A")
+    graph.size shouldBeEqualTo 4
+
+    val graph2 = GraphImplSimple[String](GraphDirectionMixed).addUndirectedEdge("A", "B").addUndirectedEdge("A", "B")
+    graph2.size shouldBeEqualTo 1
   }
 
   @Test def testDegree() = {
+    val emptyGraph = GraphImplSimple[String](GraphDirectionMixed)
+    expectException(classOf[GraphVertexNotFound], emptyGraph.degree("A"))
+
+    val AB = GraphImplSimple[String](GraphDirectionMixed).addUndirectedEdge("A", "B")
+    AB.degree("A") shouldBeEqualTo 1
+    AB.degree("B") shouldBeEqualTo 1
+
+    val graph = GraphImplSimple[String](GraphDirectionMixed).addUndirectedEdge("A", "B").addUndirectedEdge("C", "D").addDirectedEdge("A", "C").addDirectedEdge("C", "A")
+    graph.degree("A") shouldBeEqualTo 3
+    graph.degree("B") shouldBeEqualTo 1
+    graph.degree("C") shouldBeEqualTo 3
+    graph.degree("D") shouldBeEqualTo 1
+
+    val graph2 = GraphImplSimple[String](GraphDirectionMixed).addUndirectedEdge("A", "B").addUndirectedEdge("A", "B").addUndirectedEdge("A", "A")
+    graph2.degree("A") shouldBeEqualTo 3
+    graph2.degree("B") shouldBeEqualTo 1
   }
 }

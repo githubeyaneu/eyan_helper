@@ -8,6 +8,7 @@ import eu.eyan.graph.GraphDirection
 import eu.eyan.graph.GraphEdgeDirection
 import eu.eyan.graph.GraphUndirectedEdgeNotSupported
 import eu.eyan.graph.GraphDirectionDirected
+import eu.eyan.graph.GraphVertexNotFound
 
 object GraphImplSimple {
 	def apply[VERTEX](): Graph[VERTEX, Any] = apply(GraphDirectionUndirected)
@@ -42,9 +43,14 @@ class GraphImplSimple[VERTEX] protected (val vertices: Set[VERTEX], val edges: S
 
   def size = edges.size
   def order = vertices.size
-  def degree(node: VERTEX) = ??? // edges.count(edge => edge._1 == node || edge._2 == node)
+  def degree(vertex: VERTEX) = {
+    if (vertices.contains(vertex))  edges.toList.map(edge => edge.vertices.count(_ == vertex)).sum
+    else throw new GraphVertexNotFound
+  }
   
   def edges(vertex: VERTEX) = edges.filter(edge => edge.vertices.exists(_ == vertex))
 
   def edges(vertices: VERTICES) = edges.filter(edge => edge.vertices.toSet.intersect(vertices.toSet).nonEmpty)
+  
+  def addAll(edges: EDGES):GRAPH = edges.foldLeft(this.asInstanceOf[GRAPH])((graph, edge) => graph.add(edge))
 }
