@@ -22,6 +22,11 @@ import eu.eyan.util.swing.JComponentPlus.JComponentImplicit
 import javax.swing.plaf.PanelUI
 import eu.eyan.util.swing.JTextAreaPlus.JTextAreaImplicit
 import javax.swing.JTextArea
+import javax.swing.text.JTextComponent
+import javax.swing.JPasswordField
+import java.awt.Desktop
+import java.net.URI
+import javax.swing.JCheckBox
 
 object JPanelPlus {
   implicit class JPanelImplicit[TYPE <: JPanel](jPanel: JPanel) extends JComponentImplicit(jPanel) {
@@ -30,6 +35,8 @@ object JPanelPlus {
 }
 
 object JPanelWithFrameLayout {
+  private var counterForLogs = 0
+  def counterForLog = { counterForLogs += 1; counterForLogs }
   val PREF = "p"
   val DEFAULT_SEPARATOR_SIZE = "3dlu"
   val DEFAULT_BORDER_SIZE = "6dlu"
@@ -39,6 +46,7 @@ object JPanelWithFrameLayout {
 
 //TODO Rename to JPanelPlus...
 class JPanelWithFrameLayout() extends JPanel {
+  private val counterForLog = JPanelWithFrameLayout.counterForLog
   private val frameLayout = new FormLayout("", "")
   this.setLayout(frameLayout)
 
@@ -133,14 +141,27 @@ class JPanelWithFrameLayout() extends JPanel {
     this
   }
 
+  // TODO make it generic
   override def add(comp: Component) = {
     if (noRowYet) newRow
     if (noColumnYet) newColumn
 
     val width = if (useSeparators) actualSpanColumns * 2 - 1 else actualSpanColumns
+
+    val name = if (getName != null) getName else f"($counterForLog)"
+    val cc = f"x$actualColumn%-2s y$actualRow%-2s w$width%-2s"
+    Log.debug(f"$name%-4s $cc ${debug(comp)}")
     this.add(comp, CC.xyw(actualColumn, actualRow, width))
     actualSpanColumns = 1
     comp
+  }
+
+  def debug(comp: Component) = {
+    val text = if (comp.isInstanceOf[JTextComponent]) "\"" + comp.asInstanceOf[JTextComponent].getText.lines.toList.lift(0).getOrElse("") + "\""
+    else if (comp.isInstanceOf[JLabel]) "\"" + comp.asInstanceOf[JLabel].getText + "\""
+    else ""
+    val name = if (comp.getName == null) "" else comp.getName
+    f"${comp.getClass.getSimpleName}%-20s $text $name"
   }
 
   def addButton(text: String) = {
@@ -156,6 +177,12 @@ class JPanelWithFrameLayout() extends JPanel {
     tf
   }
 
+  def addPasswordField(text: String, size: Int = TEXTFIELD_DEFAULT_SIZE) = {
+    val tf = new JPasswordField(text, size)
+    add(tf)
+    tf
+  }
+
   def addTextArea(text: String = "") = {
     val textArea = new JTextArea().appendText(text)
     val scrollPane = new JScrollPane(textArea)
@@ -167,6 +194,12 @@ class JPanelWithFrameLayout() extends JPanel {
   def addLabel(text: String) = {
     val label = new JLabel(text)
     add(label)
+    label
+  }
+
+  def addLabelAsURL(text: String) = {
+    val label = addLabel(text).cursor_HAND_CURSOR
+    label.onMouseClicked(Desktop.getDesktop.browse((new URI(label.getText))), 1)
     label
   }
 
@@ -192,5 +225,13 @@ class JPanelWithFrameLayout() extends JPanel {
     val titledSeparator = FormsSetup.getComponentFactoryDefault.createSeparator(title, SwingConstants.LEFT)
     add(titledSeparator)
     this
+  }
+
+  def addSeparatorRow(title: String, span: Int) = newRow("5px").newRow.span(span).addSeparatorWithTitle(title)
+
+  def addCheckBox(text: String = "") = {
+    val cb = new JCheckBox(text)
+    add(cb)
+    cb
   }
 }

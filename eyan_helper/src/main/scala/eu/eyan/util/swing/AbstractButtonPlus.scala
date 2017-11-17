@@ -7,6 +7,8 @@ import java.awt.event.ActionEvent
 import akka.actor.ActorRef
 import javax.swing.JButton
 import eu.eyan.util.swingakka.ActionEventHandler
+import javax.swing.event.ChangeEvent
+import java.awt.event.ItemEvent
 
 object AbstractButtonPlus {
   
@@ -21,9 +23,16 @@ object AbstractButtonPlus {
     def onActionEvent_EnableDisable(action: ActionEvent => Unit) = onActionPerformedEvent { e => abstractButton.disabled; SwingPlus.runInWorker(action(e), abstractButton.enabled) }
     def onAction_disableEnable(action: => Unit) = onActionEvent_EnableDisable { e => action }
     
-
+    def onChange(action: => Unit) = onChangeEvent { e => action;  }
+    def onChangeEvent(action: ChangeEvent => Unit) ={ abstractButton.addChangeListener(SwingPlus.onStateChanged(action)); abstractButton }
+    def onStateChange(action: => Unit) = onChangeEvent { e => action;  }
+    def onStateChangeEvent(action: ChangeEvent => Unit) ={ abstractButton.addChangeListener(SwingPlus.onStateChanged(action)); abstractButton }
+    
+    def onItemStateChange(action: => Unit) = onItemStateChangeEvent { e => action;  }
+    def onItemStateChangeEvent(action: ItemEvent => Unit) ={ abstractButton.addItemListener(SwingPlus.onItemStateChanged(action)); abstractButton }
+    
     //addChangeListener(ChangeListener)
-    //addItemListener(ItemListener)
+//    addItemListener(ItemListener)
     //doClick()
     //doClick(int)
     //imageUpdate(Image, int, int, int, int, int)

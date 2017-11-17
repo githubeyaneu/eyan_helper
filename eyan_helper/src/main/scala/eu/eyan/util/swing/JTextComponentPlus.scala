@@ -19,9 +19,17 @@ import javax.swing.text.JTextComponent
 import javax.swing.text.Keymap
 import javax.swing.text.NavigationFilter
 import javax.swing.text.DefaultCaret
+import javax.swing.event.DocumentEvent
+import eu.eyan.util.registry.RegistryPlus
+import eu.eyan.log.Log
+import javax.swing.SwingUtilities
+import javax.swing.JFrame
+import eu.eyan.util.awt.remember.RememberInRegistry
 
 object JTextComponentPlus {
-  implicit class JTextComponentImplicit[TYPE <: JTextComponent](jTextComponent: TYPE) extends JComponentImplicit(jTextComponent) {
+  implicit class JTextComponentImplicit[TYPE <: JTextComponent](jTextComponent: TYPE) extends JComponentImplicit(jTextComponent) with RememberInRegistry[TYPE] {
+    //    updateUI()
+
     //    AccessibleJTextComponent
     //      AccessibleJTextComponent(JTextComponent)
     //      caretUpdate(CaretEvent)
@@ -40,6 +48,16 @@ object JTextComponentPlus {
 
     def onCaretUpdate(action: => Unit) = onCaretUpdateEvent(e => action)
     def onCaretUpdateEvent(action: CaretEvent => Unit) = { jTextComponent.addCaretListener(SwingPlus.onCaretUpdate(action)); jTextComponent }
+
+    def onTextChanged(action: => Unit): TYPE = onTextChangedEvent(e => action)
+    def onTextChangedEvent(action: DocumentEvent => Unit) = { onChangedUpdateEvent(action); onRemoveUpdateEvent(action); onInsertUpdateEvent(action); jTextComponent }
+
+    def onChangedUpdate(action: => Unit): TYPE = onChangedUpdateEvent(e => action)
+    def onChangedUpdateEvent(action: DocumentEvent => Unit) = { jTextComponent.getDocument.addDocumentListener(SwingPlus.onChangedUpdate(action)); jTextComponent }
+    def onRemoveUpdate(action: => Unit): TYPE = onRemoveUpdateEvent(e => action)
+    def onRemoveUpdateEvent(action: DocumentEvent => Unit) = { jTextComponent.getDocument.addDocumentListener(SwingPlus.onRemoveUpdate(action)); jTextComponent }
+    def onInsertUpdate(action: => Unit): TYPE = onInsertUpdateEvent(e => action)
+    def onInsertUpdateEvent(action: DocumentEvent => Unit) = { jTextComponent.getDocument.addDocumentListener(SwingPlus.onInsertUpdate(action)); jTextComponent }
 
     override def onInputMethodTextChanged(action: => Unit) = onInputMethodTextChangedEvent(e => action)
     override def onInputMethodTextChangedEvent(action: InputMethodEvent => Unit) = { jTextComponent.addInputMethodListener(AwtHelper.onInputMethodTextChanged(action)); jTextComponent }
@@ -91,5 +109,10 @@ object JTextComponentPlus {
     def clickSelectsAll = onClicked(jTextComponent.selectAll)
     def lines: Iterator[String] = jTextComponent.getText.lines
     def onClickedSelectAll = onClicked(jTextComponent.selectAll)
+
+    protected def rememberComponent = jTextComponent
+    protected def rememberEventListener(action: => Unit) = onTextChanged(action)
+    protected def rememberValueGet = jTextComponent.getText
+    protected def rememberValueSet(value: String) = jTextComponent.setText(value)
   }
 }

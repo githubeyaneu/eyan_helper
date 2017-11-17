@@ -1,37 +1,43 @@
 package eu.eyan.log
 
-import scala.collection.mutable.MutableList
-
 object Log {
-  val STACK_LEVEL = 3
-  var isActive: Boolean = false
-  var isWithPrevTime: Boolean = false
-  var prevTime = System.currentTimeMillis
-  type LogEntry = (LogLevel, String)
-  val logs = new MutableList[LogEntry]
+  private val STACK_LEVEL = 3
+  
+  var actualLevel: LogLevel = None
+  private var isWithPrevTime: Boolean = false
+  private var prevTime = System.currentTimeMillis
 
-  private def log(level: LogLevel, message: String = "") = {
-    if (isActive) {
-      if (level != Trace) {
-        val stack = Thread.currentThread().getStackTrace()(STACK_LEVEL)
-        logs += ((level, message))
-        val logText = stack.getClassName.substring(stack.getClassName.lastIndexOf(".") + 1) + "." + stack.getMethodName + ": " + message
-        val prevTimeLog = if (isWithPrevTime) { " " + (System.currentTimeMillis - prevTime) } else ""
-        println(level + prevTimeLog + " " + logText)
-        prevTime = System.currentTimeMillis
-        LogWindow.add(logText)
-      }
+  private def stack = Thread.currentThread().getStackTrace()(STACK_LEVEL)
+  private def prevTimeLog = if (isWithPrevTime) { " " + (System.currentTimeMillis - prevTime) } else ""
+
+  private def log(level: LogLevel, message: String = ""):Log.type = {
+    if (actualLevel.shouldLog(level)) {
+  		prevTime = System.currentTimeMillis
+      val logText = stack.getClassName.substring(stack.getClassName.lastIndexOf(".") + 1) + "." + stack.getMethodName + ": " + message
+      println(f"$level%-5s $prevTimeLog $logText")
+      LogWindow.add(logText)
     }
     this
   }
 
-  def activate = { isActive = true; this }
-  def deactivate = { isActive = false; this }
+  def start = activate
+  def stop = deactivate
+  def enable = activate
+  def disable = deactivate
+  def activate: Log.type = activate(Debug)
+  def deactivate = activate(None)
   def withPrevTime = { isWithPrevTime = true; this }
+  def activate(level: LogLevel = Debug): Log.type = { actualLevel = level; LogWindow.setLevel(level); this }
 
-  def error() = log(Error)
+  def activateDebugLevel = activate
+  def activateInfoLevel = activate(Info)
+  def activateErrorLevel = activate(Error)
+  def activateWarnLevel = activate(Warn)
+  def activateTraceLevel = activate(Trace)
+
+  def error = log(Error)
   def error(message: String) = log(Error, message)
-  def error(exception: Throwable) = log(Error, exception.getMessage + "\r\n  " + exception.getStackTrace.mkString("  \r\n"))
+  def error(exception: Throwable) = log(Error, exception.getClass.getName+ ": " +exception.getMessage + "\r\n  " + exception.getStackTrace.mkString("  \r\n"))
   def error(message: String, exception: Throwable) = log(Error, message + " - " + exception.getMessage + "\r\n  " + exception.getStackTrace.mkString("  \r\n"))
   def errorOnConsoleToo(exception: Throwable) = {
     log(Error, exception.getMessage + "\r\n  " + exception.getStackTrace.mkString("  \r\n"))
@@ -55,11 +61,13 @@ object Log {
   def trace(o: Object) = log(Trace, String.valueOf(o))
 }
 
-class Log
-
-abstract class LogLevel
-case object Error extends LogLevel
-case object Warn extends LogLevel
-case object Info extends LogLevel
-case object Debug extends LogLevel
-case object Trace extends LogLevel
+abstract class LogLevel(val prio: Int) {
+  def shouldLog(otherLevel: LogLevel) = otherLevel.prio <= prio
+}
+case object None extends LogLevel(100)
+case object Fatal extends LogLevel(200)
+case object Error extends LogLevel(300)
+case object Warn extends LogLevel(400)
+case object Info extends LogLevel(500)
+case object Debug extends LogLevel(600)
+case object Trace extends LogLevel(700)

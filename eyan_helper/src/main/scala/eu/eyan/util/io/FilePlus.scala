@@ -14,7 +14,11 @@ object FilePlus {
       if (file.exists && !file.delete) throw new Exception(s"Unable to delete ${file.getAbsolutePath}")
     }
 
+    def notExists = !file.exists
+
     def extension = if (file.getName.lastIndexOf(".") > 0) file.getName.substring(file.getName.lastIndexOf(".")) else ""
+
+    def withoutExtension = if (extension.isEmpty) file else new File(file.getPath.substring(0, file.getPath.lastIndexOf(".")))
 
     def dirs = if (file.exists) file.listFiles.filter(_.isDirectory).toStream else Stream()
 
@@ -24,35 +28,44 @@ object FilePlus {
 
     def filesWithExtension(extension: String) = file.listFiles.filter(_.getName.endsWith("." + extension))
 
-    def getFileTree: Stream[File] = FilePlus.getFileTree(file)
-    
+    def getFileTreeWithItself = FilePlus.getFileTree(file)
+    def getSubFileTree = getFileTreeWithItself.tail
+    def getFileTreeSub = getSubFileTree
+
     def getFile(subFilename: String): File = new File(file.getAbsolutePath + File.separator + subFilename)
+
+    def lines = Source.fromFile(file).getLines
+
+    def files = file.listFiles.toList
+
+    def endsWith(extensions: String*) = extensions.map(ext => file.getName.endsWith("." + ext)).contains(true)
+
+    def contains(fileToContain: String) = file.exists && file.isDirectory && file.list.contains(fileToContain)
     
-    def lines = Source.fromFile(file).getLines 
+    def mkDirs = {file.mkdirs; file}
 
     def hash = {
-			if (file.isFile()) {
-			  if(file.length > 50*1000*1000){
-				  val messageDigest = MessageDigest.getInstance("SHA")
-						  val is = new FileInputStream(file)
-				  val buffer = new Array[Byte](8192)
-				  is.skip(file.length/2)
-				  val bytesRead = is.read(buffer)
-				  if (bytesRead > 0) messageDigest.update(buffer, 0, bytesRead)
-				  val sha = messageDigest.digest
-				  
-				  sha.map("%02x".format(_)).mkString
-			  }
-			  else "small"
-			}
-			else "d"//throw new IllegalArgumentException("Create hash not possible to directory! "+file.getAbsolutePath)
+      if (file.isFile()) {
+        if (file.length > 50 * 1000 * 1000) {
+          val messageDigest = MessageDigest.getInstance("SHA")
+          val is = new FileInputStream(file)
+          val buffer = new Array[Byte](8192)
+          is.skip(file.length / 2)
+          val bytesRead = is.read(buffer)
+          if (bytesRead > 0) messageDigest.update(buffer, 0, bytesRead)
+          val sha = messageDigest.digest
+
+          sha.map("%02x".format(_)).mkString
+        } else "small"
+      } else "d" //throw new IllegalArgumentException("Create hash not possible to directory! "+file.getAbsolutePath)
     }
   }
 
-  def getFileTree(f: File): Stream[File] =
+  private def getFileTree(f: File): Stream[File] =
     f #:: (
       if (f.isDirectory) f.listFiles().toStream.flatMap(getFileTree)
       else Stream.empty)
 
-  def fileTrees(paths: String*): Stream[File] = (paths map { _.asFile } map getFileTree).toStream.flatten
+  private def fileTrees(paths: String*): Stream[File] = (paths map { _.asFile } map getFileTree).toStream.flatten
+
 }

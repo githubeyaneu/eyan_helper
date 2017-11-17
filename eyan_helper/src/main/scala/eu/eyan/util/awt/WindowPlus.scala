@@ -15,6 +15,7 @@ import java.awt.Dimension
 import java.awt.Dialog
 import java.awt.Shape
 import java.awt.Window.Type
+import java.awt.Frame
 
 object WindowPlus {
   implicit class WindowPlusImplicit[TYPE <: Window](window: TYPE) extends ContainerPlusImplicit(window) {
@@ -36,7 +37,12 @@ object WindowPlus {
     def onWindowDeactivatedEvent(action: WindowEvent => Unit) = { window.addWindowListener(AwtHelper.onWindowDeactivated(action)); window }
 
     def onWindowStateChanged(action: => Unit) = onWindowStateChangedEvent { e => action }
+    def onWindowStateChanged_ICONIFIED(action: => Unit) =  onWindowStateChangedEvent { e => if (e.getNewState == Frame.ICONIFIED) action }
+    def onWindowStateChanged_NORMAL(action: => Unit) =  onWindowStateChangedEvent { e => if (e.getNewState == Frame.NORMAL) action }
+    def onWindowStateChanged_MAXIMIZED_BOTH(action: => Unit) =  onWindowStateChangedEvent { e => if (e.getNewState == Frame.MAXIMIZED_BOTH) action }
     def onWindowStateChangedEvent(action: WindowEvent => Unit) = { window.addWindowStateListener(AwtHelper.onWindowStateChanged(action)); window }
+    //TODO: others.... maximized vert...
+    
 
     def onWindowGainedFocus(action: => Unit) = onWindowGainedFocusEvent { e => action }
     def onWindowGainedFocusEvent(action: WindowEvent => Unit) = { window.addWindowFocusListener(AwtHelper.onWindowGainedFocus(action)); window }

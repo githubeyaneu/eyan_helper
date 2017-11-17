@@ -42,6 +42,10 @@ import java.awt.Point
 import java.awt.Dimension
 import java.awt.AWTKeyStroke
 import scala.collection.JavaConverters._
+import javax.swing.SwingUtilities
+import javax.swing.JFrame
+import javax.swing.SwingUtilities
+import java.awt.Container
 
 object ComponentPlus {
 
@@ -76,6 +80,21 @@ object ComponentPlus {
     def bounds(rectangle: Rectangle) = { component.setBounds(rectangle); component }
     def componentOrientation(orientation: ComponentOrientation) = { component.setComponentOrientation(orientation); component }
     def cursor(cursor: Cursor) = { component.setCursor(cursor); component }
+    
+    def cursor_DEFAULT_CURSOR    = cursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR    ))
+    def cursor_CROSSHAIR_CURSOR  = cursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR  ))
+    def cursor_TEXT_CURSOR       = cursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR       ))
+    def cursor_WAIT_CURSOR       = cursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR       ))
+    def cursor_SW_RESIZE_CURSOR  = cursor(Cursor.getPredefinedCursor(Cursor.SW_RESIZE_CURSOR  ))
+    def cursor_SE_RESIZE_CURSOR  = cursor(Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR  ))
+    def cursor_NW_RESIZE_CURSOR  = cursor(Cursor.getPredefinedCursor(Cursor.NW_RESIZE_CURSOR  ))
+    def cursor_NE_RESIZE_CURSOR  = cursor(Cursor.getPredefinedCursor(Cursor.NE_RESIZE_CURSOR  ))
+    def cursor_N_RESIZE_CURSOR   = cursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR   ))
+    def cursor_S_RESIZE_CURSOR   = cursor(Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR   ))
+    def cursor_W_RESIZE_CURSOR   = cursor(Cursor.getPredefinedCursor(Cursor.W_RESIZE_CURSOR   ))
+    def cursor_E_RESIZE_CURSOR   = cursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR   ))
+    def cursor_HAND_CURSOR       = cursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR       ))
+    def cursor_MOVE_CURSOR       = cursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR       ))
 
     def dropTarget(dropTarget: DropTarget) = { component.setDropTarget(dropTarget); component }
 
@@ -89,7 +108,7 @@ object ComponentPlus {
 
     def focusTraversalKeys(id: Int, keystrokes: Set[AWTKeyStroke]) = { component.setFocusTraversalKeys(id, keystrokes.asJava); component }
     def focusTraversalKeysEnabled(enabled: Boolean) = { component.setFocusTraversalKeysEnabled(enabled); component }
-    
+
     def font(font: Font) = { component.setFont(font); component }
     def foreground(color: Color) = { component.setForeground(color); component }
     def ignoreRepaint(ignore: Boolean) = { component.setIgnoreRepaint(ignore); component }
@@ -211,7 +230,19 @@ object ComponentPlus {
       }
       component
     }
+
+    def window = SwingUtilities.windowForComponent(component)
     
+    def windowName =
+      if (window != null)
+        if (window.isInstanceOf[JFrame]) window.asInstanceOf[JFrame].getTitle
+        else window.getName
+      else null
+      
+    def parentPath:String = if(component.getParent!=null) component.getParent.componentPath+component.getParent.asInstanceOf[Container].getComponents.indexOf(component) else ""
+    
+    def componentPath:String = parentPath + "/" + component.getClass.getSimpleName + "." + component.getName
+
     // TODO implement file list and...
     //TODO implement other DND Flavors...
   }

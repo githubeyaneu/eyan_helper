@@ -4,6 +4,7 @@ import java.awt.Font
 
 import eu.eyan.util.swing.JTextComponentPlus.JTextComponentImplicit
 import javax.swing.JTextArea
+import javax.swing.text.DefaultCaret
 
 object JTextAreaPlus {
   implicit class JTextAreaImplicit[TYPE <: JTextArea](jTextArea: TYPE) extends JTextComponentImplicit(jTextArea) {

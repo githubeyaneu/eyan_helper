@@ -5,6 +5,16 @@ import eu.eyan.util.swing.JComponentPlus.JComponentImplicit
 import java.awt.Component
 import javax.swing.Icon
 import javax.swing.plaf.OptionPaneUI
+import javax.swing.JRootPane
+import javax.swing.UIManager
+import java.util.Locale
+import java.awt.Container
+import javax.swing.JPanel
+import javax.swing.JTextField
+import javax.swing.JPasswordField
+import javax.swing.JFrame
+import eu.eyan.util.swing.JFramePlus.JFramePlusImplicit
+import javax.swing.JDialog
 
 object JOptionPanePlus {
   implicit class JOptionPaneImplicit[TYPE <: JOptionPane](jOptionPane: TYPE) extends JComponentImplicit(jOptionPane) {
@@ -33,5 +43,39 @@ object JOptionPanePlus {
     def wantsInput(enabled: Boolean) = { jOptionPane.setWantsInput(enabled); jOptionPane }
     def wantsInput: TYPE = wantsInput(true)
     def wantsInputDisabled = wantsInput(false)
+
   }
+//  def showPasswordInputDialog(parentComponent: Component) = {
+//
+//    def locale = if (parentComponent == null) Locale.getDefault() else parentComponent.getLocale();
+//    def title = UIManager.getString("OptionPane.inputDialogTitle", locale)
+//
+//    val pane = new JOptionPane("Password", JOptionPane.QUESTION_MESSAGE, JOptionPane.OK_CANCEL_OPTION, null, null, null)
+//
+//    pane.setWantsInput(true)
+//    pane.setComponentOrientation((if (parentComponent == null) JOptionPane.getRootFrame() else parentComponent).getComponentOrientation())
+//
+//    val dialog = pane.createDialog(parentComponent, title)
+//
+//    val textField = dialog.getContentPane
+//      .getComponent(0).asInstanceOf[JOptionPane]
+//      .getComponent(0).asInstanceOf[JPanel]
+//      .getComponent(0).asInstanceOf[JPanel]
+//      .getComponent(1).asInstanceOf[JPanel]
+//      .getComponent(1).asInstanceOf[JTextField]
+//    
+//    textField
+//
+////    pane.selectInitialValue()
+////    dialog.setVisible(true)
+////    dialog.dispose()
+////
+////    val value = pane.getInputValue()
+////
+////    if (value == JOptionPane.UNINITIALIZED_VALUE) null else value
+//    val pwdField = new JPasswordField
+////    println(JOptionPane.showMessageDialog(null, pwdField))
+//    println(pwdField.getText)
+//    new JFrame("Pwd").withComponent(pwdField).packAndSetVisible
+//  }
 }

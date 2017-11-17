@@ -15,6 +15,7 @@ import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.net.URLDecoder
 
 object StringPlus {
   lazy val reg = "[\\p{InCombiningDiacriticalMarks}]".r
@@ -39,9 +40,9 @@ object StringPlus {
     }
 
     def appendToFile(file: File): Unit = {
-    	val bw = new BufferedWriter(new FileWriter(file, true))
-    	bw.write(s)
-    	bw.close
+      val bw = new BufferedWriter(new FileWriter(file, true))
+      bw.write(s)
+      bw.close
     }
 
     def deleteAsFile = asFile.delete
@@ -57,9 +58,14 @@ object StringPlus {
     def asDir = asFile
     def file = asFile
     def dir = asFile
+    
+    def executeAsProcess = {
+      ("Executing a process:\r\n  "+s).println
+      s.!!
+    }
 
-    def executeAsProcess = s.!!
     def executeAsBatchFile(batName: String = "temp_bat_can_deleted.bat", deleteBatAfterwards: Boolean = true) = {
+    		("Executing a batch file: \r\n"+s).println
       s.writeToFile(batName).executeAsProcess.println
       if (deleteBatAfterwards) batName.deleteAsFile
     }
@@ -68,11 +74,17 @@ object StringPlus {
     def asUrlGet_responseAsStream() = HttpPlus.sendGet_responseAsStream(s)
 
     def linesFromFile = Source.fromFile(s).getLines
-    
+
     def toSafeFileName = s.replaceAll(":", "").replaceAll("\\\\", "_")
 
     def asDateTime(format: DateTimeFormatter, zoneId: ZoneId = ZoneOffset.UTC) = LocalDateTime.parse(s, format).atZone(zoneId).toInstant
+
+    def toIntOr(orElse: Int) = try { s.toInt } catch { case nfe: NumberFormatException => orElse }
+
+    def withoutAccents = StringPlus.withoutAccents(s)
     
-    def toIntOr(orElse: Int) = try{s.toInt} catch {case nfe:NumberFormatException => orElse}
+    def toSafeFilename = s.replaceAll("""[\*\.\"\/\\\:\;\|\=\,\´\']""", "_").withoutAccents
+    		
+    def toUrlDecoded = URLDecoder.decode(s, "utf-8")
   }
 }

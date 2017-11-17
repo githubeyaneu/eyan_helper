@@ -134,6 +134,7 @@ object AwtHelper {
   
   
   def newRunnable(runnable: () => Unit) = new Runnable() { override def run() = runnable() }
+  def runnable(runnable: => Unit) = new Runnable() { override def run() = runnable }
 
   def tryToEnlargeWindow(window: Window) = {
     val screenSize = Toolkit.getDefaultToolkit().getScreenSize()
