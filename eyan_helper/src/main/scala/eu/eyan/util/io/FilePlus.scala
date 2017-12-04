@@ -5,6 +5,7 @@ import eu.eyan.util.string.StringPlus.StringPlusImplicit
 import java.security.MessageDigest
 import java.io.FileInputStream
 import scala.io.Source
+import eu.eyan.util.scala.TryFinally
 
 object FilePlus {
 
@@ -42,23 +43,36 @@ object FilePlus {
 
     def contains(fileToContain: String) = file.exists && file.isDirectory && file.list.contains(fileToContain)
     
-    def mkDirs = {file.mkdirs; file}
+    def containsFileWithExtension(extension: String) = file.exists && file.isDirectory && file.listFiles.exists(_.endsWith(extension))
+
+    def mkDirs = { file.mkdirs; file }
 
     def hash = {
       if (file.isFile()) {
         if (file.length > 50 * 1000 * 1000) {
           val messageDigest = MessageDigest.getInstance("SHA")
           val is = new FileInputStream(file)
-          val buffer = new Array[Byte](8192)
-          is.skip(file.length / 2)
-          val bytesRead = is.read(buffer)
-          if (bytesRead > 0) messageDigest.update(buffer, 0, bytesRead)
-          val sha = messageDigest.digest
+          TryFinally(
+            {
+            val buffer = new Array[Byte](8192)
+            is.skip(file.length / 2)
+            val bytesRead = is.read(buffer)
+            if (bytesRead > 0) messageDigest.update(buffer, 0, bytesRead)
+            val sha = messageDigest.digest
 
-          sha.map("%02x".format(_)).mkString
+            sha.map("%02x".format(_)).mkString
+          },
+
+            is.close)
         } else "small"
       } else "d" //throw new IllegalArgumentException("Create hash not possible to directory! "+file.getAbsolutePath)
     }
+    
+    def listFilesIfExists = if(file.isDirectory) file.listFiles else Array[File]()
+    
+    def empty = !file.isDirectory || file.list.isEmpty
+    def notEmpty = !empty
+        
   }
 
   private def getFileTree(f: File): Stream[File] =
@@ -67,5 +81,6 @@ object FilePlus {
       else Stream.empty)
 
   private def fileTrees(paths: String*): Stream[File] = (paths map { _.asFile } map getFileTree).toStream.flatten
+  
 
 }

@@ -20,7 +20,7 @@ object LogWindow {
   }
 
   def add(text: String) = {
-    if (window!=null && window.frame != null && window.frame.isVisible) {
+    if (window!=null && window.frame != null /*&& window.frame.isVisible*/) {
       window.textArea.append(text + "\n")
       window.textArea.invalidate()
       window.textArea.repaint()
@@ -28,9 +28,16 @@ object LogWindow {
     }
   }
   
+  def addToOut(b:Int)= window.outTextArea.append(b.toChar.toString)
+  def addToErr(b:Int)= window.errTextArea.append(b.toChar.toString)
+  
   def setLevel(level: LogLevel) = if(window!=null) window.level(level)
 
   def close() = window.frame.dispose
+  
+  def logs = window.textArea.getText
+  def logsOut = window.outTextArea
+  def logsErr = window.errTextArea.getText
 }
 
 class LogWindow {
@@ -38,7 +45,7 @@ class LogWindow {
   val DEFAULT_HEIGHT = 600
   def level(level:LogLevel) = frame.title("Log "+level)
 
-  val content = new JPanelWithFrameLayout().newColumn("f:1px:g")
+  val content = new JPanelWithFrameLayout().withBorders.withSeparators.newColumn("f:1px:g")
 
   val buttons = content.addPanelWithFormLayout().withSeparators.newColumn()
   buttons.addButton("Clear").onAction_disableEnable(textArea.setText(""))
@@ -46,7 +53,12 @@ class LogWindow {
    level => buttons.newColumn.addButton(level.toString).onAction_disableEnable(Log.activate(level))
   )
   
+  content.newRow.addSeparatorWithTitle("Logs")
   val textArea = content.newRow("f:1px:g").addTextArea().alwaysScrollDown
+  content.newRow.addSeparatorWithTitle("Console out")
+  val outTextArea = content.newRow("f:1px:g").addTextArea().alwaysScrollDown
+  content.newRow.addSeparatorWithTitle("Console err")
+  val errTextArea = content.newRow("f:1px:g").addTextArea().alwaysScrollDown
 
   val frame = new JFrame("").withComponent(content).size(DEFAULT_WIDTH, DEFAULT_HEIGHT).onCloseDispose.modalExclusionType_ApplicationExclude
 }

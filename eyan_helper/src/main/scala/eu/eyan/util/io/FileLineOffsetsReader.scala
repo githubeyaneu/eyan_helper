@@ -25,7 +25,7 @@ class FileLineStartOffsetReader private (file: String, bufferSize: Int) extends 
 
   def getOffset = offset
 
-  override def close() = { fis.close() }
+  override def close() = fis.close
 
   /**
    * @return start offset from the line. After calling this method the end

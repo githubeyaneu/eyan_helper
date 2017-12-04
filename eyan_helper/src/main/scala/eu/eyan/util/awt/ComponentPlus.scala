@@ -46,6 +46,8 @@ import javax.swing.SwingUtilities
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
 import java.awt.Container
+import java.io.StringReader
+import org.apache.commons.compress.utils.IOUtils
 
 object ComponentPlus {
 
@@ -80,21 +82,21 @@ object ComponentPlus {
     def bounds(rectangle: Rectangle) = { component.setBounds(rectangle); component }
     def componentOrientation(orientation: ComponentOrientation) = { component.setComponentOrientation(orientation); component }
     def cursor(cursor: Cursor) = { component.setCursor(cursor); component }
-    
-    def cursor_DEFAULT_CURSOR    = cursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR    ))
-    def cursor_CROSSHAIR_CURSOR  = cursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR  ))
-    def cursor_TEXT_CURSOR       = cursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR       ))
-    def cursor_WAIT_CURSOR       = cursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR       ))
-    def cursor_SW_RESIZE_CURSOR  = cursor(Cursor.getPredefinedCursor(Cursor.SW_RESIZE_CURSOR  ))
-    def cursor_SE_RESIZE_CURSOR  = cursor(Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR  ))
-    def cursor_NW_RESIZE_CURSOR  = cursor(Cursor.getPredefinedCursor(Cursor.NW_RESIZE_CURSOR  ))
-    def cursor_NE_RESIZE_CURSOR  = cursor(Cursor.getPredefinedCursor(Cursor.NE_RESIZE_CURSOR  ))
-    def cursor_N_RESIZE_CURSOR   = cursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR   ))
-    def cursor_S_RESIZE_CURSOR   = cursor(Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR   ))
-    def cursor_W_RESIZE_CURSOR   = cursor(Cursor.getPredefinedCursor(Cursor.W_RESIZE_CURSOR   ))
-    def cursor_E_RESIZE_CURSOR   = cursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR   ))
-    def cursor_HAND_CURSOR       = cursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR       ))
-    def cursor_MOVE_CURSOR       = cursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR       ))
+
+    def cursor_DEFAULT_CURSOR = cursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR))
+    def cursor_CROSSHAIR_CURSOR = cursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR))
+    def cursor_TEXT_CURSOR = cursor(Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR))
+    def cursor_WAIT_CURSOR = cursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR))
+    def cursor_SW_RESIZE_CURSOR = cursor(Cursor.getPredefinedCursor(Cursor.SW_RESIZE_CURSOR))
+    def cursor_SE_RESIZE_CURSOR = cursor(Cursor.getPredefinedCursor(Cursor.SE_RESIZE_CURSOR))
+    def cursor_NW_RESIZE_CURSOR = cursor(Cursor.getPredefinedCursor(Cursor.NW_RESIZE_CURSOR))
+    def cursor_NE_RESIZE_CURSOR = cursor(Cursor.getPredefinedCursor(Cursor.NE_RESIZE_CURSOR))
+    def cursor_N_RESIZE_CURSOR = cursor(Cursor.getPredefinedCursor(Cursor.N_RESIZE_CURSOR))
+    def cursor_S_RESIZE_CURSOR = cursor(Cursor.getPredefinedCursor(Cursor.S_RESIZE_CURSOR))
+    def cursor_W_RESIZE_CURSOR = cursor(Cursor.getPredefinedCursor(Cursor.W_RESIZE_CURSOR))
+    def cursor_E_RESIZE_CURSOR = cursor(Cursor.getPredefinedCursor(Cursor.E_RESIZE_CURSOR))
+    def cursor_HAND_CURSOR = cursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR))
+    def cursor_MOVE_CURSOR = cursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR))
 
     def dropTarget(dropTarget: DropTarget) = { component.setDropTarget(dropTarget); component }
 
@@ -231,17 +233,36 @@ object ComponentPlus {
       component
     }
 
+    def onDropString(action: String => Unit) = {
+      onDropEvent { evt =>
+        this.synchronized {
+          try {
+            evt.acceptDrop(DnDConstants.ACTION_COPY)
+            val transferable = evt.getTransferable()
+            val transferData = transferable.getTransferData(DataFlavor.plainTextFlavor)
+            val reader = transferData.asInstanceOf[StringReader]
+            val array = new Array[Char](100)
+            reader.read(array)
+            action(new String(array))
+          } catch {
+            case ex: Exception => Log.error(ex); ex.printStackTrace
+          }
+        }
+      }
+      component
+    }
+
     def window = SwingUtilities.windowForComponent(component)
-    
+
     def windowName =
       if (window != null)
         if (window.isInstanceOf[JFrame]) window.asInstanceOf[JFrame].getTitle
         else window.getName
       else null
-      
-    def parentPath:String = if(component.getParent!=null) component.getParent.componentPath+component.getParent.asInstanceOf[Container].getComponents.indexOf(component) else ""
-    
-    def componentPath:String = parentPath + "/" + component.getClass.getSimpleName + "." + component.getName
+
+    def parentPath: String = if (component.getParent != null) component.getParent.componentPath + component.getParent.asInstanceOf[Container].getComponents.indexOf(component) else ""
+
+    def componentPath: String = parentPath + "/" + component.getClass.getSimpleName + "." + component.getName
 
     // TODO implement file list and...
     //TODO implement other DND Flavors...

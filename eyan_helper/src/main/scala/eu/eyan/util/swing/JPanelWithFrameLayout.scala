@@ -27,6 +27,9 @@ import javax.swing.JPasswordField
 import java.awt.Desktop
 import java.net.URI
 import javax.swing.JCheckBox
+import java.io.File
+import javax.swing.JOptionPane
+import eu.eyan.util.swing.JLabelPlus.JLabelImplicit
 
 object JPanelPlus {
   implicit class JPanelImplicit[TYPE <: JPanel](jPanel: JPanel) extends JComponentImplicit(jPanel) {
@@ -197,9 +200,23 @@ class JPanelWithFrameLayout() extends JPanel {
     label
   }
 
+  def addHelpLabel(text: String) = {
+    val label = new JLabel("").cursor_HAND_CURSOR.onClicked(JOptionPane.showMessageDialog(null, text)).iconFromChar('?').tooltipText(text)
+    add(label)
+    label
+  }
+
   def addLabelAsURL(text: String) = {
     val label = addLabel(text).cursor_HAND_CURSOR
-    label.onMouseClicked(Desktop.getDesktop.browse((new URI(label.getText))), 1)
+    label.onMouseClicked(Desktop.getDesktop.browse((new URI(label.getText))))
+    label
+  }
+
+  def addLabelAsFile(text: String) = {
+    val label = addLabel(text)
+    def file = new File(label.getText)
+    label.onPropertyChange({ if (file.exists()) label.cursor_HAND_CURSOR else label.cursor_DEFAULT_CURSOR })
+    label.onMouseClicked(if (file.exists()) Desktop.getDesktop.open(new File(label.getText)))
     label
   }
 

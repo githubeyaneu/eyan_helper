@@ -135,6 +135,7 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
+			<!-- No scope test because of it is used as main code <scope>test</scope> -->
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.specs2/specs2_2.11 -->
@@ -150,7 +151,7 @@
 			<groupId>org.easytesting</groupId>
 			<artifactId>fest-swing</artifactId>
 			<version>1.2.1</version>
-			<!-- <scope>test</scope> -->
+			<!-- No scope test because of it is used as main code <scope>test</scope> -->
 		</dependency>
 
 		<!-- Conflict with fes assert! <dependency> -->

@@ -6,6 +6,9 @@ import javax.swing.Icon
 import javax.swing.plaf.LabelUI
 import java.awt.Component
 import javax.swing.SwingConstants
+import javax.swing.ImageIcon
+import eu.eyan.util.awt.ImagePlus
+import java.awt.Color
 
 object JLabelPlus {
   implicit class JLabelImplicit[TYPE <: JLabel](jLabel: TYPE) extends JComponentImplicit(jLabel) {
@@ -28,7 +31,7 @@ object JLabelPlus {
     def icon(icon: Icon) = { jLabel.setIcon(icon); jLabel }
     def iconTextGap(iconTextGap: Int) = { jLabel.setIconTextGap(iconTextGap); jLabel }
     def labelFor(component: Component) = { jLabel.setLabelFor(component); jLabel }
-    def text(text: String) = { jLabel.setText(text); jLabel }
+    def text(text: String) = { if(jLabel.getText != text) jLabel.setText(text); jLabel }
     def ui(ui: LabelUI) = { jLabel.setUI(ui); jLabel }
     def verticalAlignment(alignment: Int) = { jLabel.setVerticalAlignment(alignment); jLabel }
     def verticalAlignment_Top = verticalAlignment(SwingConstants.TOP)
@@ -38,5 +41,7 @@ object JLabelPlus {
     def verticalTextPosition_Top = verticalTextPosition(SwingConstants.TOP)
     def verticalTextPosition_Center = verticalTextPosition(SwingConstants.CENTER)
     def verticalTextPosition_Bottom = verticalTextPosition(SwingConstants.BOTTOM)
+
+    def iconFromChar(c:Char) = { jLabel.setIcon(new ImageIcon(ImagePlus.imageFromChar(c, Color.gray, 12,12))); jLabel }
   }
 }

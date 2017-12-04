@@ -47,7 +47,7 @@ class CachedFileLineReader extends Iterable[String] {
     lineCache.get(index)
   }
 
-  def load(file: File, loadFileProgressChangedEvent: Int => Unit) = {
+  def load(file: File, loadFileProgressChangedEvent: Int => Unit = i=> {}) = {
     fileLength = file.length()
 
     Log.info("Loading " + file + " " + fileLength + " bytes")
@@ -79,7 +79,7 @@ class CachedFileLineReader extends Iterable[String] {
             progressPercent = newProgressPercent
           }
         }
-        lnr.close()
+        lnr.close
 
         fileInputStream = new FileInputStream(file)
         fileChannel = fileInputStream.getChannel()
@@ -97,19 +97,20 @@ class CachedFileLineReader extends Iterable[String] {
         case e: IOException => e.printStackTrace()
       }
     }
+    this
   }
 
   def close = {
     try {
-      if (fileInputStream != null) fileInputStream.close()
-      if (fileChannel != null) fileChannel.close()
+      if (fileInputStream != null) fileInputStream.close
+      if (fileChannel != null) fileChannel.close
       lineOffsets.clear
       lineCache.clear
       longestLine = ""
       fileLength = 0
     }
     catch {
-      case e: IOException => e.printStackTrace()
+      case e: IOException => e.printStackTrace
     }
   }
 

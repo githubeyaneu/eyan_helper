@@ -1,8 +1,13 @@
 package eu.eyan.log
 
+import eu.eyan.util.string.StringPlus.StringPlusImplicit
+import java.io.PrintStream
+import java.io.ByteArrayOutputStream
+import java.io.OutputStream
+
 object Log {
   private val STACK_LEVEL = 3
-  
+
   var actualLevel: LogLevel = None
   private var isWithPrevTime: Boolean = false
   private var prevTime = System.currentTimeMillis
@@ -10,16 +15,19 @@ object Log {
   private def stack = Thread.currentThread().getStackTrace()(STACK_LEVEL)
   private def prevTimeLog = if (isWithPrevTime) { " " + (System.currentTimeMillis - prevTime) } else ""
 
-  private def log(level: LogLevel, message: String = ""):Log.type = {
+  private def log(level: LogLevel, message: String = ""): Log.type = {
     if (actualLevel.shouldLog(level)) {
-  		prevTime = System.currentTimeMillis
+      prevTime = System.currentTimeMillis
       val logText = stack.getClassName.substring(stack.getClassName.lastIndexOf(".") + 1) + "." + stack.getMethodName + ": " + message
-      println(f"$level%-5s $prevTimeLog $logText")
+      val consoleText = f"$level%-5s $prevTimeLog $logText"
+      if (Error.shouldLog(level)) consoleText.printlnErr
+      else consoleText.println
+
       LogWindow.add(logText)
     }
     this
   }
-
+  
   def start = activate
   def stop = deactivate
   def enable = activate
@@ -37,7 +45,7 @@ object Log {
 
   def error = log(Error)
   def error(message: String) = log(Error, message)
-  def error(exception: Throwable) = log(Error, exception.getClass.getName+ ": " +exception.getMessage + "\r\n  " + exception.getStackTrace.mkString("  \r\n"))
+  def error(exception: Throwable) = log(Error, exception.getClass.getName + ": " + exception.getMessage + "\r\n  " + exception.getStackTrace.mkString("  \r\n"))
   def error(message: String, exception: Throwable) = log(Error, message + " - " + exception.getMessage + "\r\n  " + exception.getStackTrace.mkString("  \r\n"))
   def errorOnConsoleToo(exception: Throwable) = {
     log(Error, exception.getMessage + "\r\n  " + exception.getStackTrace.mkString("  \r\n"))
@@ -59,6 +67,23 @@ object Log {
   def trace() = log(Trace)
   def trace(message: String) = log(Trace, message)
   def trace(o: Object) = log(Trace, String.valueOf(o))
+
+  def redirectToLogWindow(originalOut: PrintStream, addToConsole: Int=> Unit) = {
+    val combiner = new PrintStream(new OutputStream() {
+      def write(b: Int) = { originalOut.write(b); addToConsole(b) }
+      override def flush() = originalOut.flush
+      override def close() = originalOut.close
+    })
+    combiner
+  }
+
+  def redirectSystemOut = System.setOut(redirectToLogWindow(System.out, LogWindow.addToOut))
+  def redirectSystemError = System.setErr(redirectToLogWindow(System.err, LogWindow.addToErr))
+  def redirectSystemOutAndError = { redirectSystemOut; redirectSystemError }
+  
+  def logs = LogWindow.logs
+  def logsOut = LogWindow.logsOut
+  def logsErr = LogWindow.logsErr
 }
 
 abstract class LogLevel(val prio: Int) {
