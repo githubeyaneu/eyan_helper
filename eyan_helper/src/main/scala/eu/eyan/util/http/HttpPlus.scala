@@ -11,6 +11,7 @@ import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 import javax.net.ssl.SSLContext
+import scala.io.Codec
 
 object HttpPlus {
   private def activateCookieManager = if (CookieHandler.getDefault == null) CookieHandler.setDefault(new CookieManager())
@@ -66,7 +67,7 @@ object HttpPlus {
     wr.close
 
     Log.debug("Response Code : " + conn.getResponseCode)
-    Source.fromInputStream(conn.getInputStream)
+    Source.fromInputStream(conn.getInputStream)(Codec.UTF8)
   }
 
   def sendGet_responseAsStream(url: String) = {

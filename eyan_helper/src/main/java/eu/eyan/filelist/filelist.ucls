@@ -1,0 +1,124 @@
+<class-diagram version="1.0.1" icons="true" always-add-relationships="true" generalizations="true" realizations="true" 
+  associations="true" dependencies="true" nesting-relationships="true">  
+  <class id="1" corner="BOTTOM_RIGHT" language="java" name="eu.eyan.filelist.FindDuplicatesByHashFile" 
+    project="Eyan Java Tools Library" file="/Eyan Java Tools Library/src/eu/eyan/filelist/FindDuplicatesByHashFile.java" 
+    binary="false">    
+    <position x="41" y="37" width="267" height="131"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="2" corner="BOTTOM_RIGHT" language="java" name="eu.eyan.filelist.CreateHashList" 
+    project="Eyan Java Tools Library" file="/Eyan Java Tools Library/src/eu/eyan/filelist/CreateHashList.java" 
+    binary="false">    
+    <position x="789" y="143" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <interface id="3" corner="BOTTOM_RIGHT" language="java" name="eu.eyan.filelist.Sizes" 
+    project="Eyan Java Tools Library" file="/Eyan Java Tools Library/src/eu/eyan/filelist/Sizes.java" binary="false">    
+    <position x="348" y="37" width="100" height="99"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </interface>  
+  <class id="4" corner="BOTTOM_RIGHT" language="java" name="eu.eyan.filelist.FileSearchByContent" 
+    project="Eyan Java Tools Library" file="/Eyan Java Tools Library/src/eu/eyan/filelist/FileSearchByContent.java" 
+    binary="false">    
+    <position x="756" y="406" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="5" corner="BOTTOM_RIGHT" language="java" name="eu.eyan.filelist.Descriptor" 
+    project="Eyan Java Tools Library" file="/Eyan Java Tools Library/src/eu/eyan/filelist/FindDuplicatesByHashFile.java" 
+    binary="false">    
+    <position x="488" y="37" width="102" height="131"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="6" corner="BOTTOM_RIGHT" language="java" name="eu.eyan.filelist.ListFiles" 
+    project="Eyan Java Tools Library" file="/Eyan Java Tools Library/src/eu/eyan/filelist/ListFiles.java" binary="false">    
+    <position x="1453" y="439" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="7" corner="BOTTOM_RIGHT" language="java" name="eu.eyan.filelist.directoryexplorer.DirectoryExplorer" 
+    project="Eyan Java Tools Library" 
+    file="/Eyan Java Tools Library/src/eu/eyan/filelist/directoryexplorer/DirectoryExplorer.java" binary="false">    
+    <position x="1406" y="37" width="182" height="99"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <class id="8" corner="BOTTOM_RIGHT" language="java" name="eu.eyan.filelist.directoryexplorer.FileCallbackEvent" 
+    project="Eyan Java Tools Library" 
+    file="/Eyan Java Tools Library/src/eu/eyan/filelist/directoryexplorer/FileCallbackEvent.java" binary="false">    
+    <position x="1146" y="445" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </class>  
+  <interface id="9" corner="BOTTOM_RIGHT" language="java" name="eu.eyan.filelist.directoryexplorer.FileCallback" 
+    project="Eyan Java Tools Library" 
+    file="/Eyan Java Tools Library/src/eu/eyan/filelist/directoryexplorer/FileCallback.java" binary="false">    
+    <position x="1147" y="187" width="-1" height="-1"/>    
+    <display autosize="true" package="true" initial-value="false" signature="true" visibility="true">      
+      <attributes public="true" package="true" protected="true" private="true"/>      
+      <operations public="true" package="true" protected="true" private="true"/>    
+    </display>  
+  </interface>  
+  <dependency>    
+    <end type="SOURCE" nodeId="9"/>    
+    <end type="TARGET" nodeId="8"/>  
+  </dependency>  
+  <dependency>    
+    <end type="SOURCE" nodeId="7"/>    
+    <end type="TARGET" nodeId="9"/>  
+  </dependency>  
+  <dependency>    
+    <end type="SOURCE" nodeId="2"/>    
+    <end type="TARGET" nodeId="9"/>  
+  </dependency>  
+  <dependency>    
+    <bendpoint x="1272" y="304"/>    
+    <end type="SOURCE" nodeId="7"/>    
+    <end type="TARGET" nodeId="8"/>  
+  </dependency>  
+  <dependency>    
+    <end type="SOURCE" nodeId="6"/>    
+    <end type="TARGET" nodeId="9"/>  
+  </dependency>  
+  <dependency>    
+    <end type="SOURCE" nodeId="2"/>    
+    <end type="TARGET" nodeId="8"/>  
+  </dependency>  
+  <dependency>    
+    <end type="SOURCE" nodeId="4"/>    
+    <end type="TARGET" nodeId="9"/>  
+  </dependency>  
+  <dependency>    
+    <end type="SOURCE" nodeId="4"/>    
+    <end type="TARGET" nodeId="8"/>  
+  </dependency>  
+  <dependency>    
+    <end type="SOURCE" nodeId="6"/>    
+    <end type="TARGET" nodeId="8"/>  
+  </dependency>  
+  <classifier-display autosize="true" package="true" initial-value="false" signature="true" visibility="true">    
+    <attributes public="true" package="true" protected="true" private="true"/>    
+    <operations public="true" package="true" protected="true" private="true"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="true"/>
+</class-diagram>
