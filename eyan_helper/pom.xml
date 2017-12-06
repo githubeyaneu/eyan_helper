@@ -59,6 +59,23 @@
 				</executions>
 			</plugin>
 
+			<!-- For scalatest -->
+			<plugin>
+				<groupId>net.alchim31.maven</groupId>
+				<artifactId>scala-maven-plugin</artifactId>
+				<configuration>
+					<compilerPlugins>
+						<compilerPlugin>
+							<groupId>com.artima.supersafe</groupId>
+							<artifactId>supersafe_2.12.7</artifactId>
+							<version>1.1.2</version>
+						</compilerPlugin>
+					</compilerPlugins>
+				</configuration>
+				<executions>
+				</executions>
+			</plugin>
+
 		</plugins>
 	</build>
 
@@ -68,6 +85,13 @@
 			<id>scala-tools.org</id>
 			<name>Scala-tools Maven2 Repository</name>
 			<url>http://scala-tools.org/repo-releases</url>
+		</repository>
+
+		<!-- For scalatest -->
+		<repository>
+			<id>artima</id>
+			<name>Artima Maven Repository</name>
+			<url>http://repo.artima.com/releases</url>
 		</repository>
 	</repositories>
 
@@ -111,6 +135,7 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
+			<!-- No scope test because of it is used as main code <scope>test</scope> -->
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.specs2/specs2_2.11 -->
@@ -126,7 +151,7 @@
 			<groupId>org.easytesting</groupId>
 			<artifactId>fest-swing</artifactId>
 			<version>1.2.1</version>
-			<!-- <scope>test</scope> -->
+			<!-- No scope test because of it is used as main code <scope>test</scope> -->
 		</dependency>
 
 		<!-- Conflict with fes assert! <dependency> -->
@@ -151,12 +176,17 @@
 			<version>2.6.12</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.scalatest/scalatest_2.11 -->
-		<!-- <dependency> -->
-		<!-- <groupId>org.scalatest</groupId> -->
-		<!-- <artifactId>scalatest_2.11</artifactId> -->
-		<!-- <version>3.0.0</version> -->
-		<!-- </dependency> -->
+		<dependency>
+			<groupId>org.scalactic</groupId>
+			<artifactId>scalactic_2.12</artifactId>
+			<version>3.0.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.scalatest</groupId>
+			<artifactId>scalatest_2.12</artifactId>
+			<version>3.0.4</version>
+			<scope>test</scope>
+		</dependency>
 
 		<!-- For 7zip -->
 		<dependency>
@@ -171,6 +201,11 @@
 			<version>1.6</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.typesafe.akka</groupId>
+			<artifactId>akka-actor_2.12</artifactId>
+			<version>2.5.3</version>
+		</dependency>
 
 	</dependencies>
 </project>

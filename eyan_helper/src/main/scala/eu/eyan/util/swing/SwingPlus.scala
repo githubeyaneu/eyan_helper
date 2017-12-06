@@ -63,6 +63,10 @@ import javax.swing.event.TreeWillExpandListener
 import javax.swing.event.PopupMenuListener
 import javax.swing.event.ChangeListener
 import javax.swing.event.InternalFrameAdapter
+import eu.eyan.util.scala.TryCatchFinally
+import eu.eyan.util.scala.TryCatch
+import java.awt.event.ItemEvent
+import java.awt.event.ItemListener
 
 object SwingPlus {
 
@@ -91,8 +95,12 @@ object SwingPlus {
   }
   def onEditingStopped(action: ChangeEvent => Unit) = new CellEditorAdapter() { override def editingStopped(e: ChangeEvent) = action(e) }
   def onEditingCanceled(action: ChangeEvent => Unit) = new CellEditorAdapter() { override def editingCanceled(e: ChangeEvent) = action(e) }
+
   //  ChangeListener
   def onStateChanged(action: ChangeEvent => Unit) = new ChangeListener() { override def stateChanged(e: ChangeEvent) = action(e) }
+
+  //  ItemListener
+  def onItemStateChanged(action: ItemEvent => Unit) = new ItemListener() { override def itemStateChanged(e: ItemEvent) = action(e) }
 
   //  DocumentEvent
   //  DocumentListener
@@ -248,14 +256,25 @@ object SwingPlus {
   //////////////////////////////////////////////////////////////////
 
   //FIXME: delete the listeners under
-  
+
   def showErrorDialog(msg: String, e: Throwable, shown: Set[Throwable] = Set()): Unit = {
     if (e.getCause != null && !shown.contains(e.getCause))
       showErrorDialog(msg + ", " + e.getLocalizedMessage, e.getCause, shown + e)
     else JOptionPane.showMessageDialog(null, msg + ", " + e.getLocalizedMessage)
   }
 
-  def invokeLater(runnable: () => Unit) = SwingUtilities.invokeLater(AwtHelper.newRunnable(() => runnable()))
+  def invokeLater(action: => Unit) = SwingUtilities.invokeLater(AwtHelper.newRunnable(() => action))
+
+  def invokeLaterTryCatchFinally[T](action: => T, error: Throwable => T, finaly: => Unit) = invokeLater(TryCatchFinally(action, error, finaly))
+
+  def swingWorkerTryCatchFinally[T](action: => T, error: Throwable => T, finaly: => Unit) = {
+    new SwingWorker[T, T]() {
+      override def doInBackground = TryCatch(action, error)
+      override def done = finaly
+    }.execute
+  }
+
+  def beforeActionErrorAfter[T](before: => Unit, action: => T, error: Throwable => T, finaly: => Unit) = { before; SwingPlus.swingWorkerTryCatchFinally(action, error, finaly) }
 
   def createListContentsChangedListener(listDataContentsChangedEventConsumer: ListDataEvent => Unit) =
     new ListDataListener() {
@@ -325,10 +344,10 @@ object SwingPlus {
     if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) action(fc.getSelectedFile)
   }
 
-  def docListener(action: () => Unit) = new DocumentListener() {
-    override def insertUpdate(e: DocumentEvent) = action()
+  def docListener(action: => Unit) = new DocumentListener() {
+    override def insertUpdate(e: DocumentEvent) = action
     override def removeUpdate(e: DocumentEvent) = {}
-    override def changedUpdate(e: DocumentEvent) = action()
+    override def changedUpdate(e: DocumentEvent) = action
   }
 
   def runInWorker(work: => Unit, doAtDone: => Unit) = {

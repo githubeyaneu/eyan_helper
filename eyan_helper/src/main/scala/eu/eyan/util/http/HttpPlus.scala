@@ -42,7 +42,7 @@ object HttpPlus {
   def sendPost(urlPath: String, postParams: String = "") = {
     activateCookieManager
     Log.debug("Sending 'POST' request to URL : " + urlPath)
-    Log.debug("  params: " + postParams)
+    Log.trace("  params: " + postParams)
 
     val url = new URL(urlPath)
     val conn = url.openConnection().asInstanceOf[HttpURLConnection]

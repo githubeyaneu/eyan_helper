@@ -19,8 +19,8 @@ object FramePlus {
     def withResizeable(resizeable: Boolean) = { frame.setResizable(resizeable); frame }
     override def shape(shape: Shape) = { frame.setShape(shape); frame }
     def state(state: Int) = { frame.setState(state); frame }
-    def state_Iconified(state: Int) = this.state(Frame.ICONIFIED)
-    def state_Normal(state: Int) = this.state(Frame.NORMAL)
+    def state_Iconified = this.state(Frame.ICONIFIED)
+    def state_Normal = this.state(Frame.NORMAL)
     def title(title: String) = { frame.setTitle(title); frame }
     def undecorated = withUndecorated(true)
     def notUndecorated = withUndecorated(false)

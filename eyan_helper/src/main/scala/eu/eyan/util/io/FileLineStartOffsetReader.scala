@@ -47,7 +47,7 @@ class CachedFileLineReader extends Iterable[String] {
     lineCache.get(index)
   }
 
-  def load(file: File, loadFileProgressChangedEvent: Int => Unit) = {
+  def load(file: File, loadFileProgressChangedEvent: Int => Unit = i=> {}) = {
     fileLength = file.length()
 
     Log.info("Loading " + file + " " + fileLength + " bytes")
@@ -79,37 +79,38 @@ class CachedFileLineReader extends Iterable[String] {
             progressPercent = newProgressPercent
           }
         }
-        lnr.close()
+        lnr.close
 
         fileInputStream = new FileInputStream(file)
         fileChannel = fileInputStream.getChannel()
         longestLine = get(longestLineIndex);
         if (fileLength != endIndex) {
           // special characters brake the offsets
-          val isActive = Log.isActive
-          Log.activate
+          val oldLevel = Log.actualLevel
+          Log.activate()
           Log.error("special characters brake the offsets: " + file.getAbsolutePath)
           Log.error("Length: " + fileLength + " endOffset:" + endIndex + NL + "Error at loading file. There are newline problems! ")
-          if (!isActive) Log.deactivate
+          Log.activate(oldLevel)
         }
       }
       catch {
         case e: IOException => e.printStackTrace()
       }
     }
+    this
   }
 
   def close = {
     try {
-      if (fileInputStream != null) fileInputStream.close()
-      if (fileChannel != null) fileChannel.close()
+      if (fileInputStream != null) fileInputStream.close
+      if (fileChannel != null) fileChannel.close
       lineOffsets.clear
       lineCache.clear
       longestLine = ""
       fileLength = 0
     }
     catch {
-      case e: IOException => e.printStackTrace()
+      case e: IOException => e.printStackTrace
     }
   }
 

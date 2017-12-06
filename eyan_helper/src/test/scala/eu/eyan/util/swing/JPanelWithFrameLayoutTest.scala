@@ -14,6 +14,7 @@ import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JViewport
 import javax.swing.JLabel
+import javax.swing.JTextArea
 
 @RunWith(classOf[ScalaEclipseJunitRunner])
 class JPanelWithFrameLayoutTest() {
@@ -292,7 +293,7 @@ class JPanelWithFrameLayoutTest() {
   @Test
   def test_addTextArea = {
     val ta = new JPanelWithFrameLayout().addTextArea("123")
-    ta.assertClass(classOf[JTextAreaPlus])
+    ta.assertClass(classOf[JTextArea])
     ta.getParent.assertClass(classOf[JViewport])
     ta.getParent.getParent.assertClass(classOf[JScrollPane])
     ta.getParent.getParent.getParent.assertClass(classOf[JPanelWithFrameLayout])

@@ -10,62 +10,27 @@ import java.awt.event.ComponentEvent
 import eu.eyan.util.awt.AwtHelper
 import javax.swing.text.JTextComponent
 import eu.eyan.util.swing.JTextComponentPlus.JTextComponentImplicit
+import java.awt.event.ActionEvent
+import java.awt.Rectangle
+import javax.swing.Action
+import javax.swing.text.Document
+import java.awt.Font
 
 object JTextFieldPlus {
+
   //TODO remove Plus from name
-  implicit class JTextFieldPlusImplicit[A <: JTextField](val jTextField: A) extends JTextComponentImplicit(jTextField){
-    
-    //addActionListener(ActionListener)
-    //isValidateRoot()
-    //postActionEvent()
-    //removeActionListener(ActionListener)
-    //scrollRectToVisible(Rectangle)
-    //setAction(Action)
-    //setActionCommand(String)
-    //setColumns(int)
-    //setDocument(Document)
-    //setFont(Font)
-    //setHorizontalAlignment(int)
-    //setScrollOffset(int)    
-    
-    def onFocusLost(action: () => Unit) = {
-      jTextField.addFocusListener(new FocusAdapter { override def focusLost(e: FocusEvent) = { action() } })
-      jTextField
-    }
+  implicit class JTextFieldPlusImplicit[A <: JTextField](val jTextField: A) extends JTextComponentImplicit(jTextField) {
 
-    def addComponentMovedListener(action: ComponentEvent => Unit) = {
-      jTextField.addComponentListener(new ComponentAdapter { override def componentMoved(e: ComponentEvent) = { action(e) } })
-      jTextField
-    }
+    def onActionPerformed(action: => Unit) = onActionPerformedEvent { e => action }
+    def onActionPerformedEvent(action: ActionEvent => Unit) = { jTextField.addActionListener(AwtHelper.onActionPerformed(action)); jTextField }
 
-    def addComponentResizedListener(action: ComponentEvent => Unit) = {
-      jTextField.addComponentListener(new ComponentAdapter { override def componentResized(e: ComponentEvent) = { action(e) } })
-      jTextField
-    }
-
-    def onComponentResized(action: () => Unit) = {
-      jTextField.addComponentListener(new ComponentAdapter { override def componentResized(e: ComponentEvent) = { action() } })
-      jTextField
-    }
-
-    def addKeyTypedListener(keyTypedAction: KeyEvent => Unit) = {
-      jTextField.addKeyListener(new KeyAdapter { override def keyTyped(e: KeyEvent) = { keyTypedAction(e) } })
-      jTextField
-    }
-    def addKeyReleasedListener(keyReleasedAction: KeyEvent => Unit) = {
-      jTextField.addKeyListener(new KeyAdapter { override def keyReleased(e: KeyEvent) = { keyReleasedAction(e) } })
-      jTextField
-    }
-    def addKeyPressedListener(keyPressedAction: KeyEvent => Unit) = {
-      jTextField.addKeyListener(new KeyAdapter { override def keyPressed(e: KeyEvent) = { keyPressedAction(e) } })
-      jTextField
-    }
-
-    def addFocusLostListener(action: FocusEvent => Unit) = {
-      jTextField.addFocusListener(new FocusAdapter { override def focusLost(e: FocusEvent) = { action(e) } })
-      jTextField
-    }
-
-    def clickSelectAll = { jTextField.addMouseListener(AwtHelper.onClicked { e => jTextField.selectAll }); jTextField }
+    override def scrollRectToVisible(r: Rectangle) = { jTextField.scrollRectToVisible(r); jTextField }
+    def setAction(a: Action) = { jTextField.setAction(a); jTextField }
+    def setActionCommand(command: String) = { jTextField.setActionCommand(command); jTextField }
+    def setColumns(columns: Int) = { jTextField.setColumns(columns); jTextField }
+    def setDocument(doc: Document) = { jTextField.setDocument(doc); jTextField }
+    def setFont(f: Font) = { jTextField.setFont(f); jTextField }
+    def setHorizontalAlignment(alignment: Int) = { jTextField.setHorizontalAlignment(alignment); jTextField }
+    def setScrollOffset(scrollOffset: Int) = { jTextField.setScrollOffset(scrollOffset); jTextField }
   }
 }
