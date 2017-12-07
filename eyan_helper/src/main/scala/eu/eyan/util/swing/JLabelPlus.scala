@@ -42,6 +42,6 @@ object JLabelPlus {
     def verticalTextPosition_Center = verticalTextPosition(SwingConstants.CENTER)
     def verticalTextPosition_Bottom = verticalTextPosition(SwingConstants.BOTTOM)
 
-    def iconFromChar(c:Char) = { jLabel.setIcon(new ImageIcon(ImagePlus.imageFromChar(c, Color.gray, 12,12))); jLabel }
+    def iconFromChar(c:Char, color:Color=Color.BLACK) = { jLabel.setIcon(new ImageIcon(ImagePlus.imageFromChar(c, color, 12,12))); jLabel }
   }
 }

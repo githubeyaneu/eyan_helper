@@ -6,6 +6,12 @@ import java.security.MessageDigest
 import java.io.FileInputStream
 import scala.io.Source
 import eu.eyan.util.scala.TryFinally
+import java.nio.file.Files
+import java.nio.file.attribute.BasicFileAttributes
+import java.nio.file.Path
+import eu.eyan.util.scala.TryCatchFinally
+import eu.eyan.log.Log
+import java.io.FileOutputStream
 
 object FilePlus {
 
@@ -16,6 +22,8 @@ object FilePlus {
     }
 
     def notExists = !file.exists
+    def existsAndFile = file != null && file.exists && file.isFile
+    def existsAndDir = file != null && file.exists && file.isDirectory
 
     def extension = if (file.getName.lastIndexOf(".") > 0) file.getName.substring(file.getName.lastIndexOf(".")) else ""
 
@@ -29,9 +37,11 @@ object FilePlus {
 
     def filesWithExtension(extension: String) = file.listFiles.filter(_.getName.endsWith("." + extension))
 
-    def getFileTreeWithItself = FilePlus.getFileTree(file)
-    def getSubFileTree = getFileTreeWithItself.tail
-    def getFileTreeSub = getSubFileTree
+    def fileTreeWithItself = FilePlus.treeWithItself(file)
+    def subTree = fileTreeWithItself.tail
+    def treeSub = subTree
+    def subFiles = subTree.filter(_.isFile)
+    def subDirs = subTree.filter(_.isDirectory)
 
     def getFile(subFilename: String): File = new File(file.getAbsolutePath + File.separator + subFilename)
 
@@ -39,10 +49,11 @@ object FilePlus {
 
     def files = file.listFiles.toList
 
-    def endsWith(extensions: String*) = extensions.map(ext => file.getName.endsWith("." + ext)).contains(true)
+    def endsWith(extensions: String*) = extensions.map(ext => file.getName.toLowerCase.endsWith(ext.toLowerCase)).contains(true)
+    def notEndsWith(extensions: String*) = !(extensions.map(ext => file.getName.toLowerCase.endsWith(ext.toLowerCase)).contains(true))
 
     def contains(fileToContain: String) = file.exists && file.isDirectory && file.list.contains(fileToContain)
-    
+
     def containsFileWithExtension(extension: String) = file.exists && file.isDirectory && file.listFiles.exists(_.endsWith(extension))
 
     def mkDirs = { file.mkdirs; file }
@@ -54,33 +65,45 @@ object FilePlus {
           val is = new FileInputStream(file)
           TryFinally(
             {
-            val buffer = new Array[Byte](8192)
-            is.skip(file.length / 2)
-            val bytesRead = is.read(buffer)
-            if (bytesRead > 0) messageDigest.update(buffer, 0, bytesRead)
-            val sha = messageDigest.digest
+              val buffer = new Array[Byte](8192)
+              is.skip(file.length / 2)
+              val bytesRead = is.read(buffer)
+              if (bytesRead > 0) messageDigest.update(buffer, 0, bytesRead)
+              val sha = messageDigest.digest
 
-            sha.map("%02x".format(_)).mkString
-          },
+              sha.map("%02x".format(_)).mkString
+            },
 
             is.close)
         } else "small"
       } else "d" //throw new IllegalArgumentException("Create hash not possible to directory! "+file.getAbsolutePath)
     }
-    
-    def listFilesIfExists = if(file.isDirectory) file.listFiles else Array[File]()
-    
+
+    def listFilesIfExists = if (file.isDirectory) file.listFiles else Array[File]()
+
     def empty = !file.isDirectory || file.list.isEmpty
     def notEmpty = !empty
-        
+
+    def attr = Files.readAttributes[BasicFileAttributes](file.toPath, classOf[BasicFileAttributes])
+    def creationTime = attr.creationTime.toInstant
+    def lastAccessTime = attr.lastAccessTime.toInstant
+    def lastModifiedTime = attr.lastModifiedTime.toInstant
+
+    def copyTo(destination: File) = {
+      val dest = new FileOutputStream(destination)
+      val src = new FileInputStream(file)
+      Log.debug(s"Copy $file to $destination")
+      TryCatchFinally(
+        { dest.getChannel().transferFrom(src.getChannel, 0, Long.MaxValue); true },
+        { e => Log.error(e); false },
+        { dest.close; src.close })
+    }
   }
 
-  private def getFileTree(f: File): Stream[File] =
+  private def treeWithItself(f: File): Stream[File] =
     f #:: (
-      if (f.isDirectory) f.listFiles().toStream.flatMap(getFileTree)
+      if (f.isDirectory) f.listFiles().toStream.flatMap(treeWithItself)
       else Stream.empty)
 
-  private def fileTrees(paths: String*): Stream[File] = (paths map { _.asFile } map getFileTree).toStream.flatten
-  
-
+  private def fileTreesWithItselfs(paths: String*): Stream[File] = (paths map { _.asFile } map treeWithItself).toStream.flatten
 }

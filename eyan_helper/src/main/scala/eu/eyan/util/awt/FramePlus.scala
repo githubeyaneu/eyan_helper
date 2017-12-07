@@ -25,5 +25,7 @@ object FramePlus {
     def undecorated = withUndecorated(true)
     def notUndecorated = withUndecorated(false)
     def withUndecorated(undecorated: Boolean) = { frame.setUndecorated(undecorated); frame }
+    
+    def maximize = extendedState(Frame.MAXIMIZED_BOTH)
   }
 }

@@ -43,7 +43,9 @@ object AbstractButtonPlus {
     //isFocusPainted()
     //isRolloverEnabled()
     //isSelected()
-    def notSelected = !abstractButton.isSelected
+    def isNotSelected = !abstractButton.isSelected
+    def selected = {abstractButton.setSelected(true); abstractButton}
+    def notSelected = {abstractButton.setSelected(false); abstractButton}
     //removeActionListener(ActionListener)
     //removeChangeListener(ChangeListener)
     //removeItemListener(ItemListener)

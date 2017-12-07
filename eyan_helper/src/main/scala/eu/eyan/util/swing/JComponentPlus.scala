@@ -88,6 +88,11 @@ object JComponentPlus {
     def hide: TYPE = notVisible
     override def invisible = notVisible
 
-    def enabledDependsOn(buttons: AbstractButton*) = { buttons.foreach(_.onStateChange(jComponent.setEnabled(!buttons.exists(_.notSelected)))); jComponent }
+    def enabledDependsOn(buttons: AbstractButton*) = {
+      def evaluateEnabled = jComponent.setEnabled(!buttons.exists(_.isNotSelected))
+      buttons.foreach(_.onStateChange(evaluateEnabled))
+      evaluateEnabled
+      jComponent
+    }
   }
 }

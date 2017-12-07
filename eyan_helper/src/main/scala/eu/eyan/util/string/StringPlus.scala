@@ -16,6 +16,10 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.net.URLDecoder
+import eu.eyan.util.scala.TryCatchFinally
+import eu.eyan.log.Log
+import java.io.OutputStreamWriter
+import java.io.FileOutputStream
 
 object StringPlus {
   lazy val reg = "[\\p{InCombiningDiacriticalMarks}]".r
@@ -30,13 +34,24 @@ object StringPlus {
     def println = { System.out.println(s); s }
     def printlnErr = { System.err.println(s); s }
 
-    def writeToFile(filename: String): String = { writeToFile(new File(filename)); filename }
+    def writeToFile(filename: String): String = { writeToFile(filename.asFile); filename }
 
     def writeToFile(file: File): File = {
       val bw = new BufferedWriter(new FileWriter(file))
-      bw.write(s)
-      bw.close
+      TryCatchFinally(
+        bw.write(s),
+        e => Log.error(e),
+        bw.close)
       file
+    }
+
+    def writeToFileAnsi(filename: String): String = {
+      val writer = new OutputStreamWriter(new FileOutputStream(filename, true), "windows-1252")
+      TryCatchFinally(
+        writer.append(s),
+        e => Log.error(e),
+        writer.close)
+      filename
     }
 
     def appendToFile(file: File): Unit = {
@@ -58,14 +73,14 @@ object StringPlus {
     def asDir = asFile
     def file = asFile
     def dir = asFile
-    
+
     def executeAsProcess = {
-      ("Executing a process:\r\n  "+s).println
+      ("Executing a process:\r\n  " + s).println
       s.!!
     }
 
     def executeAsBatchFile(batName: String = "temp_bat_can_deleted.bat", deleteBatAfterwards: Boolean = true) = {
-    		("Executing a batch file: \r\n"+s).println
+      ("Executing a batch file: \r\n" + s).println
       s.writeToFile(batName).executeAsProcess.println
       if (deleteBatAfterwards) batName.deleteAsFile
     }
@@ -82,9 +97,16 @@ object StringPlus {
     def toIntOr(orElse: Int) = try { s.toInt } catch { case nfe: NumberFormatException => orElse }
 
     def withoutAccents = StringPlus.withoutAccents(s)
-    
+
     def toSafeFilename = s.replaceAll("""[\*\.\"\/\\\:\;\|\=\,\´\']""", "_").withoutAccents
-    		
+
     def toUrlDecoded = URLDecoder.decode(s, "utf-8")
+
+    def containsAny(strings: Seq[String]) = strings.exists(s.contains(_))
+
+    def containsAnyIgnoreCase(strings: Seq[String]) = s.toLowerCase.containsAny(strings.map(_.toLowerCase))
+
+    def toHexEncode = s.getBytes.map(_.toHexString).mkString(",")
+    def toHexDecode = new String(s.split(",").map(Integer.parseUnsignedInt(_, 16).toByte).toArray)
   }
 }

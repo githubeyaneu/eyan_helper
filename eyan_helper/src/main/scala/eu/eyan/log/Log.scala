@@ -12,13 +12,16 @@ object Log {
   private var isWithPrevTime: Boolean = false
   private var prevTime = System.currentTimeMillis
 
-  private def stack = Thread.currentThread().getStackTrace()(STACK_LEVEL)
+  def stackClassAndMethod = {
+	  val stack = Thread.currentThread().getStackTrace().filter(se=>se.getClassName!=Log.getClass.getName)(1)
+    stack.getClassName.substring(stack.getClassName.lastIndexOf(".") + 1) + "." + stack.getMethodName
+  }
   private def prevTimeLog = if (isWithPrevTime) { " " + (System.currentTimeMillis - prevTime) } else ""
 
   private def log(level: LogLevel, message: String = ""): Log.type = {
     if (actualLevel.shouldLog(level)) {
       prevTime = System.currentTimeMillis
-      val logText = stack.getClassName.substring(stack.getClassName.lastIndexOf(".") + 1) + "." + stack.getMethodName + ": " + message
+      val logText = stackClassAndMethod + ": " + message
       val consoleText = f"$level%-5s $prevTimeLog $logText"
       if (Error.shouldLog(level)) consoleText.printlnErr
       else consoleText.println
@@ -77,13 +80,21 @@ object Log {
     combiner
   }
 
-  def redirectSystemOut = System.setOut(redirectToLogWindow(System.out, LogWindow.addToOut))
-  def redirectSystemError = System.setErr(redirectToLogWindow(System.err, LogWindow.addToErr))
+  def redirectSystemOut = {System.setOut(redirectToLogWindow(System.out, LogWindow.addToOut));this}
+  def redirectSystemError = {System.setErr(redirectToLogWindow(System.err, LogWindow.addToErr));this}
   def redirectSystemOutAndError = { redirectSystemOut; redirectSystemError }
   
   def logs = LogWindow.logs
   def logsOut = LogWindow.logsOut
   def logsErr = LogWindow.logsErr
+  
+  def getAllLogs = {
+		  val loggerLogs = "Logger logs:\r\n" + logs
+		  val out = "System.out:\r\n" + logsOut
+		  val err = "System.err:\r\n" + logsErr
+		  val logSum = List(loggerLogs, out, err).mkString("\r\n\r\n")
+		  logSum
+  }
 }
 
 abstract class LogLevel(val prio: Int) {

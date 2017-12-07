@@ -30,6 +30,7 @@ import javax.swing.JCheckBox
 import java.io.File
 import javax.swing.JOptionPane
 import eu.eyan.util.swing.JLabelPlus.JLabelImplicit
+import java.awt.Color
 
 object JPanelPlus {
   implicit class JPanelImplicit[TYPE <: JPanel](jPanel: JPanel) extends JComponentImplicit(jPanel) {
@@ -201,7 +202,7 @@ class JPanelWithFrameLayout() extends JPanel {
   }
 
   def addHelpLabel(text: String) = {
-    val label = new JLabel("").cursor_HAND_CURSOR.onClicked(JOptionPane.showMessageDialog(null, text)).iconFromChar('?').tooltipText(text)
+    val label = new JLabel("").cursor_HAND_CURSOR.onClicked(JOptionPane.showMessageDialog(null, text)).iconFromChar('?', Color.gray.brighter).tooltipText(text)
     add(label)
     label
   }
