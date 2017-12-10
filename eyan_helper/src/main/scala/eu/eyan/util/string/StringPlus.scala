@@ -2,24 +2,25 @@ package eu.eyan.util.string
 
 import java.io.BufferedWriter
 import java.io.File
+import java.io.FileOutputStream
 import java.io.FileWriter
+import java.io.OutputStreamWriter
+import java.net.URLDecoder
 import java.text.Normalizer
-import scala.sys.process.stringToProcess
-
-import eu.eyan.util.io.FilePlus.FilePlusImplicit
-import eu.eyan.util.http.HttpPlus
-import eu.eyan.util.io.FilePlus
-import scala.io.Source
-import eu.eyan.util.io.FilePlus.FilePlusImplicit
-import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
-import java.net.URLDecoder
-import eu.eyan.util.scala.TryCatchFinally
+import java.time.format.DateTimeFormatter
+
+import scala.io.Source
+import scala.sys.process.stringToProcess
+
 import eu.eyan.log.Log
-import java.io.OutputStreamWriter
-import java.io.FileOutputStream
+import eu.eyan.util.http.HttpPlus
+import eu.eyan.util.io.FilePlus
+import eu.eyan.util.io.FilePlus.FilePlusImplicit
+import eu.eyan.util.scala.TryCatchFinally
+import eu.eyan.util.java.lang.RuntimePlus
 
 object StringPlus {
   lazy val reg = "[\\p{InCombiningDiacriticalMarks}]".r
@@ -31,6 +32,8 @@ object StringPlus {
   def s1_containsSearch_s2_doesNot(s1: String, s2: String, search: String) = s1.contains(search) && !s2.contains(search)
 
   implicit class StringPlusImplicit(val s: String) {
+    def print = { System.out.print(s); s }
+    def printErr = { System.err.print(s); s }
     def println = { System.out.println(s); s }
     def printlnErr = { System.err.println(s); s }
 
@@ -81,11 +84,14 @@ object StringPlus {
 
     def executeAsBatchFile(batName: String = "temp_bat_can_deleted.bat", deleteBatAfterwards: Boolean = true) = {
       ("Executing a batch file: \r\n" + s).println
-      s.writeToFile(batName).executeAsProcess.println
+      val res = s.writeToFile(batName).executeAsProcess.println
       if (deleteBatAfterwards) batName.deleteAsFile
     }
 
+    def executeAsProcessWithResult = RuntimePlus.exec(s)
+
     def asUrlPost(postParams: String = "") = HttpPlus.sendPost(s, postParams)
+    
     def asUrlGet_responseAsStream() = HttpPlus.sendGet_responseAsStream(s)
 
     def linesFromFile = Source.fromFile(s).getLines

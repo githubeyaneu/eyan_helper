@@ -25,7 +25,5 @@ object InputStreamPlus {
         n + copyTo(output, buffer, progressCallback)
       }
     }
-
   }
-
 }
