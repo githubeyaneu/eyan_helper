@@ -32,7 +32,7 @@ object RegistryPlus extends App {
   def read(key: String, name: String): String = {
     Log.debug(s"HKEY_CURRENT_USER, $keyRoot\\$key, $name")
     val valueHex = WinRegistry.readString(hkey, s"$keyRoot\\$key", name, wow)
-    val value = TryCatch(valueHex.toHexDecode, t => { Log.error("error converting from hex"); valueHex })
+    val value = TryCatch(valueHex.toHexDecode, (t:Throwable) => { Log.error("error converting from hex"); valueHex })
     Log.debug(s"$valueHex $value")
     value
   }

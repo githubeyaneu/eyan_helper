@@ -98,12 +98,22 @@ object FilePlus {
         { e => Log.error(e); false },
         { dest.close; src.close })
     }
+
+    def extendFileNameWith(plus: String) = file.getAbsolutePath.extendFileNameWith(plus).asFile
+
+    def generateNewNameIfExists(ct: Int = 0): File = {
+      val plus = if (ct == 0) file else file.extendFileNameWith("_" + ct)
+      if (plus.notExists) plus
+      else generateNewNameIfExists(ct + 1)
+    }
   }
 
   private def treeWithItself(f: File): Stream[File] =
     f #:: (
-      if (f.isDirectory) f.listFiles().toStream.flatMap(treeWithItself)
+      if (f.isDirectory) emptyArrayIfNull(f.listFiles).toStream.flatMap(treeWithItself)
       else Stream.empty)
+
+  private def emptyArrayIfNull(list: Array[File])= if (list == null) Array[File]() else list
 
   private def fileTreesWithItselfs(paths: String*): Stream[File] = (paths map { _.asFile } map treeWithItself).toStream.flatten
 }
