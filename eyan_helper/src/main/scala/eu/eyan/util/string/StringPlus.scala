@@ -104,7 +104,27 @@ object StringPlus {
 
     def withoutAccents = StringPlus.withoutAccents(s)
 
-    def toSafeFilename = s.replaceAll("""[\*\.\"\/\\\:\;\|\=\,\´\']""", "_").withoutAccents
+    // with \ for regex
+    val SLASH = """\/"""
+    val BACKSLASH = """\\"""
+    val COLON = """\:"""
+    val ASTERISK = """\*"""
+    val QUESTION_MARK = """\?"""
+    val QUOTATION_MARK = """\""""
+    val VERTICAL_BAR = """\|"""
+    val FULL_STOP = """\."""
+    val SEMICOLON = """\;"""
+    val EQUALS = """\="""
+    val COMMA = """\,"""
+    val GRAVE_ACCENT = """\´"""
+    val APOSTROPHE = """\'"""
+
+    // without \
+    val LESS_THAN = """<"""
+    val GREATER_THAN = """>"""
+    
+    val CHARS_TO_REPLACE =  SLASH+BACKSLASH+COLON+ASTERISK+QUESTION_MARK+QUOTATION_MARK+LESS_THAN+GREATER_THAN+VERTICAL_BAR+FULL_STOP+SEMICOLON+EQUALS+COMMA+GRAVE_ACCENT+APOSTROPHE
+    def toSafeFilename = s.replaceAll(s"[$CHARS_TO_REPLACE]", "_").withoutAccents
 
     def toUrlDecoded = URLDecoder.decode(s, "utf-8")
 
