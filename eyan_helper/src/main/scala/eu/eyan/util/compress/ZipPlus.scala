@@ -23,7 +23,7 @@ object ZipPlus {
         ze = zip.getNextEntry
       }
       list.toList
-    })
+    }).getOrElse(List())
   }
 }
 

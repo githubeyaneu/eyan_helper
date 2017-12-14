@@ -25,7 +25,7 @@ object SevenZipPlus {
       }
       sevenZFile.close
       list.toList
-    })
+    }).getOrElse(List())
   }
 }
 
