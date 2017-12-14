@@ -91,7 +91,7 @@ object StringPlus {
     def executeAsProcessWithResult = RuntimePlus.exec(s)
 
     def asUrlPost(postParams: String = "") = HttpPlus.sendPost(s, postParams)
-    
+
     def asUrlGet_responseAsStream() = HttpPlus.sendGet_responseAsStream(s)
 
     def linesFromFile = Source.fromFile(s).getLines
@@ -105,25 +105,26 @@ object StringPlus {
     def withoutAccents = StringPlus.withoutAccents(s)
 
     // with \ for regex
-    val SLASH = """\/"""
-    val BACKSLASH = """\\"""
-    val COLON = """\:"""
-    val ASTERISK = """\*"""
-    val QUESTION_MARK = """\?"""
-    val QUOTATION_MARK = """\""""
-    val VERTICAL_BAR = """\|"""
-    val FULL_STOP = """\."""
-    val SEMICOLON = """\;"""
-    val EQUALS = """\="""
-    val COMMA = """\,"""
-    val GRAVE_ACCENT = """\´"""
-    val APOSTROPHE = """\'"""
+    val SLASH_R = """\/"""
+    val BACKSLASH_R = """\\"""
+    val COLON_R = """\:"""
+    val ASTERISK_R = """\*"""
+    val QUESTION_MARK_R = """\?"""
+    val QUOTATION_MARK_R = """\""""
+    val VERTICAL_BAR_R = """\|"""
+    val FULL_STOP_R = """\."""
+    val SEMICOLON_R = """\;"""
+    val EQUALS_R = """\="""
+    val COMMA_R = """\,"""
+    val GRAVE_ACCENT_R = """\´"""
+    val APOSTROPHE_R = """\'"""
 
     // without \
     val LESS_THAN = """<"""
     val GREATER_THAN = """>"""
+
+    val CHARS_TO_REPLACE = SLASH_R + BACKSLASH_R + COLON_R + ASTERISK_R + QUESTION_MARK_R + QUOTATION_MARK_R + VERTICAL_BAR_R + FULL_STOP_R + SEMICOLON_R + EQUALS_R + COMMA_R + GRAVE_ACCENT_R + APOSTROPHE_R + LESS_THAN + GREATER_THAN
     
-    val CHARS_TO_REPLACE =  SLASH+BACKSLASH+COLON+ASTERISK+QUESTION_MARK+QUOTATION_MARK+LESS_THAN+GREATER_THAN+VERTICAL_BAR+FULL_STOP+SEMICOLON+EQUALS+COMMA+GRAVE_ACCENT+APOSTROPHE
     def toSafeFilename = s.replaceAll(s"[$CHARS_TO_REPLACE]", "_").withoutAccents
 
     def toUrlDecoded = URLDecoder.decode(s, "utf-8")
