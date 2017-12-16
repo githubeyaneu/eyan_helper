@@ -13,7 +13,7 @@ trait RememberInRegistry[T <: Component] {
 
       def regValue = RegistryPlus.read(comp.windowName, comp.componentPath + name)
       comp.onHierarchyChanged(
-        if (regValue != null && regValue != "") rememberValueSet(regValue)
+        if (regValue != null) rememberValueSet(regValue)
       //else Log.error(s"set name for the window to remember the value for component ${jTextComponent.windowName}, ${jTextComponent.componentPath}, $name")
       )
 

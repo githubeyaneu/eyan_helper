@@ -12,11 +12,12 @@ import java.io.ByteArrayOutputStream
 import java.io.OutputStream
 import scala.collection.mutable.ListBuffer
 import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry
-import eu.eyan.util.scala.CloseFinally
+import eu.eyan.util.scala.TryCatchFinallyClose
+import eu.eyan.log.Log
 
 object SevenZipPlus {
   def listFiles(file: File) = {
-    CloseFinally(new SevenZFile(file), (sevenZFile: SevenZFile) => {
+    TryCatchFinallyClose({new SevenZFile(file)}, (sevenZFile: SevenZFile) => {
       val list = ListBuffer[SevenZArchiveEntry]()
       var entry = sevenZFile.getNextEntry
       while (entry != null) {
@@ -25,7 +26,9 @@ object SevenZipPlus {
       }
       sevenZFile.close
       list.toList
-    }).getOrElse(List())
+    }
+    ,t=>{Log.error("Error extracting "+file);List()}
+    )
   }
 }
 

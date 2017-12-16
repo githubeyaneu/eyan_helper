@@ -8,14 +8,14 @@ import java.io.FileInputStream
 import eu.eyan.util.scala.TryFinally
 import eu.eyan.util.scala.TryCatchFinally
 import eu.eyan.log.Log
-import eu.eyan.util.scala.CloseFinally
 import scala.collection.mutable.MutableList
 import scala.collection.mutable.ListBuffer
 import java.util.zip.ZipEntry
+import eu.eyan.util.scala.TryCatchFinallyClose
 
 object ZipPlus {
   def listFiles(file: File) = {
-    CloseFinally(new ZipInputStream(new FileInputStream(file)), (zip: ZipInputStream) => {
+    TryCatchFinallyClose({new ZipInputStream(new FileInputStream(file))}, (zip: ZipInputStream) => {
       val list = ListBuffer[ZipEntry]()
       var ze = zip.getNextEntry
       while (ze != null) {
@@ -23,7 +23,7 @@ object ZipPlus {
         ze = zip.getNextEntry
       }
       list.toList
-    }).getOrElse(List())
+    }, t => { Log.error("Error extracting " + file); List() })
   }
 }
 
