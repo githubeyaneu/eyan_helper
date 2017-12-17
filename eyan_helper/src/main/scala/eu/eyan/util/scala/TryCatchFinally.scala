@@ -6,29 +6,44 @@ import java.io.Closeable
 import eu.eyan.log.Log
 import eu.eyan.util.io.CloseablePlus
 
-object Try { def apply[T](action: => T) = TryFinally[T](action, {}) }
+/** To execute sg silently -> Throwable catched, logged, result as Try.*/
+object Try {
+  /**To execute sg silently -> Throwable catched, logged, result as Try. */
+  def apply[T](action: => T) = TryCatchFinally(Success(action), e => { Log.error(e); Failure(e) }, {})
+}
 //object CloseFinally { def apply[T, CLOSEABLE <: Closeable](closeable: => CLOSEABLE, action: CLOSEABLE => T) = FinallyClose(closeable, action) }
 //object FinallyClose { def apply[T, CLOSEABLE <: Closeable](closeable: => CLOSEABLE, action: CLOSEABLE => T) = TryFinally(action(closeable), CloseablePlus.closeQuietly(closeable)) }
-object TryCatchFinallyClose { def apply[T, CLOSEABLE <: Closeable](closeable: => CLOSEABLE, action: CLOSEABLE => T, errorAction: Throwable => T) = TryCatchFinally(action(closeable), errorAction, CloseablePlus.closeQuietly(closeable)) }
-object TryFinally { def apply[T](action: => T, finaly: => Unit) = TryCatchFinally[scala.util.Try[T]](Success(action), e => { Log.error(e); Failure(e) }, finaly) }
+/** closes (quietly) the closeables afterwards. */
+object TryCatchFinallyClose {
+  /** closes (quietly) the closeable afterwards. */
+  def apply[T, CLOSEABLE <: Closeable](closeable: => CLOSEABLE, action: => CLOSEABLE => T, errorAction: => Throwable => T) = TryCatchFinally(action(closeable), errorAction, CloseablePlus.closeQuietly(closeable))
 
-object TryCatch { def apply[T](action: => T, errorAction: Throwable => T) = TryCatchFinally[T](action, errorAction, {}) }
+  /** closes (quietly) the 2 closeables afterwards. */
+  def apply[T, CLOSEABLE1 <: Closeable, CLOSEABLE2 <: Closeable](closeable1: => CLOSEABLE1, closeable2: => CLOSEABLE2, action: => (CLOSEABLE1, CLOSEABLE2) => T, errorAction: => Throwable => T) =
+    TryCatchFinally(action(closeable1, closeable2), errorAction, CloseablePlus.closeQuietly(closeable1))
+}
 
-object TryCatchFinally { def apply[T](action: => T, errorAction: Throwable => T, finaly: => Unit) = new TryCatchFinally[T](action, finaly).Catch(errorAction) }
+// use try{} finally {} instead. This has no really use.
+//object TryFinally { def apply[T](action: => T, finaly: => Unit) = TryCatchFinally[scala.util.Try[T]](Success(action), e => { Log.error(e); Failure(e) }, finaly) }
 
-private class TryCatchFinally[T](action: => T, finaly: => Unit) {
-  private val tryResult =
-    try Success(action)
-    catch { case t: Throwable => Failure(t) }
+// use try{} catch {case t:Throwable =>{}} instead. This has no really use.
+//object TryCatch { def apply[T](action: => T, errorAction: => Throwable => T) = TryCatchFinally[T](action, errorAction, {}) }
+
+object TryCatchFinally { def apply[T](action: => T, errorAction: => Throwable => T, finaly: => Unit) = new TryCatchFinally[T](action, errorAction, finaly).execute /*.Catch(errorAction)*/ }
+
+private class TryCatchFinally[T](action: => T, errorAction: => Throwable => T, finaly: => Unit) {
+  private def execute =
+    try action
+    catch { case t: Throwable => errorAction(t) }
     finally finaly
 
-//  private def Catch(errorAction: => T) = tryResult match {
-//    case Success(res) => res
-//    case Failure(t)   => errorAction
-//  }
+  //  private def Catch(errorAction: => T) = tryResult match {
+  //    case Success(res) => res
+  //    case Failure(t)   => errorAction
+  //  }
 
-  private def Catch(errorAction: Throwable => T) = tryResult match {
-    case Success(res) => res
-    case Failure(t)   => errorAction(t)
-  }
+  //  private def Catch(errorAction: => Throwable => T) = tryResult match {
+  //    case Success(res) => res
+  //    case Failure(t)   => errorAction(t)
+  //  }
 }

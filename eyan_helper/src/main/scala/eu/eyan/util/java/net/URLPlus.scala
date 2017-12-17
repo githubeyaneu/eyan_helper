@@ -1,21 +1,25 @@
 package eu.eyan.util.java.net
 
-import java.net.URL
 import java.io.File
 import java.io.FileOutputStream
-import eu.eyan.util.scala.TryFinally
+import java.net.URL
+
 import eu.eyan.util.io.InputStreamPlus.InputStreamPlusImplicit
+import eu.eyan.util.scala.TryCatchFinallyClose
+import java.io.InputStream
+import eu.eyan.log.Log
 
 object URLPlus {
 
   implicit class URLImplicit(url: URL) {
+
     def saveToFile(destination: File, progressCallback: Int => Unit = i => {}) = {
-      val input = url.openStream
-      val output = new FileOutputStream(destination, false)
-      val buffer = new Array[Byte](65536)
-      TryFinally(input.copyTo(output, buffer, progressCallback), { output.close; input.close })
+      TryCatchFinallyClose(
+        url.openStream, new FileOutputStream(destination, false),
+        (input: InputStream, output: FileOutputStream) => input.copyTo(output, new Array[Byte](65536), progressCallback),
+        t => Log.error(s"Cannot save URL($url) to file($destination)", t))
       url
     }
-  }
 
+  }
 }

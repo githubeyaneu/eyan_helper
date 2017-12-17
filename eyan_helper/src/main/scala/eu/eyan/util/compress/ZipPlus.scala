@@ -5,7 +5,6 @@ import java.util.zip.ZipInputStream
 import java.io.InputStream
 import java.io.File
 import java.io.FileInputStream
-import eu.eyan.util.scala.TryFinally
 import eu.eyan.util.scala.TryCatchFinally
 import eu.eyan.log.Log
 import scala.collection.mutable.MutableList

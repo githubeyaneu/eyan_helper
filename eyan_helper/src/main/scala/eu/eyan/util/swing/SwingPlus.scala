@@ -3,6 +3,8 @@ package eu.eyan.util.swing
 import java.awt.Component
 import java.awt.FlowLayout
 import java.awt.event.ActionEvent
+import java.awt.event.ItemEvent
+import java.awt.event.ItemListener
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import java.io.File
@@ -11,6 +13,7 @@ import com.jgoodies.forms.factories.CC
 
 import eu.eyan.util.awt.AwtHelper
 import eu.eyan.util.jgoodies.FormLayoutPlus
+import eu.eyan.util.scala.TryCatchFinally
 import javax.swing.JButton
 import javax.swing.JCheckBox
 import javax.swing.JFileChooser
@@ -21,52 +24,47 @@ import javax.swing.JTextField
 import javax.swing.JTextPane
 import javax.swing.SwingUtilities
 import javax.swing.SwingWorker
-import javax.swing.event.DocumentEvent
-import javax.swing.event.DocumentListener
-import javax.swing.event.ListDataEvent
-import javax.swing.event.ListDataListener
-import javax.swing.filechooser.FileNameExtensionFilter
 import javax.swing.event.AncestorEvent
 import javax.swing.event.AncestorListener
-import javax.swing.event.TableModelEvent
-import javax.swing.event.InternalFrameEvent
-import javax.swing.event.ListSelectionEvent
-import javax.swing.event.TreeExpansionEvent
-import javax.swing.event.RowSorterEvent
-import javax.swing.event.PopupMenuEvent
-import javax.swing.event.MenuEvent
-import javax.swing.event.TreeSelectionEvent
-import javax.swing.event.TreeModelEvent
-import javax.swing.event.ChangeEvent
-import javax.swing.event.TableColumnModelEvent
-import javax.swing.event.UndoableEditEvent
-import javax.swing.event.MenuDragMouseEvent
-import javax.swing.event.MenuKeyEvent
-import javax.swing.event.HyperlinkEvent
 import javax.swing.event.CaretEvent
-import javax.swing.event.TreeModelListener
-import javax.swing.event.InternalFrameListener
-import javax.swing.event.CellEditorListener
-import javax.swing.event.MenuListener
 import javax.swing.event.CaretListener
-import javax.swing.event.UndoableEditListener
-import javax.swing.event.TableColumnModelListener
-import javax.swing.event.MenuDragMouseListener
-import javax.swing.event.HyperlinkListener
-import javax.swing.event.TreeSelectionListener
-import javax.swing.event.RowSorterListener
-import javax.swing.event.TreeExpansionListener
-import javax.swing.event.MenuKeyListener
-import javax.swing.event.TableModelListener
-import javax.swing.event.ListSelectionListener
-import javax.swing.event.TreeWillExpandListener
-import javax.swing.event.PopupMenuListener
+import javax.swing.event.CellEditorListener
+import javax.swing.event.ChangeEvent
 import javax.swing.event.ChangeListener
+import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
+import javax.swing.event.HyperlinkEvent
+import javax.swing.event.HyperlinkListener
 import javax.swing.event.InternalFrameAdapter
-import eu.eyan.util.scala.TryCatchFinally
-import eu.eyan.util.scala.TryCatch
-import java.awt.event.ItemEvent
-import java.awt.event.ItemListener
+import javax.swing.event.InternalFrameEvent
+import javax.swing.event.ListDataEvent
+import javax.swing.event.ListDataListener
+import javax.swing.event.ListSelectionEvent
+import javax.swing.event.ListSelectionListener
+import javax.swing.event.MenuDragMouseEvent
+import javax.swing.event.MenuDragMouseListener
+import javax.swing.event.MenuEvent
+import javax.swing.event.MenuKeyEvent
+import javax.swing.event.MenuKeyListener
+import javax.swing.event.MenuListener
+import javax.swing.event.PopupMenuEvent
+import javax.swing.event.PopupMenuListener
+import javax.swing.event.RowSorterEvent
+import javax.swing.event.RowSorterListener
+import javax.swing.event.TableColumnModelEvent
+import javax.swing.event.TableColumnModelListener
+import javax.swing.event.TableModelEvent
+import javax.swing.event.TableModelListener
+import javax.swing.event.TreeExpansionEvent
+import javax.swing.event.TreeExpansionListener
+import javax.swing.event.TreeModelEvent
+import javax.swing.event.TreeModelListener
+import javax.swing.event.TreeSelectionEvent
+import javax.swing.event.TreeSelectionListener
+import javax.swing.event.TreeWillExpandListener
+import javax.swing.event.UndoableEditEvent
+import javax.swing.event.UndoableEditListener
+import javax.swing.filechooser.FileNameExtensionFilter
 
 object SwingPlus {
 
@@ -267,9 +265,9 @@ object SwingPlus {
 
   def invokeLaterTryCatchFinally[T](action: => T, error: Throwable => T, finaly: => Unit) = invokeLater(TryCatchFinally(action, error, finaly))
 
-  def swingWorkerTryCatchFinally[T](action: => T, error: Throwable => T, finaly: => Unit) = {
+  def swingWorkerTryCatchFinally[T](action: => T, error: => Throwable => T, finaly: => Unit) = {
     new SwingWorker[T, T]() {
-      override def doInBackground = TryCatch(action, error)
+      override def doInBackground = try action catch { case t: Throwable => error(t) }
       override def done = finaly
     }.execute
   }

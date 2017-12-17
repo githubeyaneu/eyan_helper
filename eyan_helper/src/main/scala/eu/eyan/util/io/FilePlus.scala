@@ -5,13 +5,13 @@ import eu.eyan.util.string.StringPlus.StringPlusImplicit
 import java.security.MessageDigest
 import java.io.FileInputStream
 import scala.io.Source
-import eu.eyan.util.scala.TryFinally
 import java.nio.file.Files
 import java.nio.file.attribute.BasicFileAttributes
 import java.nio.file.Path
 import eu.eyan.util.scala.TryCatchFinally
 import eu.eyan.log.Log
 import java.io.FileOutputStream
+import eu.eyan.util.scala.TryCatchFinallyClose
 
 object FilePlus {
 
@@ -62,9 +62,9 @@ object FilePlus {
       if (file.isFile()) {
         if (file.length > 50 * 1000 * 1000) {
           val messageDigest = MessageDigest.getInstance("SHA")
-          val is = new FileInputStream(file)
-          TryFinally(
-            {
+          TryCatchFinallyClose(
+            new FileInputStream(file),
+            (is: FileInputStream) => {
               val buffer = new Array[Byte](8192)
               is.skip(file.length / 2)
               val bytesRead = is.read(buffer)
@@ -73,8 +73,7 @@ object FilePlus {
 
               sha.map("%02x".format(_)).mkString
             },
-
-            is.close)
+            t => t.printStackTrace)
         } else "small"
       } else "d" //throw new IllegalArgumentException("Create hash not possible to directory! "+file.getAbsolutePath)
     }
@@ -113,7 +112,7 @@ object FilePlus {
       if (f.isDirectory) emptyArrayIfNull(f.listFiles).toStream.flatMap(treeWithItself)
       else Stream.empty)
 
-  private def emptyArrayIfNull(list: Array[File])= if (list == null) Array[File]() else list
+  private def emptyArrayIfNull(list: Array[File]) = if (list == null) Array[File]() else list
 
   private def fileTreesWithItselfs(paths: String*): Stream[File] = (paths map { _.asFile } map treeWithItself).toStream.flatten
 }
