@@ -10,8 +10,9 @@ import java.util.regex.Pattern
 
 import eu.eyan.log.Log
 import eu.eyan.util.collection.MapsPlus
+import java.io.Closeable
 
-class CachedFileLineReader extends Iterable[String] {
+class CachedFileLineReader extends Iterable[String] with Closeable {
 
   private val LINE_COUNT_EARLY_READ = 100
   // FIXME dont use java
