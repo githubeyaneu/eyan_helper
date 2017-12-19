@@ -12,6 +12,7 @@ import eu.eyan.util.scala.TryCatchFinally
 import eu.eyan.log.Log
 import java.io.FileOutputStream
 import eu.eyan.util.scala.TryCatchFinallyClose
+import scala.io.BufferedSource
 
 object FilePlus {
 
@@ -45,7 +46,16 @@ object FilePlus {
 
     def getFile(subFilename: String): File = new File(file.getAbsolutePath + File.separator + subFilename)
 
-    def lines = Source.fromFile(file).getLines
+    def linesList = TryCatchFinallyClose(Source.fromFile(file), (bs: BufferedSource) => bs.getLines.toList, e => { Log.error(s"cannot read file", e); List() })
+    
+//    def lines = Source.fromFile(file).getLines
+    //TODO test it
+    def lines = new Iterator[String] {
+      val bs = Source.fromFile(file)
+      val lines = bs.getLines
+      def hasNext: Boolean = { val hn = lines.hasNext; if (!hn) CloseablePlus.closeQuietly(bs); hn }
+      def next(): String = lines.next
+    }
 
     def files = file.listFiles.toList
 
