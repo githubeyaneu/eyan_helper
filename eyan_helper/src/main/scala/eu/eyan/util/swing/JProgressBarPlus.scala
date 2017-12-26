@@ -6,45 +6,31 @@ import eu.eyan.util.swing.JComponentPlus.JComponentImplicit
 
 object JProgressBarPlus {
   implicit class JProgressBarImplicit[TYPE <: JProgressBar](jProgressBar: TYPE) extends JComponentImplicit(jProgressBar) {
-//    addChangeListener(ChangeListener)
-//    removeChangeListener(ChangeListener)
-//    setBorderPainted(boolean)
-//    setIndeterminate(boolean)
-//    setMaximum(int)
-//    setMinimum(int)
-//    setModel(BoundedRangeModel)
-//    setOrientation(int)
-//    setString(String)
-//    setStringPainted(boolean)
-//    setUI(ProgressBarUI)
-//    setValue(int)
-//    updateUI()
+    //    addChangeListener(ChangeListener)
+    //    removeChangeListener(ChangeListener)
+    //    setBorderPainted(boolean)
+    //    setIndeterminate(boolean)
+    //    setMaximum(int)
+    //    setMinimum(int)
+    //    setModel(BoundedRangeModel)
+    //    setOrientation(int)
+    //    setString(String)
+    //    setStringPainted(boolean)
+    //    setUI(ProgressBarUI)
+    //    setValue(int)
+    //    updateUI()
   }
 }
+class JProgressBarPlus(min: Int = 0, max: Int = 100, format: String = "%d%%", finishedText: String = "Ready") extends JProgressBar(min, max) {
 
-class JProgressBarPlus(min: Int, max: Int, var format: String) extends JProgressBar(min, max) {
-  this.setNewValue(min)
+  setNewValue(min)
 
-  private var percentChangedConsumer = createPercentChangedConsumer
-  private var finishedText = "Ready";
+  def setNewValue(percent: Int) = { setString(String.format(format, percent: Integer)); setValue(percent); this }
 
-  def setNewValue(percent: Int) = {
-    this.setString(String.format(format, percent: Integer))
-    this.setValue(percent)
-    this
-  }
+  def percentChanged(percent: Int) = { if (this.getValue() != percent) invokeLater { this.setVisible(true); setNewValue(percent) }; this }
 
-  def createPercentChangedConsumer: Int => Unit = percent => invokeLater( { this.setVisible(true); setNewValue(percent); })
+  // refactor it.
+  def doneThenInvisible = { finished; invokeLater(setVisible(false)); this }
 
-  def percentChanged(value: Int) = {if (this.getValue() != value) this.percentChangedConsumer(value); this }
-
-  def doneThenInvisible = () => invokeLater(setVisible(false))
-
-  def setFormat(format: String) = {
-    this.format = format
-    setNewValue(this.getValue())
-    this
-  }
-
-  def finished = { invokeLater( { this.setString(finishedText); this.setValue(this.getMaximum()) }); this }
+  def finished = { invokeLater({ this.setString(finishedText); this.setValue(this.getMaximum()) }); this }
 }
