@@ -34,11 +34,11 @@ class JProgressBarPlus(min: Int, max: Int, var format: String) extends JProgress
     this
   }
 
-  def createPercentChangedConsumer: Int => Unit = percent => invokeLater(() => { this.setVisible(true); setNewValue(percent); })
+  def createPercentChangedConsumer: Int => Unit = percent => invokeLater( { this.setVisible(true); setNewValue(percent); })
 
-  def percentChanged(value: Int) = { if (this.getValue() != value) this.percentChangedConsumer(value); this }
+  def percentChanged(value: Int) = {if (this.getValue() != value) this.percentChangedConsumer(value); this }
 
-  def doneThenInvisible = () => invokeLater(() => setVisible(false))
+  def doneThenInvisible = () => invokeLater(setVisible(false))
 
   def setFormat(format: String) = {
     this.format = format
@@ -46,5 +46,5 @@ class JProgressBarPlus(min: Int, max: Int, var format: String) extends JProgress
     this
   }
 
-  def finished = { invokeLater(() => { this.setString(finishedText); this.setValue(this.getMaximum()) }); this }
+  def finished = { invokeLater( { this.setString(finishedText); this.setValue(this.getMaximum()) }); this }
 }

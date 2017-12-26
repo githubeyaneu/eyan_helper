@@ -252,4 +252,13 @@ class JPanelWithFrameLayout() extends JPanel {
     add(cb)
     cb
   }
+
+  def addProgressBar(min: Int = 0, max: Int = 100, format: String = "%d%%") = {
+    val progressBar = new JProgressBarPlus(min, max, format)
+    progressBar.setValue(-1)
+    progressBar.setStringPainted(true)
+    progressBar.setString("...")
+    add(progressBar)
+    progressBar
+  }
 }

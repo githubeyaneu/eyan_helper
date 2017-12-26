@@ -48,7 +48,7 @@ class LogWindow {
   val content = new JPanelWithFrameLayout().withBorders.withSeparators.newColumn("f:1px:g")
 
   val buttons = content.addPanelWithFormLayout().withSeparators.newColumn()
-  buttons.addButton("Clear").onAction_disableEnable(textArea.setText(""))
+  buttons.addButton("Clear").onAction_disableEnable({textArea.setText(""); outTextArea.setText(""); errTextArea.setText("")})
   List(None, Fatal, Error, Warn, Info, Debug, Trace).foreach( 
    level => buttons.newColumn.addButton(level.toString).onAction_disableEnable(Log.activate(level))
   )

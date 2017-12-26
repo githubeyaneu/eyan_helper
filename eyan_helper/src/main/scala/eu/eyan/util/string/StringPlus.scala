@@ -21,6 +21,10 @@ import eu.eyan.util.io.FilePlus
 import eu.eyan.util.io.FilePlus.FilePlusImplicit
 import eu.eyan.util.scala.TryCatchFinally
 import eu.eyan.util.java.lang.RuntimePlus
+import java.awt.Desktop
+import java.net.URL
+import java.net.URI
+import scala.util.matching.Regex
 
 object StringPlus {
   lazy val reg = "[\\p{InCombiningDiacriticalMarks}]".r
@@ -90,6 +94,8 @@ object StringPlus {
 
     def executeAsProcessWithResult = RuntimePlus.exec(s)
 
+    def executeAsProcessWithResultAndOutputLineCallback(callback: String => Unit) = RuntimePlus.execAndProcessOutputs(s, callback, callback)
+
     def asUrlPost(postParams: String = "") = HttpPlus.sendPost(s, postParams)
 
     def asUrlGet_responseAsStream() = HttpPlus.sendGet_responseAsStream(s)
@@ -135,5 +141,13 @@ object StringPlus {
 
     def toHexEncode = s.getBytes.map(_.toHexString).mkString(",")
     def toHexDecode = new String(s.split(",").map(Integer.parseUnsignedInt(_, 16).toByte).toArray)
+    
+    def openAsFile = if (s.asFile.exists()) Desktop.getDesktop.open(asFile)
+    def openAsURL = Desktop.getDesktop.browse(new URI(s))
+    
+//    def findGroup(regex: String, group: Int = 1):Option[String] = findGroup(regex.r, group)
+    def findGroup(regex: Regex, group: Int = 1) = regex.findAllIn(s).matchData.toList.lift(0).map(_.group(group))
+    
+    def toIntOrElse(default: Int) = try s.toInt catch { case _: Throwable => default }
   }
 }

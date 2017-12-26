@@ -47,8 +47,8 @@ object FilePlus {
     def getFile(subFilename: String): File = new File(file.getAbsolutePath + File.separator + subFilename)
 
     def linesList = TryCatchFinallyClose(Source.fromFile(file), (bs: BufferedSource) => bs.getLines.toList, e => { Log.error(s"cannot read file", e); List() })
-    
-//    def lines = Source.fromFile(file).getLines
+
+    //    def lines = Source.fromFile(file).getLines
     //TODO test it
     def lines = new Iterator[String] {
       val bs = Source.fromFile(file)
@@ -98,10 +98,11 @@ object FilePlus {
     def lastAccessTime = attr.lastAccessTime.toInstant
     def lastModifiedTime = attr.lastModifiedTime.toInstant
 
-    def copyTo(destination: File) = {
+    def copyTo(destination: File, progressCallback: Int => Unit = dontcare => {}) = {
       val dest = new FileOutputStream(destination)
       val src = new FileInputStream(file)
       Log.debug(s"Copy $file to $destination")
+      // TODO progress implementieren
       TryCatchFinally(
         { dest.getChannel().transferFrom(src.getChannel, 0, Long.MaxValue); true },
         { e => Log.error(e); false },
