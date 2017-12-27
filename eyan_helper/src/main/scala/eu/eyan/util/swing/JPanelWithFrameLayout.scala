@@ -31,6 +31,7 @@ import java.io.File
 import javax.swing.JOptionPane
 import eu.eyan.util.swing.JLabelPlus.JLabelImplicit
 import java.awt.Color
+import javax.swing.JComponent
 
 object JPanelPlus {
   implicit class JPanelImplicit[TYPE <: JPanel](jPanel: JPanel) extends JComponentImplicit(jPanel) {
@@ -260,5 +261,9 @@ class JPanelWithFrameLayout() extends JPanel {
     progressBar.setString("...")
     add(progressBar)
     progressBar
+  }
+
+  def addMore[COMPONENT <: JComponent](createComponent: => COMPONENT) = {
+    //TODO
   }
 }
