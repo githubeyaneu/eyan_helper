@@ -65,6 +65,7 @@ import javax.swing.event.TreeWillExpandListener
 import javax.swing.event.UndoableEditEvent
 import javax.swing.event.UndoableEditListener
 import javax.swing.filechooser.FileNameExtensionFilter
+import eu.eyan.log.Log
 
 object SwingPlus {
 
@@ -261,6 +262,8 @@ object SwingPlus {
     else JOptionPane.showMessageDialog(null, msg + ", " + e.getLocalizedMessage)
   }
 
+  def invokeAndWait(action: => Unit) = SwingUtilities.invokeAndWait(AwtHelper.newRunnable(() => action))
+  
   def invokeLater(action: => Unit) = SwingUtilities.invokeLater(AwtHelper.newRunnable(() => action))
 
   def invokeLaterTryCatchFinally[T](action: => T, error: Throwable => T, finaly: => Unit) = invokeLater(TryCatchFinally(action, error, finaly))
@@ -350,8 +353,8 @@ object SwingPlus {
 
   def runInWorker(work: => Unit, doAtDone: => Unit) = {
     new SwingWorker[Void, Void]() {
-      override def doInBackground() = { work; null }
-      override def done() = doAtDone
+      override def doInBackground = { try { work } catch { case (t: Throwable) => { Log.error("Error in SwingWorker", t) } }; null }
+      override def done = doAtDone
     }.execute()
   }
 }

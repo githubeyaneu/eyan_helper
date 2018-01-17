@@ -54,16 +54,16 @@ object JFramePlus {
     override def layout(manager: LayoutManager) = { jFrame.setLayout(manager); jFrame }
     def transferHandler(newHandler: TransferHandler) = { jFrame.setTransferHandler(newHandler); jFrame }
     override def iconImage(image: Image) = { jFrame.setIconImage(image); jFrame }
-    
+
     //TODO -> make it better...
     def iconFromChar(c: Char, color: Color = Color.GREEN.darker.darker) = {
-//      val off_Image = new BufferedImage(256, 256, BufferedImage.TYPE_INT_ARGB)
-//      val g2 = off_Image.createGraphics.asInstanceOf[Graphics2D]
-//      g2.setFont(new Font(null, Font.BOLD, 256))
-//      g2.setColor(color)
-//      g2.drawString(c+"", 42, 219)
-//      //			ImageIO.write(off_Image.asInstanceOf[RenderedImage], "png", new File("""C:\temp\A.png"""))
-//      iconImage(off_Image)
+      //      val off_Image = new BufferedImage(256, 256, BufferedImage.TYPE_INT_ARGB)
+      //      val g2 = off_Image.createGraphics.asInstanceOf[Graphics2D]
+      //      g2.setFont(new Font(null, Font.BOLD, 256))
+      //      g2.setColor(color)
+      //      g2.drawString(c+"", 42, 219)
+      //      //			ImageIO.write(off_Image.asInstanceOf[RenderedImage], "png", new File("""C:\temp\A.png"""))
+      //      iconImage(off_Image)
       iconImage(ImagePlus.imageFromChar(c, color))
     }
 
@@ -94,12 +94,12 @@ object JFramePlus {
     def addToSystemTray(icon: Image = jFrame.getIconImage, toolTip: String = jFrame.getTitle, popupMenu: PopupMenu = createOpenExitPopup) = {
       if (SystemTray.isSupported()) {
         val iconToUse = if (icon != null) icon else Toolkit.getDefaultToolkit().getImage("/dontexists.jpg")
-        
+
         //TODO TrayIcon Implicit
         val trayIcon = new TrayIcon(iconToUse, toolTip, popupMenu)
         trayIcon.setImageAutoSize(true)
-        trayIcon.addMouseListener(AwtHelper.onDoubleClick(e => jFrame.visible))
-        
+        trayIcon.addMouseListener(AwtHelper.onClicked(e => if (jFrame.isVisible) jFrame.invisible else {jFrame.visible; jFrame.setState(Frame.NORMAL); jFrame.toFront}))
+
         systemTray.add(trayIcon)
         jFrame.onWindowStateChanged_ICONIFIED(jFrame.invisible)
         jFrame.onWindowStateChanged_NORMAL(jFrame.visible)
@@ -107,9 +107,9 @@ object JFramePlus {
       }
       jFrame
     }
-    
-    def menuItem(menuText: String, menuItemText: String, action: =>Unit)={
-      if(jFrame.getJMenuBar==null) jMenuBar(new JMenuBar())
+
+    def menuItem(menuText: String, menuItemText: String, action: => Unit) = {
+      if (jFrame.getJMenuBar == null) jMenuBar(new JMenuBar())
       val menu = jFrame.getJMenuBar.getOrCreateMenu(menuText)
       val menuItem = new JMenuItem(menuItemText)
       menu.add(menuItem)

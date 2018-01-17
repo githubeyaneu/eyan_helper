@@ -5,6 +5,8 @@ import java.io.PrintStream
 import java.io.ByteArrayOutputStream
 import java.io.OutputStream
 
+// TODO: be able to listen the logs
+// dont show all the logs in window, but remeber all of them for the copy to clipboard action
 object Log {
   private val STACK_LEVEL = 3
 
