@@ -4,6 +4,7 @@ import eu.eyan.util.string.StringPlus.StringPlusImplicit
 import java.io.PrintStream
 import java.io.ByteArrayOutputStream
 import java.io.OutputStream
+import eu.eyan.util.io.PrintStreamPlus.PrintStreamImplicit
 
 // TODO: be able to listen the logs
 // dont show all the logs in window, but remeber all of them for the copy to clipboard action
@@ -14,8 +15,11 @@ object Log {
   private var isWithPrevTime: Boolean = false
   private var prevTime = System.currentTimeMillis
 
+  var logToConsole = true
+  var errToConsole = true
+
   def stackClassAndMethod = {
-	  val stack = Thread.currentThread().getStackTrace().filter(se=>se.getClassName!=Log.getClass.getName)(1)
+    val stack = Thread.currentThread().getStackTrace().filter(se => se.getClassName != Log.getClass.getName)(1)
     stack.getClassName.substring(stack.getClassName.lastIndexOf(".") + 1) + "." + stack.getMethodName
   }
   private def prevTimeLog = if (isWithPrevTime) { " " + (System.currentTimeMillis - prevTime) } else ""
@@ -25,14 +29,14 @@ object Log {
       prevTime = System.currentTimeMillis
       val logText = stackClassAndMethod + ": " + message
       val consoleText = f"$level%-5s $prevTimeLog $logText"
-      if (Error.shouldLog(level)) consoleText.printlnErr
-      else consoleText.println
+      if (Error.shouldLog(level)) if (errToConsole) consoleText.printlnErr
+      else if (logToConsole) consoleText.println
 
       LogWindow.add(logText)
     }
     this
   }
-  
+
   def start = activate
   def stop = deactivate
   def enable = activate
@@ -73,29 +77,20 @@ object Log {
   def trace(message: String) = log(Trace, message)
   def trace(o: Object) = log(Trace, String.valueOf(o))
 
-  def redirectToLogWindow(originalOut: PrintStream, addToConsole: Int=> Unit) = {
-    val combiner = new PrintStream(new OutputStream() {
-      def write(b: Int) = { originalOut.write(b); addToConsole(b) }
-      override def flush() = originalOut.flush
-      override def close() = originalOut.close
-    })
-    combiner
-  }
+  private def redirectSystemOut = { System.setOut(System.out.copyToStream(LogWindow.outStream)); logToConsole = false; this }
+  private def redirectSystemError = { System.setErr(System.err.copyToStream(LogWindow.errStream)); errToConsole = false; this }
+  def redirectSystemOutAndErrToLogWindow = { redirectSystemOut; redirectSystemError }
 
-  def redirectSystemOut = {System.setOut(redirectToLogWindow(System.out, LogWindow.addToOut));this}
-  def redirectSystemError = {System.setErr(redirectToLogWindow(System.err, LogWindow.addToErr));this}
-  def redirectSystemOutAndError = { redirectSystemOut; redirectSystemError }
-  
   def logs = LogWindow.logs
   def logsOut = LogWindow.logsOut
   def logsErr = LogWindow.logsErr
-  
+
   def getAllLogs = {
-		  val loggerLogs = "Logger logs:\r\n" + logs
-		  val out = "System.out:\r\n" + logsOut
-		  val err = "System.err:\r\n" + logsErr
-		  val logSum = List(loggerLogs, out, err).mkString("\r\n\r\n")
-		  logSum
+    val loggerLogs = "Logger logs:\r\n" + logs
+    val out = "System.out:\r\n" + logsOut
+    val err = "System.err:\r\n" + logsErr
+    val logSum = List(loggerLogs, out, err).mkString("\r\n\r\n")
+    logSum
   }
 }
 

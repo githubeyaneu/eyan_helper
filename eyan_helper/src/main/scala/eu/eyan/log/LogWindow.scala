@@ -11,6 +11,10 @@ import eu.eyan.util.swing.JTextAreaPlus.JTextAreaImplicit
 import eu.eyan.util.swing.JFramePlus.JFramePlusImplicit
 import eu.eyan.util.swing.JTextFieldPlus.JTextFieldPlusImplicit
 import eu.eyan.util.swing.LimitLinesDocumentListener
+import java.io.OutputStream
+import eu.eyan.util.io.OutputStreamPlus
+import java.util.Timer
+import java.util.TimerTask
 
 // FIXME: too many lines in textarea -> goes bad. show only configurable amount!
 object LogWindow {
@@ -22,17 +26,10 @@ object LogWindow {
     if (origin != null) origin.positionToLeft
   }
 
-  def add(text: String) = {
-    if (window != null && window.frame != null /*&& window.frame.isVisible*/ ) {
-      window.textArea.append(text + "\n")
-//      window.textArea.invalidate()
-//      window.textArea.repaint()
-//      window.textArea.validate()
-    }
-  }
+  def add(text: String) = if (window != null && window.frame != null) window.textArea.append(text + "\n")
 
-  def addToOut(b: Int) = window.outTextArea.append(b.toChar.toString)
-  def addToErr(b: Int) = window.errTextArea.append(b.toChar.toString)
+  def outStream = OutputStreamPlus.carriageReturnReplacer(OutputStreamPlus.timebuffered(s => window.outTextArea.append(s)))
+  def errStream = OutputStreamPlus.carriageReturnReplacer(OutputStreamPlus.timebuffered(s => window.errTextArea.append(s)))
 
   def setLevel(level: LogLevel) = if (window != null) window.level(level)
 
@@ -57,8 +54,8 @@ class LogWindow {
   buttons.newColumn.addLabel("max rows:")
   val maxRowsTf = buttons.newColumn.addTextField("1000", 6).rememberValueInRegistry("LogWindowMaxRows").onTextChanged(limitLines.setLimitLines(maxRows))
 
-  def maxRows:Int = try { maxRowsTf.getText.toInt } catch { case _: Throwable => 1000 }
-    
+  def maxRows: Int = try { maxRowsTf.getText.toInt } catch { case _: Throwable => 1000 }
+
   content.newRow.addSeparatorWithTitle("Logs")
   val textArea = content.newRow("f:1px:g").addTextArea().alwaysScrollDown
   content.newRow.addSeparatorWithTitle("Console out")
