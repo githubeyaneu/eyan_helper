@@ -65,6 +65,8 @@ import javax.swing.event.TreeWillExpandListener
 import javax.swing.event.UndoableEditEvent
 import javax.swing.event.UndoableEditListener
 import javax.swing.filechooser.FileNameExtensionFilter
+import eu.eyan.log.Log
+import eu.eyan.util.scala.TryCatch
 
 object SwingPlus {
 
@@ -263,13 +265,26 @@ object SwingPlus {
 
   def invokeLater(action: => Unit) = SwingUtilities.invokeLater(AwtHelper.newRunnable(() => action))
 
+  //TODO merge with other methods
   def invokeLaterTryCatchFinally[T](action: => T, error: Throwable => T, finaly: => Unit) = invokeLater(TryCatchFinally(action, error, finaly))
 
+  //TODO merge with other methods
   def swingWorkerTryCatchFinally[T](action: => T, error: => Throwable => T, finaly: => Unit) = {
     new SwingWorker[T, T]() {
       override def doInBackground = try action catch { case t: Throwable => error(t) }
       override def done = finaly
     }.execute
+  }
+
+  //TODO merge with other methods
+  def runInWorker(work: => Unit, doAtDone: => Unit) = {
+    new SwingWorker[Void, Void]() {
+      override def doInBackground() = {
+        //try { work } catch { case t: Throwable => Log.error("Error in SwingWorker", t) }
+        TryCatch(work, t => Log.error("Error in SwingWorker", t)); null
+      }
+      override def done() = doAtDone
+    }.execute()
   }
 
   def beforeActionErrorAfter[T](before: => Unit, action: => T, error: Throwable => T, finaly: => Unit) = { before; SwingPlus.swingWorkerTryCatchFinally(action, error, finaly) }
@@ -346,12 +361,5 @@ object SwingPlus {
     override def insertUpdate(e: DocumentEvent) = action
     override def removeUpdate(e: DocumentEvent) = {}
     override def changedUpdate(e: DocumentEvent) = action
-  }
-
-  def runInWorker(work: => Unit, doAtDone: => Unit) = {
-    new SwingWorker[Void, Void]() {
-      override def doInBackground() = { work; null }
-      override def done() = doAtDone
-    }.execute()
   }
 }

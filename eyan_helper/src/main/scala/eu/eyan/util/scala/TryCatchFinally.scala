@@ -38,7 +38,7 @@ object TryCatchFinallyClose {
 //object TryFinally { def apply[T](action: => T, finaly: => Unit) = TryCatchFinally[scala.util.Try[T]](Success(action), e => { Log.error(e); Failure(e) }, finaly) }
 
 // use try{} catch {case t:Throwable =>{}} instead. This has no really use.
-//object TryCatch { def apply[T](action: => T, errorAction: => Throwable => T) = TryCatchFinally[T](action, errorAction, {}) }
+object TryCatch { def apply[T](action: => T, errorAction: => Throwable => T) = TryCatchFinally[T](action, errorAction, {}) }
 
 object TryCatchFinally { def apply[T](action: => T, errorAction: => Throwable => T, finaly: => Unit) = new TryCatchFinally[T](action, errorAction, finaly).execute /*.Catch(errorAction)*/ }
 
