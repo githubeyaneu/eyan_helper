@@ -7,7 +7,7 @@ import scala.io.Source
 import eu.eyan.log.Log
 
 object RuntimePlus {
-  case class ProcessResult(exitValue: Int, output: String, errorOutput: String)
+  case class ProcessResult(exitValue: Int, output: Option[String], errorOutput: Option[String])
 
   def exec(cmd: String) = {
     //TODO params: copy out end arr to console and as a result...

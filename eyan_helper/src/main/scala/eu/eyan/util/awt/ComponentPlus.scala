@@ -57,6 +57,8 @@ object ComponentPlus {
     def height = size.height
     def screenSize = AwtHelper.screenSize
 
+    def center = positionToCenter
+    def toCenter = positionToCenter
     def positionToCenter = {
       component.setSize(width, height)
       component.setLocation((screenSize.width - width) / 2, (screenSize.height - height) / 2)
