@@ -263,6 +263,8 @@ object SwingPlus {
     else JOptionPane.showMessageDialog(null, msg + ", " + e.getLocalizedMessage)
   }
 
+  def invokeAndWait(action: => Unit) = SwingUtilities.invokeAndWait(AwtHelper.newRunnable(() => action))
+  
   def invokeLater(action: => Unit) = SwingUtilities.invokeLater(AwtHelper.newRunnable(() => action))
 
   //TODO merge with other methods
@@ -287,6 +289,13 @@ object SwingPlus {
     }.execute()
   }
 
+//    def runInWorker(work: => Unit, doAtDone: => Unit) = {
+//    new SwingWorker[Void, Void]() {
+//      override def doInBackground = { try { work } catch { case (t: Throwable) => { Log.error("Error in SwingWorker", t) } }; null }
+//      override def done = doAtDone
+//    }.execute()
+//  }
+    
   def beforeActionErrorAfter[T](before: => Unit, action: => T, error: Throwable => T, finaly: => Unit) = { before; SwingPlus.swingWorkerTryCatchFinally(action, error, finaly) }
 
   def createListContentsChangedListener(listDataContentsChangedEventConsumer: ListDataEvent => Unit) =
@@ -362,4 +371,6 @@ object SwingPlus {
     override def removeUpdate(e: DocumentEvent) = {}
     override def changedUpdate(e: DocumentEvent) = action
   }
+
+
 }

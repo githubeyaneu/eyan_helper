@@ -8,10 +8,11 @@ trait RememberInRegistry[T <: Component] {
   def rememberValueInRegistry(name: String): T =
     {
       val comp = rememberComponent
-      def remember = if (comp.windowName != null) RegistryPlus.write(comp.windowName, comp.componentPath + name, rememberValueGet)
+      def nameInRegistry = if (name == "") comp.componentPath else name
+      def remember = if (comp.windowName != null) RegistryPlus.write(comp.windowName, nameInRegistry, rememberValueGet)
       rememberEventListener(remember)
 
-      def regValue = RegistryPlus.read(comp.windowName, comp.componentPath + name)
+      def regValue = RegistryPlus.read(comp.windowName, nameInRegistry)
       comp.onHierarchyChanged(
         if (regValue != null) rememberValueSet(regValue)
       //else Log.error(s"set name for the window to remember the value for component ${jTextComponent.windowName}, ${jTextComponent.componentPath}, $name")
