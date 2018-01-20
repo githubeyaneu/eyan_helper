@@ -1,10 +1,8 @@
 package eu.eyan.util.swing
 
 import java.awt.Font
-
-import eu.eyan.util.swing.JTextComponentPlus.JTextComponentImplicit
 import javax.swing.JTextArea
-import javax.swing.text.DefaultCaret
+import eu.eyan.util.swing.JTextComponentPlus.JTextComponentImplicit
 
 object JTextAreaPlus {
   implicit class JTextAreaImplicit[TYPE <: JTextArea](jTextArea: TYPE) extends JTextComponentImplicit(jTextArea) {
@@ -22,3 +20,4 @@ object JTextAreaPlus {
     def onDocumentAction(documentAction: => Unit) = { jTextArea.getDocument.addDocumentListener(SwingPlus.docListener(documentAction)); jTextArea }
   }
 }
+

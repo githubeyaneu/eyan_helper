@@ -70,7 +70,7 @@ object FilePlus {
 
     def hash = {
       if (file.isFile()) {
-        if (file.length > 50 * 1000 * 1000) { // TODO thisshould not be here
+        if (file.length > 50 * 1000 * 1000) {
           val messageDigest = MessageDigest.getInstance("SHA")
           TryCatchFinallyClose(
             new FileInputStream(file),
@@ -83,7 +83,7 @@ object FilePlus {
 
               sha.map("%02x".format(_)).mkString
             },
-            t => {t.printStackTrace; "error"})
+            t => t.printStackTrace)
         } else "small"
       } else "d" //throw new IllegalArgumentException("Create hash not possible to directory! "+file.getAbsolutePath)
     }
@@ -98,6 +98,12 @@ object FilePlus {
     def lastAccessTime = attr.lastAccessTime.toInstant
     def lastModifiedTime = attr.lastModifiedTime.toInstant
 
+    def copyToDir(destination: File, progressCallback: Int => Unit = dontcare => {}) = {
+      val destFile = (destination.getAbsolutePath+"\\"+file.getName).asFile
+      val result = copyTo(destFile, progressCallback)
+      if (result) Option(destFile) else None
+    }
+    
     def copyTo(destination: File, progressCallback: Int => Unit = dontcare => {}) = {
       val dest = new FileOutputStream(destination)
       val src = new FileInputStream(file)

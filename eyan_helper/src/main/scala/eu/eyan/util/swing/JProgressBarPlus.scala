@@ -34,5 +34,5 @@ class JProgressBarPlus(min: Int = 0, max: Int = 100, var format: String = "%d%%"
 
   def finished = { invokeLater({ this.setString(finishedText); this.setValue(this.getMaximum()) }); this }
 
-  def setFormat(newFormat: String) = {format = newFormat; this}
+  def setFormat(newFormat: String) = { format = newFormat; setNewValue(this.getValue()); this }
 }
