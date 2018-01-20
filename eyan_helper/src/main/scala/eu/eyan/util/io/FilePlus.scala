@@ -70,7 +70,7 @@ object FilePlus {
 
     def hash = {
       if (file.isFile()) {
-        if (file.length > 50 * 1000 * 1000) {
+        if (file.length > 50 * 1000 * 1000) { // TODO thisshould not be here
           val messageDigest = MessageDigest.getInstance("SHA")
           TryCatchFinallyClose(
             new FileInputStream(file),
@@ -83,7 +83,7 @@ object FilePlus {
 
               sha.map("%02x".format(_)).mkString
             },
-            t => t.printStackTrace)
+            t => {t.printStackTrace; "error"})
         } else "small"
       } else "d" //throw new IllegalArgumentException("Create hash not possible to directory! "+file.getAbsolutePath)
     }

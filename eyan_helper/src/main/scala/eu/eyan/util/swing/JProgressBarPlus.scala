@@ -21,7 +21,7 @@ object JProgressBarPlus {
     //    updateUI()
   }
 }
-class JProgressBarPlus(min: Int = 0, max: Int = 100, format: String = "%d%%", finishedText: String = "Ready") extends JProgressBar(min, max) {
+class JProgressBarPlus(min: Int = 0, max: Int = 100, var format: String = "%d%%", finishedText: String = "Ready") extends JProgressBar(min, max) {
 
   setNewValue(min)
 
@@ -33,4 +33,6 @@ class JProgressBarPlus(min: Int = 0, max: Int = 100, format: String = "%d%%", fi
   def doneThenInvisible = { finished; invokeLater(setVisible(false)); this }
 
   def finished = { invokeLater({ this.setString(finishedText); this.setValue(this.getMaximum()) }); this }
+
+  def setFormat(newFormat: String) = {format = newFormat; this}
 }
