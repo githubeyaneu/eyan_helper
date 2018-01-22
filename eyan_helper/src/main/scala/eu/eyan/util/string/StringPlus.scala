@@ -99,6 +99,8 @@ object StringPlus {
     def asUrlPost(postParams: String = "") = HttpPlus.sendPost(s, postParams)
 
     def asUrlGet_responseAsStream() = HttpPlus.sendGet_responseAsStream(s)
+    
+    def asUrlGet = Source.fromInputStream(asUrlGet_responseAsStream()).mkString
 
     def linesFromFile = Source.fromFile(s).getLines
 
