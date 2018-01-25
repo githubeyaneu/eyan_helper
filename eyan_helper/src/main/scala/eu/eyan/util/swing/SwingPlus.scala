@@ -67,6 +67,7 @@ import javax.swing.event.UndoableEditListener
 import javax.swing.filechooser.FileNameExtensionFilter
 import eu.eyan.log.Log
 import eu.eyan.util.scala.TryCatch
+import eu.eyan.util.scala.TryCatchThrowable
 
 object SwingPlus {
 
@@ -283,7 +284,7 @@ object SwingPlus {
     new SwingWorker[Void, Void]() {
       override def doInBackground() = {
         //try { work } catch { case t: Throwable => Log.error("Error in SwingWorker", t) }
-        TryCatch(work, t => Log.error("Error in SwingWorker", t)); null
+        TryCatchThrowable(work, t => Log.error("Error in SwingWorker", t)); null
       }
       override def done() = doAtDone
     }.execute()
