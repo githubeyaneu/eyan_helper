@@ -29,7 +29,7 @@ object Log {
       prevTime = System.currentTimeMillis
       val logText = stackClassAndMethod + ": " + message
       val consoleText = f"$level%-5s $prevTimeLog $logText"
-      if (Error.shouldLog(level)) if (errToConsole) consoleText.printlnErr
+      if (Error.shouldLog(level) && errToConsole) consoleText.printlnErr
       else if (logToConsole) consoleText.println
 
       LogWindow.add(logText)

@@ -11,10 +11,17 @@ import scala.collection.mutable.MutableList
 import scala.collection.mutable.ListBuffer
 import java.util.zip.ZipEntry
 import eu.eyan.util.scala.TryCatchFinallyClose
+import java.util.zip.GZIPInputStream
+import scala.io.Source
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
+import org.apache.commons.compress.archivers.ArchiveStreamFactory
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry
+import org.apache.commons.compress.utils.IOUtils
+import java.io.ByteArrayInputStream
 
 object ZipPlus {
   def listFiles(file: File) = {
-    TryCatchFinallyClose({new ZipInputStream(new FileInputStream(file))}, (zip: ZipInputStream) => {
+    TryCatchFinallyClose({ new ZipInputStream(new FileInputStream(file)) }, (zip: ZipInputStream) => {
       val list = ListBuffer[ZipEntry]()
       var ze = zip.getNextEntry
       while (ze != null) {
@@ -23,6 +30,37 @@ object ZipPlus {
       }
       list.toList
     }, t => { Log.error("Error extracting " + file); List() })
+  }
+
+  def gzToString(file: File) = {
+    val source = Source.fromInputStream(new GZIPInputStream(new FileInputStream(file)))
+    val ret = source.getLines.mkString
+    source.close
+    ret
+  }
+
+  def gzArrayToString(input: Array[Byte]) = {
+    val source = Source.fromInputStream(new GZIPInputStream(new ByteArrayInputStream(input)))
+    val ret = source.getLines.mkString
+    source.close
+    ret
+  }
+
+  def unTarAllFilesToMemory(tarPath: File) = {
+    val debInputStream = new ArchiveStreamFactory().createArchiveInputStream("tar", new FileInputStream(tarPath)).asInstanceOf[TarArchiveInputStream]
+
+    val files = new MutableList[Tuple2[String, Array[Byte]]]
+    var entry: TarArchiveEntry = debInputStream.getNextEntry.asInstanceOf[TarArchiveEntry]
+    while (entry != null) {
+      if (entry.isFile) {
+        val name = (entry.getName)
+        val bytes = IOUtils.toByteArray(debInputStream)
+        files += Tuple2(name, bytes)
+      }
+      entry = debInputStream.getNextEntry.asInstanceOf[TarArchiveEntry]
+    }
+    debInputStream.close
+    files
   }
 }
 
