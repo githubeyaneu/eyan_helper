@@ -61,6 +61,7 @@ object Log {
     exception.printStackTrace
   }
 
+  // FIXME use => instead of message and objects!!!
   def warn() = log(Warn)
   def warn(message: String) = log(Warn, message)
   def warn(o: Object) = log(Warn)

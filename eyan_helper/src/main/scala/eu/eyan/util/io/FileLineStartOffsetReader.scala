@@ -11,6 +11,12 @@ import java.util.regex.Pattern
 import eu.eyan.log.Log
 import eu.eyan.util.collection.MapsPlus
 import java.io.Closeable
+import eu.eyan.util.string.StringPlus.StringPlusImplicit
+
+object CachedFileLineReader {
+  def apply(file: String) =  new CachedFileLineReader().load(file.asFile)
+  def apply(file: File) = new CachedFileLineReader().load(file)
+}
 
 class CachedFileLineReader extends Iterable[String] with Closeable {
 
@@ -119,6 +125,7 @@ class CachedFileLineReader extends Iterable[String] with Closeable {
 
   override def size = lineOffsets.synchronized { lineOffsets.size }
 
+  def lines = iterator
   def iterator = new Iterator[String] {
     private var index = 0
     def hasNext = lineOffsets.synchronized { index < lineOffsets.size }

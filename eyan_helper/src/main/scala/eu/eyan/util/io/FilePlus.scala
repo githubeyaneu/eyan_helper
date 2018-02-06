@@ -13,6 +13,7 @@ import eu.eyan.log.Log
 import java.io.FileOutputStream
 import eu.eyan.util.scala.TryCatchFinallyClose
 import scala.io.BufferedSource
+import scala.io.Codec
 
 object FilePlus {
 
@@ -50,7 +51,7 @@ object FilePlus {
 
     //    def lines = Source.fromFile(file).getLines
     //TODO test it
-    def lines = new Iterator[String] {
+    def lines(codec: Codec = Codec.UTF8) = new Iterator[String] {
       val bs = Source.fromFile(file)
       val lines = bs.getLines
       def hasNext: Boolean = { val hn = lines.hasNext; if (!hn) CloseablePlus.closeQuietly(bs); hn }
