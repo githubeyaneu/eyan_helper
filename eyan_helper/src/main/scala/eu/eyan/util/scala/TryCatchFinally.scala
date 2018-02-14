@@ -33,6 +33,8 @@ object TryCatchFinallyClose {
     } catch { case e: Throwable => errorAction(e) }
 }
 
+//TODO: create TryFinallyClose without Catch, return is Try[T]
+
 // use try{} finally {} instead. This has no really use.
 //object TryFinally { def apply[T](action: => T, finaly: => Unit) = TryCatchFinally[scala.util.Try[T]](Success(action), e => { Log.error(e); Failure(e) }, finaly) }
 

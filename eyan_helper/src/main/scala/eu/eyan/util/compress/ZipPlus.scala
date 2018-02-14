@@ -18,6 +18,10 @@ import org.apache.commons.compress.archivers.ArchiveStreamFactory
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry
 import org.apache.commons.compress.utils.IOUtils
 import java.io.ByteArrayInputStream
+import scala.io.BufferedSource
+import scala.util.Failure
+import scala.util.Try
+import scala.util.Success
 
 object ZipPlus {
   def listFiles(file: File) = {
@@ -32,30 +36,32 @@ object ZipPlus {
     }, t => { Log.error("Error extracting " + file); List() })
   }
 
-  def gzToString(file: File) = {
-    val source = Source.fromInputStream(new GZIPInputStream(new FileInputStream(file)))
-    val ret = source.getLines.mkString
-    source.close
-    ret
+  def unzipToString(file: File) = {
+	  TryCatchFinallyClose(
+    Source.fromInputStream(new GZIPInputStream(new FileInputStream(file))),
+    (source: BufferedSource) => Success(source.getLines.mkString),
+    t => { Log.error("Error unzipping input array", t); Failure(t) })
   }
 
-  def gzArrayToString(input: Array[Byte]) = {
-    val source = Source.fromInputStream(new GZIPInputStream(new ByteArrayInputStream(input)))
-    val ret = source.getLines.mkString
-    source.close
-    ret
+  def unzipToString(input: Array[Byte]) = {
+    TryCatchFinallyClose(
+      Source.fromInputStream(new GZIPInputStream(new ByteArrayInputStream(input))),
+      (source: BufferedSource) => Success(source.getLines.mkString),
+      t => { Log.error("Error unzipping input array", t); Failure(t) })
   }
+
+  case class NameAndContent(filename: String, content: Array[Byte])
 
   def unTarAllFilesToMemory(tarPath: File) = {
     val debInputStream = new ArchiveStreamFactory().createArchiveInputStream("tar", new FileInputStream(tarPath)).asInstanceOf[TarArchiveInputStream]
 
-    val files = new MutableList[Tuple2[String, Array[Byte]]]
+    val files = new MutableList[NameAndContent]
     var entry: TarArchiveEntry = debInputStream.getNextEntry.asInstanceOf[TarArchiveEntry]
     while (entry != null) {
       if (entry.isFile) {
         val name = (entry.getName)
         val bytes = IOUtils.toByteArray(debInputStream)
-        files += Tuple2(name, bytes)
+        files += NameAndContent(name, bytes)
       }
       entry = debInputStream.getNextEntry.asInstanceOf[TarArchiveEntry]
     }

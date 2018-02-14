@@ -4,6 +4,7 @@ import java.io.Closeable
 import eu.eyan.log.Log
 
 object CloseablePlus {
+  // TODO write tests
   def closeQuietly(closeables: Closeable*) =
     if (closeables != null) {
       closeables foreach {
