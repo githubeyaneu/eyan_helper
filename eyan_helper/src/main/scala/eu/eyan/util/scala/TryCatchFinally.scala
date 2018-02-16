@@ -61,4 +61,18 @@ private class TryCatchFinally[T](action: => T, errorAction: => Throwable => T, f
   //    case Success(res) => res
   //    case Failure(t)   => errorAction(t)
   //  }
+    
+}
+
+object TryPlus {
+  implicit class TryPlusImplicit[FROM](tri: scala.util.Try[FROM]){
+    
+    // TODO: write tests....
+    def mapWithErrorHandler[TO](mapper: FROM => TO, errorHandler: Throwable => Unit):scala.util.Try[TO] = {
+      tri match {
+        case Success(value) => TryCatchThrowable(Success(mapper(value)), t=>Failure(t))
+        case Failure(throwable) => Failure(throwable)
+      }
+    }
+  }
 }

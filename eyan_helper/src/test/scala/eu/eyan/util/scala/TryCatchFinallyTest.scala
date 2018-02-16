@@ -14,9 +14,10 @@ import scala.util.Success
 import scala.util.Failure
 import eu.eyan.testutil.ScalaEclipseJunitRunnerTheories
 import org.junit.experimental.theories.Theory
+import eu.eyan.testutil.TestPlus
 
 @RunWith(classOf[ScalaEclipseJunitRunnerTheories])
-class TryCatchFinallyTest {
+class TryCatchFinallyTest extends TestPlus {
 
   trait Result
   object ActionResult extends Result
@@ -25,21 +26,6 @@ class TryCatchFinallyTest {
   object Closeable1ActionResult extends Result
   object Closeable2Result extends Result with Closeable { def close = if (close2Ok) close2Action else close2Error }
   object Closeable2ActionResult extends Result
-
-  def expect(expectedException: Throwable, test: => Unit) = try { test; Assert.fail("Exception was expected but none came.") } catch { case e: Exception => e ==> ("expectedException", expectedException) }
-
-  implicit class ThrowableTestImplicit[T <: Throwable](expected: T) {
-    def <==(actual: => Unit) = expect(expected, actual)
-  }
-
-  implicit class AnyTestImpicit[T <: Any](actual: T) {
-    def ==>(expected: Any) = assertThat(actual).isEqualTo(expected)
-    //		def <==(action: => Unit) = action ==> actual // why it does not work??
-    def shouldBe(expected: Any) = ==>(expected)
-
-    def ==>(expected: Tuple2[String, Any]) = assertThat(actual).as(expected._1).isEqualTo(expected._2)
-    def !==(expected: Any) = assertThat(actual).isNotEqualTo(expected)
-  }
 
   var actionDone = false
   val Exeption_Action = new Exception("actionError")
