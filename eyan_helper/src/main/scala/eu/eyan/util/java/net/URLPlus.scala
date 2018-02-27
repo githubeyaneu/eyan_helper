@@ -13,13 +13,12 @@ object URLPlus {
 
   implicit class URLImplicit(url: URL) {
 
-    def saveToFile(destination: File, progressCallback: Int => Unit = i => {}) = {
+    def saveToFile(destination: File, progressCallback: Long => Unit = l => {}) = {
       TryCatchFinallyClose(
         url.openStream, new FileOutputStream(destination, false),
         (input: InputStream, output: FileOutputStream) => input.copyTo(output, new Array[Byte](65536), progressCallback),
         t => Log.error(s"Cannot save URL($url) to file($destination)", t))
       url
     }
-
   }
 }

@@ -14,10 +14,13 @@ import scala.collection.mutable.ListBuffer
 import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry
 import eu.eyan.util.scala.TryCatchFinallyClose
 import eu.eyan.log.Log
+import java.nio.channels.FileChannel
+import java.io.RandomAccessFile
+import eu.eyan.util.string.StringPlus.StringPlusImplicit
 
 object SevenZipPlus {
   def listFiles(file: File) = {
-    TryCatchFinallyClose({new SevenZFile(file)}, (sevenZFile: SevenZFile) => {
+    TryCatchFinallyClose({ new SevenZFile(file) }, (sevenZFile: SevenZFile) => {
       val list = ListBuffer[SevenZArchiveEntry]()
       var entry = sevenZFile.getNextEntry
       while (entry != null) {
@@ -26,9 +29,31 @@ object SevenZipPlus {
       }
       sevenZFile.close
       list.toList
+    }, t => { Log.error("Error extracting " + file); List() })
+  }
+
+  /** Sometimes comes to outofmem error */
+def extractAllTo(source: File, targetDir: File) = {
+    val channel = new RandomAccessFile(source, "rw").getChannel
+    val sevenZFile = new SevenZFile(channel)
+    var entry = sevenZFile.getNextEntry()
+    while (entry != null) {
+      val content = new Array[Byte](entry.getSize.toInt)
+      sevenZFile.read(content, 0, content.length)
+      val targetFile = targetDir.getAbsoluteFile+"\\"+entry.getName
+      val dir = targetFile.substring(0, targetFile.lastIndexOf("/"))
+      Log.debug("File: "+targetFile)
+      Log.debug("Dir: "+dir)
+      Log.debug("Size: "+entry.getSize.toInt/1000000+"Mb")
+      dir.asDir.mkdirs
+      TryCatchFinallyClose(
+        new FileOutputStream(targetFile, false),
+        (out: FileOutputStream) => out.write(content),
+        t => Log.error("Error extracting 7z " + entry.getName, t))
+      entry = sevenZFile.getNextEntry()
     }
-    ,t=>{Log.error("Error extracting "+file);List()}
-    )
+    sevenZFile.close
+    targetDir
   }
 }
 
@@ -64,7 +89,7 @@ class SevenZipPlus(compressedInputStream: InputStream) extends CompressPlus {
       channel.close
   }
 
-  def extractOneFileTo(channel: SeekableInMemoryByteChannel, filePathToExtract: String, targetFile: File) = {
+  private def extractOneFileTo(channel: SeekableInMemoryByteChannel, filePathToExtract: String, targetFile: File) = {
     val sevenZFile = new SevenZFile(channel)
     var entry = sevenZFile.getNextEntry()
     while (entry != null) {
@@ -80,4 +105,5 @@ class SevenZipPlus(compressedInputStream: InputStream) extends CompressPlus {
     sevenZFile.close
     targetFile
   }
+
 }

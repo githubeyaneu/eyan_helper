@@ -80,6 +80,8 @@ object StringPlus {
     def asDir = asFile
     def file = asFile
     def dir = asFile
+    
+    def asUrl = new URL(s)
 
     def executeAsProcess = {
       ("Executing a process:\r\n  " + s).println
@@ -131,7 +133,7 @@ object StringPlus {
     val LESS_THAN = """<"""
     val GREATER_THAN = """>"""
 
-    val CHARS_TO_REPLACE = SLASH_R + BACKSLASH_R + COLON_R + ASTERISK_R + QUESTION_MARK_R + QUOTATION_MARK_R + VERTICAL_BAR_R + FULL_STOP_R + SEMICOLON_R + EQUALS_R + COMMA_R + GRAVE_ACCENT_R + APOSTROPHE_R + LESS_THAN + GREATER_THAN
+    private val CHARS_TO_REPLACE = SLASH_R + BACKSLASH_R + COLON_R + ASTERISK_R + QUESTION_MARK_R + QUOTATION_MARK_R + VERTICAL_BAR_R + FULL_STOP_R + SEMICOLON_R + EQUALS_R + COMMA_R + GRAVE_ACCENT_R + APOSTROPHE_R + LESS_THAN + GREATER_THAN
     
     def toSafeFilename = s.replaceAll(s"[$CHARS_TO_REPLACE]", "_").withoutAccents
 

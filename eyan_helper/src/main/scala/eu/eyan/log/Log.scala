@@ -54,12 +54,15 @@ object Log {
 
   def error = log(Error)
   def error(message: String) = log(Error, message)
-  def error(exception: Throwable) = log(Error, exception.getClass.getName + ": " + exception.getMessage + "\r\n  " + exception.getStackTrace.mkString("  \r\n"))
-  def error(message: String, exception: Throwable) = log(Error, message + " - " + exception.getMessage + "\r\n  " + exception.getStackTrace.mkString("  \r\n"))
-  def errorOnConsoleToo(exception: Throwable) = {
-    log(Error, exception.getMessage + "\r\n  " + exception.getStackTrace.mkString("  \r\n"))
-    exception.printStackTrace
+  def error(t: Throwable):Log.type = error("", t)
+  def error(message: String, t: Throwable) = {
+    val msg = if(message!="") {message + " - "} else ""
+    val tName = t.getClass.getName
+    val tMsg =  t.getMessage
+    val tSt = t.getStackTrace.mkString("  \r\n")
+    log(Error,  s"$msg $tName: $tMsg\r\n  $tSt")
   }
+  def errorOnConsoleToo(exception: Throwable) = { error(exception); exception.printStackTrace }
 
   // FIXME use => instead of message and objects!!!
   def warn() = log(Warn)
