@@ -32,6 +32,7 @@ import javax.swing.JFrame
 import eu.eyan.util.awt.ImagePlus
 import eu.eyan.util.swing.JMenuBarPlus.JMenuBarImplicit
 import javax.swing.JMenuItem
+import java.awt.event.MouseEvent
 
 object JFramePlus {
   implicit class JFramePlusImplicit[TYPE <: JFrame](jFrame: TYPE) extends FramePlusImplicit(jFrame) {
@@ -75,7 +76,7 @@ object JFramePlus {
 
     private def removeAllSystemTrayIcons = systemTray.getTrayIcons.foreach(systemTray.remove(_))
 
-    private def createOpenExitPopup = {
+    def createOpenExitPopup = {
       /* TODO create and use implicits for popupmenu and menuitem*/
       val popup = new PopupMenu()
 
@@ -98,7 +99,7 @@ object JFramePlus {
         //TODO TrayIcon Implicit
         val trayIcon = new TrayIcon(iconToUse, toolTip, popupMenu)
         trayIcon.setImageAutoSize(true)
-        trayIcon.addMouseListener(AwtHelper.onClicked(e => if (jFrame.isVisible) jFrame.invisible else {jFrame.visible; jFrame.setState(Frame.NORMAL); jFrame.toFront}))
+        trayIcon.addMouseListener(AwtHelper.onClicked(e => if (e.getButton == MouseEvent.BUTTON1) (if (jFrame.isVisible) jFrame.invisible else { jFrame.visible; jFrame.setState(Frame.NORMAL); jFrame.toFront })))
 
         systemTray.add(trayIcon)
         jFrame.onWindowStateChanged_ICONIFIED(jFrame.invisible)

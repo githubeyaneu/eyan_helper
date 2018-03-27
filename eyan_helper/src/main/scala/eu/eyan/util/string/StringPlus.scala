@@ -89,6 +89,7 @@ object StringPlus {
     }
 
     def executeAsBatchFile(batName: String = "temp_bat_can_deleted.bat", deleteBatAfterwards: Boolean = true) = {
+      // TODO use try 
       ("Executing a batch file: \r\n" + s).println
       val res = s.writeToFile(batName).executeAsProcess.println
       if (deleteBatAfterwards) batName.deleteAsFile

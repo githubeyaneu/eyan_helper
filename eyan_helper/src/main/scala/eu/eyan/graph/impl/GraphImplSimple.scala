@@ -28,7 +28,12 @@ class GraphImplSimple[VERTEX] protected (val vertices: Set[VERTEX], val edges: S
 
   override def equals(that: Any) = that.isInstanceOf[GraphImplSimple[VERTEX]] && that.asInstanceOf[GraphImplSimple[VERTEX]].vertices == vertices && that.asInstanceOf[GraphImplSimple[VERTEX]].edges == edges
   override def hashCode = 31 * (31 + edges.hashCode) + vertices.hashCode
-  override def toString = s"GraphImplSimple[$direction, $vertices, $edges]"
+  override def toString = {
+    //TODO implement sort???
+    val vs = vertices
+    val es=edges
+    s"GraphImplSimple[$direction, $vs, $es]"
+  }
 
   def add(vertex: VERTEX): GRAPH = GraphImplSimple(vertices + vertex, edges, direction)
   def add(edge: GraphEdge[VERTEX]): GRAPH = {

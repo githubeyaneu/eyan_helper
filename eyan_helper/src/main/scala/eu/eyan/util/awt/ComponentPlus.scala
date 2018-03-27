@@ -48,6 +48,7 @@ import javax.swing.SwingUtilities
 import java.awt.Container
 import java.io.StringReader
 import org.apache.commons.compress.utils.IOUtils
+import eu.eyan.util.swing.SwingPlus
 
 object ComponentPlus {
 
@@ -214,6 +215,8 @@ object ComponentPlus {
 
     def onDrop(action: => Unit) = onDropEvent { e => action }
     def onDropEvent(action: DropTargetDropEvent => Unit) = { DndPlus.onDrop(component, action); component }
+
+    def onDropFileEnabledDisabled(action: File => Unit) = onDropFile(file => { component.disabled; SwingPlus.runInWorker(action(file), component.enabled) })
 
     def onDropFile(action: File => Unit) = {
       onDropEvent { evt =>

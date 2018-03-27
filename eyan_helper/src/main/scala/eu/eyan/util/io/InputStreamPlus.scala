@@ -20,7 +20,10 @@ object InputStreamPlus {
     @tailrec
     final def copyTo(output: OutputStream, buffer: Array[Byte], progressCallback: Long => Unit, progress: Long = 0): Long = {
       val n = inputStream.read(buffer)
-      if (n == -1) progress
+      if (n == -1) {
+    	  progressCallback(progress)
+        progress
+      }
       else {
         output.write(buffer, 0, n)
         progressCallback(progress+n)
