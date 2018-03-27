@@ -5,11 +5,9 @@ import eu.eyan.graph.impl.GraphImplSimple
 
 /**
  * https://qubit.hu/2018/03/26/esz-ventura-fel-tudod-darabolni-virtualisan-a-legertekesebb-magyar-belyegivet
- *
  *   1           2  3  4  5
  *   6  7  8  9 10 11 12 13 14
  *  15 16 17 18 19 20 21 22 23 24
- *
  */
 
 class Feladat {
@@ -26,19 +24,18 @@ class Feladat {
 
     val graph24 = vs.foldLeft(GraphImplSimple[Int]())((g, e) => g.addUndirectedEdge(e(0), e(1)))
 
-    println(graph24)
-
-    //    e.addUndirectedEdge(,)
     val points = graph24.vertices.toList
 
-    val verticesCombinations5 = points.combinations(5)
-    val subGraphs5 = verticesCombinations5 map (vertices5=> Graphs.subGraph(graph24, vertices5.toSet))
+    for (darab <- 0 to 24) {
+      val verticesCombinations5 = points.combinations(darab)
+      val subGraphs5 = verticesCombinations5 map (vertices5 => Graphs.subGraph(graph24, vertices5.toSet))
 
-    val result = subGraphs5.filter(subGraph5 => Graphs.isConnected(subGraph5) && Graphs.isConnected(Graphs.subGraph(graph24, graph24.vertices.toSet -- subGraph5.vertices.toSet)))
-    
-    val eredmény = result.map(_.vertices.toList.sorted).toList
-    
-    println(eredmény.mkString("\r\n"))
+      val result = subGraphs5.filter(subGraph5 => Graphs.isConnected(subGraph5) && Graphs.isConnected(Graphs.subGraph(graph24, graph24.vertices.toSet -- subGraph5.vertices.toSet)))
 
+      val eredmény = result.map(_.vertices.toList.sorted).toList
+
+      println(eredmény.mkString("\r\n"))
+      println(darab+"->"+eredmény.size)
+    }
   }
 }
