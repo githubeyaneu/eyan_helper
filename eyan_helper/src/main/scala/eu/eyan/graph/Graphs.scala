@@ -67,6 +67,8 @@ object Graphs {
   // TODO unit test it!!!
   def subGraph[VERTEX, EDGE](graph: Graph[VERTEX, EDGE], verticesToInclude: Set[VERTEX]) = { 
       val subEdges = graph.edges.filter(e=>verticesToInclude.contains(e.vertices.head) && verticesToInclude.contains(e.vertices.tail.head))//TODO make it better  tail.head
-      subEdges.foldLeft(GraphImplSimple[VERTEX]())((g,e)=> g.add(e))
+      val graphWithEdges = subEdges.foldLeft(GraphImplSimple[VERTEX]())((g,e)=> g.add(e))
+      val graphWithVertices = verticesToInclude.foldLeft(graphWithEdges)((g,v)=> g.add(v))
+      graphWithVertices
   }
 }
