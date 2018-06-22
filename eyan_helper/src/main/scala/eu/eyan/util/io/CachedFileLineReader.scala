@@ -109,8 +109,7 @@ class CachedFileLineReader extends Iterable[String] with Closeable {
 
   def close = {
     try {
-      if (fileInputStream != null) fileInputStream.close
-      if (fileChannel != null) fileChannel.close
+      CloseablePlus.closeQuietly(fileInputStream, fileChannel)
       lineOffsets.clear
       lineCache.clear
       longestLine = ""

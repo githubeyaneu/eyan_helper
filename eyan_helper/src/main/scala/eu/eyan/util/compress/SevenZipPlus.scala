@@ -14,7 +14,6 @@ import scala.collection.mutable.ListBuffer
 import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry
 import eu.eyan.util.scala.TryCatchFinallyClose
 import eu.eyan.log.Log
-import java.nio.channels.FileChannel
 import java.io.RandomAccessFile
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
 

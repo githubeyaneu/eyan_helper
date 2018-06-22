@@ -18,7 +18,19 @@ object TestPlus {
 
 trait TestPlus {
   /** Expect a Throwable of the method */
-  def expect(expectedThrowable: Throwable, test: => Unit) = try { test; Assert.fail("Exception(Throwable) was expected but none came.") } catch { case e: Throwable => e ==> ("expectedThrowable", expectedThrowable) }
+  def expect(expectedThrowable: Throwable, test: => Unit, same: Boolean=false) =
+    try { test; Assert.fail("Exception(Throwable) was expected but none came.") }
+    catch {
+      case e: Throwable => {
+        if(same) e ==> ("expectedThrowable", expectedThrowable)
+        e.getClass ==> ("expectedThrowable class", expectedThrowable.getClass)
+    		e.getMessage ==> ("expectedThrowable message", expectedThrowable.getMessage)
+      }
+    }
+
+  /** Expect no Throwable of the method: remember this makes no sense, as the exception thrown makes a junit test failed.
+   *  However it is nicer to read what the test about and if it is deeper tested in an other try...*/
+  def expectNoException(test: => Unit) = try { test } catch { case e: Throwable => Assert.fail("Exception(Throwable) was NOT expected but came: " + e) }
 
   implicit class ThrowableTestImplicit[T <: Throwable](expectedThrowable: T) {
     /** Expect throwable(left) of the right*/
@@ -30,13 +42,13 @@ trait TestPlus {
     def ==>(expected: Any) = assertThat(actual).isEqualTo(expected)
 
     /** assertThat(left).isEqualTo(right) */
-		def shouldBe(expected: Any) = ==>(expected)
-    
+    def shouldBe(expected: Any) = ==>(expected)
+
     //		def <==(action: => Unit) = action ==> actual // why it does not work??
 
-		/** assertThat(left).as(right_1).isEqualTo(right_2) */
+    /** assertThat(left).as(right_1).isEqualTo(right_2) */
     def ==>(expected: Tuple2[String, Any]) = assertThat(actual).as(expected._1).isEqualTo(expected._2)
-    
+
     /** assertThat(left).isNotEqualTo(right) */
     def !==(expected: Any) = assertThat(actual).isNotEqualTo(expected)
   }
