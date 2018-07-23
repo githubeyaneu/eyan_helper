@@ -85,6 +85,7 @@ class JPanelWithFrameLayout() extends JPanel {
   def nextColumn = { if (useSeparators) actualColumn += 2 else actualColumn += 1; this }
   def newColumn: JPanelWithFrameLayout = newColumn()
   def newColumnFPG: JPanelWithFrameLayout = newColumn("f:p:g")
+  def newColumnFPGForTextArea: JPanelWithFrameLayout = newColumn("f:1px:g")
   def newColumn(spec: String = PREF): JPanelWithFrameLayout = {
     if (useBorders && actualColumn == 0) {
       appendColumnBorder
@@ -114,6 +115,8 @@ class JPanelWithFrameLayout() extends JPanel {
 
   def newRow: JPanelWithFrameLayout = newRow()
   def newRowFPG: JPanelWithFrameLayout = newRow("f:p:g")
+  def newRowFPGForTextArea: JPanelWithFrameLayout = newRow("f:1px:g")
+  
   def newRow(spec: String = PREF): JPanelWithFrameLayout = {
 
     if (useBorders && actualRow == 0) {

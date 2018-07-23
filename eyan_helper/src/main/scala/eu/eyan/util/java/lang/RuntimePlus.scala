@@ -5,15 +5,16 @@ import java.io.InputStream
 import scala.io.Source
 
 import eu.eyan.log.Log
+import scala.io.Codec
 
 object RuntimePlus {
   case class ProcessResult(exitValue: Int, output: Option[String], errorOutput: Option[String])
 
-  def exec(cmd: String) = {
+  def exec(cmd: String, codec: Codec = Codec.UTF8) = {
     //TODO params: copy out end arr to console and as a result...
     Log.info("Executing process: " + cmd)
     val process = Runtime.getRuntime.exec(cmd)
-    def readStreamInThread(stream: InputStream) = ThreadPlus.run(Source.fromInputStream(stream).mkString)
+    def readStreamInThread(stream: InputStream) = ThreadPlus.run(Source.fromInputStream(stream)(codec).mkString)
     val outRunner = readStreamInThread(process.getInputStream)
     val errRunner = readStreamInThread(process.getErrorStream)
     process.waitFor
@@ -30,5 +31,16 @@ object RuntimePlus {
     val errRunner = readStreamInThread(process.getErrorStream, callbackErr)
     process.waitFor
     process.exitValue
+  }
+
+  def execWithStreamProcessors(cmd: String, codec: Codec = Codec.UTF8, outputProcessor: Stream[String] => Unit, errorProcessor: Stream[String] => Unit) = {
+		  //TODO params: copy out end arr to console and as a result...
+		  Log.info("Executing process: " + cmd)
+		  val process = Runtime.getRuntime.exec(cmd)
+		  def readStreamInThread(stream: InputStream, processor: Stream[String] => Unit) = ThreadPlus.run(processor(Source.fromInputStream(stream)(codec).getLines.toStream))
+		  val outRunner = readStreamInThread(process.getInputStream, outputProcessor)
+		  val errRunner = readStreamInThread(process.getErrorStream, errorProcessor)
+		  process.waitFor
+		  process.exitValue
   }
 }
