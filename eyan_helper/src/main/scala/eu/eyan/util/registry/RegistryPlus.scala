@@ -2,6 +2,10 @@ package eu.eyan.util.registry
 
 import eu.eyan.log.Log
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
+import eu.eyan.util.io.OutputStreamPlus
+import eu.eyan.util.io.PrintStreamPlus.PrintStreamImplicit
+import java.io.PrintStream
+import eu.eyan.util.io.PrintStreamPlus
 
 object RegistryPlus extends App {
   /* TODO implement sg to read/write from/to win registry. Or even better platform independently... */
@@ -17,6 +21,7 @@ object RegistryPlus extends App {
   //  WinRegistry.deleteValue(hkey, keyRoot, "kej", wow)
   //  WinRegistry.deleteKey(hkey, keyRoot)
 
+  @deprecated("might be buggy at clearing the value")
   def write(name: String, value: String): Unit = write("", name, value)
 
   def read(name: String): String = read("", name)
@@ -24,13 +29,16 @@ object RegistryPlus extends App {
   def write(key: String, name: String, value: String): Unit = {
     val valueHex = value.toHexEncode
     Log.debug(s"HKEY_CURRENT_USER, $keyRoot, $name, $value, $valueHex")
-    WinRegistry.createKey(hkey, s"$keyRoot\\$key")
-    WinRegistry.writeStringValue(hkey, s"$keyRoot\\$key", name, valueHex, wow)
+
+    filterJavaBugErrorLines {
+      WinRegistry.createKey(hkey, s"$keyRoot\\$key")
+      WinRegistry.writeStringValue(hkey, s"$keyRoot\\$key", name, valueHex, wow)
+    }
   }
 
   def read(key: String, name: String): String = {
     Log.debug(s"HKEY_CURRENT_USER, $keyRoot\\$key, $name")
-    val valueHex = WinRegistry.readString(hkey, s"$keyRoot\\$key", name, wow)
+    val valueHex = filterJavaBugErrorLines { WinRegistry.readString(hkey, s"$keyRoot\\$key", name, wow) }
     val value =
       try { valueHex.toHexDecode }
       catch { case t: Throwable => { Log.error("error converting from hex"); valueHex } }
@@ -42,4 +50,12 @@ object RegistryPlus extends App {
     Log.debug(s"HKEY_CURRENT_USER, $keyRoot\\$key")
     val ret = WinRegistry.deleteKey(hkey, s"$keyRoot\\$key")
   }
+
+  def filterJavaBugErrorLines[T](action: => T) =
+    PrintStreamPlus.filterErrorLines(
+      List(
+        """java.util.prefs.WindowsPreferences <init>""",
+        """WARNING: Could not open/create prefs root node Software\JavaSoft\Prefs at root 0x80000002. Windows RegCreateKeyEx(...) returned error code 5."""))(
+        action)
+
 }

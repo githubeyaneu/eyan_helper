@@ -20,13 +20,15 @@ import eu.eyan.util.io.FilePlus
 import eu.eyan.util.io.FilePlus.FilePlusImplicit
 import eu.eyan.util.scala.TryCatchFinally
 import eu.eyan.util.java.lang.RuntimePlus
-import eu.eyan.util.scala.collection.StreamPlus.StreamPlusImplicit
+import eu.eyan.util.scala.collection.StreamPlus.StreamImplicit
 import java.awt.Desktop
 import java.net.URL
 import java.net.URI
 import scala.util.matching.Regex
 import scala.io.Codec
 import eu.eyan.util.java.lang.RuntimePlus.ProcessResult
+import java.io.InputStream
+import eu.eyan.util.java.lang.ThreadPlus
 
 object StringPlus {
   lazy val reg = "[\\p{InCombiningDiacriticalMarks}]".r
@@ -84,6 +86,23 @@ object StringPlus {
     def dir = asFile
 
     def asUrl = new URL(s)
+
+    def execInDir(
+      commandAndArgs:  Array[String],
+      codec:           Codec,
+      outputProcessor: Stream[String] => Unit = s => {},
+      errorProcessor:  Stream[String] => Unit = s => {}) = {
+
+      Log.info(s"Executing process in workDir $s cmd:${commandAndArgs.mkString(" ")}")
+
+      //TODO refactor move to ProcessPlus etc... together with RuntimePlus
+      val process = new ProcessBuilder(commandAndArgs: _*).directory(s.asFile).start
+      def readStreamInThread(stream: InputStream, processor: Stream[String] => Unit) = ThreadPlus.run(processor(Source.fromInputStream(stream)(codec).getLines.toStream))
+      val outRunner = readStreamInThread(process.getInputStream, outputProcessor)
+      val errRunner = readStreamInThread(process.getErrorStream, errorProcessor)
+      process.waitFor
+      process.exitValue
+    }
 
     //    import scala.sys.process.stringToProcess
     def executeAsProcess = {
@@ -169,16 +188,26 @@ object StringPlus {
     def toIntOrElse(default: Int) = try s.toInt catch { case _: Throwable => default }
 
     def splitLinesFromFile(splitCondition: String => Boolean): Stream[String] = splitLinesStream(splitCondition)(s.linesFromFile.toStream)
-    
-    
+
     def splitLines(splitCondition: String => Boolean): Stream[String] = splitLinesStream(splitCondition)(s.lines.toStream)
-    
-//    def splitLines2(splitCondition: String => Boolean): Stream[String] = s.lines.toStream.split(splitCondition)
+
+    //    def splitLines2(splitCondition: String => Boolean): Stream[String] = s.lines.toStream.split(splitCondition)
   }
 
+  //FIXME: do not return empty as first item
   def splitLinesStream(splitCondition: String => Boolean)(input: Stream[String], last: String = ""): Stream[String] = {
-    if (input.isEmpty) input
+    if (input.isEmpty) input //FIXME -> error? maybe last should be returned -> TEST IT
     else if (splitCondition(input.head)) Stream.cons(last, splitLinesStream(splitCondition)(input.tail, input.head))
     else splitLinesStream(splitCondition)(input.tail, last + "\r\n" + input.head)
+  }
+
+  //TODO: test
+  @deprecated
+  def splitLinesIntoStream2(splitCondition: String => Boolean, next: Stream[String] = Stream.Empty)(input: Stream[String]): Stream[Stream[String]] = {
+		  if (input.isEmpty && next.isEmpty) Stream.Empty
+		  else if (input.isEmpty) Stream(next)
+		  else if (splitCondition(input.head) && next.isEmpty) splitLinesIntoStream2(splitCondition, Stream(input.head))(input.tail)
+		  else if (splitCondition(input.head)) next #:: splitLinesIntoStream2(splitCondition, Stream(input.head))(input.tail)
+		  else splitLinesIntoStream2(splitCondition,  next :+ input.head)(input.tail)
   }
 }

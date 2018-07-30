@@ -9,6 +9,7 @@ import scala.collection.mutable.MutableList
 import eu.eyan.util.scala.Try
 import eu.eyan.log.Log
 import java.io.FileWriter
+import eu.eyan.util.string.StringPlus.StringPlusImplicit
 
 object OutputStreamPlus {
   def apply(onWrite: Int => Unit, onFlush: => Unit, onClose: => Unit) = new OutputStream {

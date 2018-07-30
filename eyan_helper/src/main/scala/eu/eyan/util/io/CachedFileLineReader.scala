@@ -93,11 +93,8 @@ class CachedFileLineReader extends Iterable[String] with Closeable {
         longestLine = get(longestLineIndex);
         if (fileLength != endIndex) {
           // special characters brake the offsets
-          val oldLevel = Log.actualLevel
-          Log.activate()
           Log.error("special characters brake the offsets: " + file.getAbsolutePath)
           Log.error("Length: " + fileLength + " endOffset:" + endIndex + NL + "Error at loading file. There are newline problems! ")
-          Log.activate(oldLevel)
         }
       }
       catch {
