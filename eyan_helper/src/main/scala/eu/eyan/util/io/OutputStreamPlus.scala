@@ -9,6 +9,7 @@ import scala.collection.mutable.MutableList
 import eu.eyan.util.scala.Try
 import eu.eyan.log.Log
 import java.io.FileWriter
+import java.io.Writer
 
 object OutputStreamPlus {
   def apply(onWrite: Int => Unit, onFlush: => Unit, onClose: => Unit) = new OutputStream {
@@ -16,6 +17,15 @@ object OutputStreamPlus {
     override def flush = onFlush
     override def close = onClose
   }
+
+  def flushPeriodically(stream: OutputStream, timeInterval: Int = 100) = {
+    val timer = new Timer(s"Flushable flusher interval $timeInterval ms")
+    val task = new TimerTask { def run = stream.flush }
+    timer.scheduleAtFixedRate(task, timeInterval, timeInterval)
+    OutputStreamPlus(i => stream.write(i), stream.flush, { stream.flush; Try(timer.cancel) })
+  }
+
+  def apply(writer: Writer): OutputStream = OutputStreamPlus(i => writer.write(i), writer.flush, writer.close)
 
   def timebuffered(callback: String => Unit, time: Int = 100) = {
     var chars = MutableList[Char]()

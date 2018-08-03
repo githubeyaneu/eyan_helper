@@ -1,102 +1,108 @@
 package eu.eyan.log
 
+import scala.collection.mutable.MutableList
+
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
-import java.io.PrintStream
-import java.io.ByteArrayOutputStream
-import java.io.OutputStream
-import eu.eyan.util.io.PrintStreamPlus.PrintStreamImplicit
+import rx.subjects.PublishSubject
 
-// TODO: be able to listen the logs
-// dont show all the logs in window, but remeber all of them for the copy to clipboard action
+case class Log(level: LogLevel, text: String)
+
 object Log {
-  private val STACK_LEVEL = 3
+  private lazy val LOG_CLASS_NAME = Log.getClass.getName
 
-  var actualLevel: LogLevel = None
-  private var isWithPrevTime: Boolean = false
-  private var prevTime = System.currentTimeMillis
+  private var actualLevel: LogLevel = None
+  def getActualLevel = actualLevel
 
   var logToConsole = true
   var errToConsole = true
 
-  def stackClassAndMethod = {
-    val stack = Thread.currentThread().getStackTrace().filter(se => se.getClassName != Log.getClass.getName)(1)
-    stack.getClassName.substring(stack.getClassName.lastIndexOf(".") + 1) + "." + stack.getMethodName
-  }
-  private def prevTimeLog = if (isWithPrevTime) { " " + (System.currentTimeMillis - prevTime) } else ""
+  private val logger = PublishSubject.create[Log]
+  val logsObservable = logger.asObservable
+  private val actualLevelPublisher = PublishSubject.create[LogLevel]
+  val levelObservable = actualLevelPublisher.asObservable
+  actualLevelPublisher.onNext(actualLevel)
 
   private def log(level: LogLevel, message: String = ""): Log.type = {
-    if (actualLevel.shouldLog(level)) {
-      prevTime = System.currentTimeMillis
-      val logText = stackClassAndMethod + ": " + message
-      val consoleText = f"$level%-5s $prevTimeLog $logText"
-      if (Error.shouldLog(level) && errToConsole) consoleText.printlnErr
-      else if (logToConsole) consoleText.println
-
-      LogWindow.add(logText)
-    }
+    def stackElementsNotToLog(stackTraceElement: StackTraceElement) = stackTraceElement.getClassName != LOG_CLASS_NAME
+    def stackElementWhereLogWasCalled = Thread.currentThread.getStackTrace.filter(stackElementsNotToLog)(1) // TODO use lift
+    def stackClassAndMethod = stackElementWhereLogWasCalled.getClassName.substring(stackElementWhereLogWasCalled.getClassName.lastIndexOf(".") + 1) + "." + stackElementWhereLogWasCalled.getMethodName
+    def logText = stackClassAndMethod + (if (message != "") { ": " + message } else "")
+    if (actualLevel.shouldLog(level)) logger.onNext(new Log(level, logText))
     this
   }
 
-  def start = activate
-  def stop = deactivate
-  def enable = activate
+  def start = enable
+  def stop = disable
+  def enable = activateDebugLevel
   def disable = deactivate
-  def activate: Log.type = activate(Debug)
   def deactivate = activate(None)
-  def withPrevTime = { isWithPrevTime = true; this }
-  def activate(level: LogLevel = Debug): Log.type = { actualLevel = level; LogWindow.setLevel(level); this }
 
-  def activateDebugLevel = activate
-  def activateInfoLevel = activate(Info)
+  // with prev time logic
+  //  private var prevTime = System.currentTimeMillis
+  //  private var isWithPrevTime: Boolean = false
+  //  def withPrevTime = { isWithPrevTime = true; this }
+  //  private def prevTimeLog = if (isWithPrevTime) { " " + (System.currentTimeMillis - prevTime) } else ""
+  //  change the method in log method: def consoleText = f"$level%-5s $prevTimeLog $logText"
+  //  prevTime = System.currentTimeMillis
+
+  def activate(level: LogLevel = Debug): Log.type = { actualLevel = level; actualLevelPublisher.onNext(level); this }
+
+  def activateNone = activate(None)
+  def activateFatalLevel = activate(Fatal)
   def activateErrorLevel = activate(Error)
   def activateWarnLevel = activate(Warn)
+  def activateInfoLevel = activate(Info)
+  def activateDebugLevel = activate(Debug)
   def activateTraceLevel = activate(Trace)
+  def activateAllLevel = activateTraceLevel
+
+  def fatal = log(Fatal)
+  def fatal(o: Object) = log(Fatal, String.valueOf(o))
 
   def error = log(Error)
-  def error(message: String) = log(Error, message)
-  def error(exception: Throwable) = log(Error, exception.getClass.getName + ": " + exception.getMessage + "\r\n  " + exception.getStackTrace.mkString("  \r\n"))
-  def error(message: String, exception: Throwable) = log(Error, message + " - " + exception.getMessage + "\r\n  " + exception.getStackTrace.mkString("  \r\n"))
-  def errorOnConsoleToo(exception: Throwable) = {
-    log(Error, exception.getMessage + "\r\n  " + exception.getStackTrace.mkString("  \r\n"))
-    exception.printStackTrace
+  def error(message: Any): Log.type =
+    message match {
+      case t: Throwable => error("", t)
+      case o: Any       => log(Error, String.valueOf(o))
+    }
+
+  def error(message: String, t: Throwable) = {
+    val msg = if (message != "") { message + " -" } else ""
+    val tName = t.getClass.getName
+    val tMsg = t.getMessage
+    val tSt = t.getStackTrace.mkString("\r\n  ")
+    log(Error, s"$msg $tName: $tMsg\r\n  $tSt")
   }
 
-  // FIXME use => instead of message and objects!!!
-  def warn() = log(Warn)
-  def warn(message: String) = log(Warn, message)
-  def warn(o: Object) = log(Warn)
+  def warn = log(Warn)
+  def warn(o: Object) = log(Warn, String.valueOf(o))
 
-  def info() = log(Info)
-  def info(message: String) = log(Info, message)
+  def info = log(Info)
   def info(o: Object) = log(Info, String.valueOf(o))
 
-  def debug() = log(Debug)
-  def debug(message: String) = log(Debug, message)
+  def debug = log(Debug)
   def debug(o: Object) = log(Debug, String.valueOf(o))
 
-  def trace() = log(Trace)
-  def trace(message: String) = log(Trace, message)
+  def trace = log(Trace)
   def trace(o: Object) = log(Trace, String.valueOf(o))
 
-  private def redirectSystemOut = { System.setOut(System.out.copyToStream(LogWindow.outStream)); logToConsole = false; this }
-  private def redirectSystemError = { System.setErr(System.err.copyToStream(LogWindow.errStream)); errToConsole = false; this }
-  def redirectSystemOutAndErrToLogWindow = { redirectSystemOut; redirectSystemError }
-
-  def logs = LogWindow.logs
-  def logsOut = LogWindow.logsOut
-  def logsErr = LogWindow.logsErr
-
-  def getAllLogs = {
-    val loggerLogs = "Logger logs:\r\n" + logs
-    val out = "System.out:\r\n" + logsOut
-    val err = "System.err:\r\n" + logsErr
-    val logSum = List(loggerLogs, out, err).mkString("\r\n\r\n")
-    logSum
-  }
+  
+  def logToConsoleText(log: Log) = f"${log.level}%-5s ${log.text}"
+  logsObservable.filter(_.level > Error).subscribe(log => { logToConsoleText(log).println })
+  logsObservable.filter(_.level <= Error).subscribe(log => { logToConsoleText(log).printlnErr })
+  logsObservable.subscribe(log => saveLog(log))
+  
+  val allLogs = MutableList[Log]() // TODO Memory leak, make fixed list / fixed size
+  def saveLog(log: Log) = allLogs += log 
+  def getAllLogs = List(allLogs: _*)
 }
 
 abstract class LogLevel(val prio: Int) {
   def shouldLog(otherLevel: LogLevel) = otherLevel.prio <= prio
+  def <(otherLevel: LogLevel) = otherLevel.prio > prio
+  def >(otherLevel: LogLevel) = otherLevel.prio < prio
+  def <=(otherLevel: LogLevel) = otherLevel.prio >= prio
+  def >=(otherLevel: LogLevel) = otherLevel.prio <= prio
 }
 case object None extends LogLevel(100)
 case object Fatal extends LogLevel(200)
