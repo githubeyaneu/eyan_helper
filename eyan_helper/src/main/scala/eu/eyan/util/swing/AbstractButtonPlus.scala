@@ -9,6 +9,7 @@ import javax.swing.JButton
 import eu.eyan.util.swingakka.ActionEventHandler
 import javax.swing.event.ChangeEvent
 import java.awt.event.ItemEvent
+import java.io.File
 
 object AbstractButtonPlus {
 
@@ -44,8 +45,8 @@ object AbstractButtonPlus {
     //isRolloverEnabled()
     //isSelected()
     def isNotSelected = !abstractButton.isSelected
-    def selected = {abstractButton.setSelected(true); abstractButton}
-    def notSelected = {abstractButton.setSelected(false); abstractButton}
+    def selected = { abstractButton.setSelected(true); abstractButton }
+    def notSelected = { abstractButton.setSelected(false); abstractButton }
     //removeActionListener(ActionListener)
     //removeChangeListener(ChangeListener)
     //removeItemListener(ItemListener)
@@ -82,5 +83,6 @@ object AbstractButtonPlus {
     //setVerticalAlignment(int)
     //setVerticalTextPosition(int)
     //updateUI()
+
   }
 }

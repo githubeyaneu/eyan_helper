@@ -17,7 +17,12 @@ object JTextAreaPlus {
     def tabSize(size: Int) = { jTextArea.setTabSize(size); jTextArea }
     def wrapStyleWord(word: Boolean) = { jTextArea.setWrapStyleWord(word); jTextArea }
 
-    def onDocumentAction(documentAction: => Unit) = { jTextArea.getDocument.addDocumentListener(SwingPlus.docListener(documentAction)); jTextArea }
+    def onAnyDocumentAction(documentAction: => Unit) = {
+      jTextArea.getDocument.addDocumentListener(SwingPlus.onInsertUpdate(e => documentAction))
+      jTextArea.getDocument.addDocumentListener(SwingPlus.onRemoveUpdate(e => documentAction))
+      jTextArea.getDocument.addDocumentListener(SwingPlus.onChangedUpdate(e => documentAction))
+      jTextArea
+    }
   }
 }
 

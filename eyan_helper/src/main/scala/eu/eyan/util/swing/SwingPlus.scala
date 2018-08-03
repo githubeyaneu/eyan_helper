@@ -68,11 +68,14 @@ import javax.swing.filechooser.FileNameExtensionFilter
 import eu.eyan.log.Log
 import eu.eyan.util.scala.TryCatch
 import eu.eyan.util.scala.TryCatchThrowable
+import java.awt.event.MouseMotionListener
+import java.awt.event.MouseMotionAdapter
+import java.awt.event.MouseEvent
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseWheelEvent
+import java.awt.event.MouseWheelEvent
 
 object SwingPlus {
-
-  //FIXME: if ready delete all methods that starts with "with" if it is no boolean parameter.
-
   //  AncestorEvent
   //  AncestorListener
   class AncestorAdapter extends AncestorListener {
@@ -181,6 +184,18 @@ object SwingPlus {
 
   //  MouseInputAdapter
   //  MouseInputListener
+  // MouseAdapter
+  // MouseListener
+  // MouseMotionListener
+  // MouseWheelListener
+  def onMouseClicked(action: MouseEvent => Unit) = new MouseAdapter { override def mouseClicked(e: MouseEvent) = action(e) }
+  def onMousePressed(action: MouseEvent => Unit) = new MouseAdapter { override def mousePressed(e: MouseEvent) = action(e) }
+  def onMouseReleased(action: MouseEvent => Unit) = new MouseAdapter { override def mouseReleased(e: MouseEvent) = action(e) }
+  def onMouseEntered(action: MouseEvent => Unit) = new MouseAdapter { override def mouseEntered(e: MouseEvent) = action(e) }
+  def onMouseExited(action: MouseEvent => Unit) = new MouseAdapter { override def mouseExited(e: MouseEvent) = action(e) }
+  def onMouseWheelMoved(action: MouseWheelEvent => Unit) = new MouseAdapter { override def mouseWheelMoved(e: MouseWheelEvent) = action(e) }
+  def onMouseDragged(action: MouseEvent => Unit) = new MouseAdapter { override def mouseDragged(e: MouseEvent) = action(e) }
+  def onMouseMoved(action: MouseEvent => Unit) = new MouseAdapter { override def mouseMoved(e: MouseEvent) = action(e) }
 
   //  PopupMenuEvent
   //  PopupMenuListener
@@ -256,8 +271,6 @@ object SwingPlus {
 
   //////////////////////////////////////////////////////////////////
 
-  //FIXME: delete the listeners under
-
   def showErrorDialog(msg: String, e: Throwable, shown: Set[Throwable] = Set()): Unit = {
     if (e.getCause != null && !shown.contains(e.getCause))
       showErrorDialog(msg + ", " + e.getLocalizedMessage, e.getCause, shown + e)
@@ -265,7 +278,7 @@ object SwingPlus {
   }
 
   def invokeAndWait(action: => Unit) = SwingUtilities.invokeAndWait(AwtHelper.newRunnable(() => action))
-  
+
   def invokeLater(action: => Unit) = SwingUtilities.invokeLater(AwtHelper.newRunnable(() => action))
 
   //TODO merge with other methods
@@ -290,13 +303,6 @@ object SwingPlus {
     }.execute()
   }
 
-//    def runInWorker(work: => Unit, doAtDone: => Unit) = {
-//    new SwingWorker[Void, Void]() {
-//      override def doInBackground = { try { work } catch { case (t: Throwable) => { Log.error("Error in SwingWorker", t) } }; null }
-//      override def done = doAtDone
-//    }.execute()
-//  }
-    
   def beforeActionErrorAfter[T](before: => Unit, action: => T, error: Throwable => T, finaly: => Unit) = { before; SwingPlus.swingWorkerTryCatchFinally(action, error, finaly) }
 
   def createListContentsChangedListener(listDataContentsChangedEventConsumer: ListDataEvent => Unit) =
@@ -305,9 +311,6 @@ object SwingPlus {
       override def intervalAdded(e: ListDataEvent) = {}
       override def contentsChanged(e: ListDataEvent) = listDataContentsChangedEventConsumer(e)
     }
-
-  def addKeyPressedListener(textPane: JTextPane, keyPressedEventConsumer: KeyEvent => Unit) =
-    textPane.addKeyListener(new KeyAdapter() { override def keyPressed(e: KeyEvent) = keyPressedEventConsumer(e) });
 
   def newLeftFlowPanel() = new FlowPanel(new FlowLayout(FlowLayout.LEFT))
 
@@ -349,7 +352,7 @@ object SwingPlus {
     progressBar.setValue(0)
     progressBar.setStringPainted(true)
     progressBar.setVisible(false)
-    invokeLater(() => progressBar.setString("..."))
+    invokeLater(progressBar.setString("..."))
     progressBar
   }
 
@@ -366,12 +369,5 @@ object SwingPlus {
     if (!extension.isEmpty) fc.setFileFilter(new FileNameExtensionFilter(extension + " files", extension))
     if (fc.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) action(fc.getSelectedFile)
   }
-
-  def docListener(action: => Unit) = new DocumentListener() {
-    override def insertUpdate(e: DocumentEvent) = action
-    override def removeUpdate(e: DocumentEvent) = {}
-    override def changedUpdate(e: DocumentEvent) = action
-  }
-
 
 }

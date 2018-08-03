@@ -207,5 +207,20 @@
 			<version>2.5.3</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.snmp4j/snmp4j -->
+		<dependency>
+			<groupId>org.snmp4j</groupId>
+			<artifactId>snmp4j</artifactId>
+			<version>2.5.0</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/io.reactivex/rxscala -->
+		<dependency>
+			<groupId>io.reactivex</groupId>
+			<artifactId>rxscala_2.12</artifactId>
+			<version>0.26.5</version>
+		</dependency>
+
+
 	</dependencies>
 </project>

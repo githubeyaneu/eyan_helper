@@ -100,11 +100,11 @@ object FilePlus {
     def lastModifiedTime = attr.lastModifiedTime.toInstant
 
     def copyToDir(destination: File, progressCallback: Int => Unit = dontcare => {}) = {
-      val destFile = (destination.getAbsolutePath+"\\"+file.getName).asFile
+      val destFile = (destination.getAbsolutePath + "\\" + file.getName).asFile
       val result = copyTo(destFile, progressCallback)
       if (result) Option(destFile) else None
     }
-    
+
     def copyTo(destination: File, progressCallback: Int => Unit = dontcare => {}) = {
       val dest = new FileOutputStream(destination)
       val src = new FileInputStream(file)

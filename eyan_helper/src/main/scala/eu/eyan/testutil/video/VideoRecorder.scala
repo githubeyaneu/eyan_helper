@@ -58,8 +58,8 @@ class VideoRecorder {
       screenRecorder.start()
     }
     catch {
-      case e: IOException  => Log.errorOnConsoleToo(e)
-      case e: AWTException => Log.errorOnConsoleToo(e)
+      case e: IOException  => Log.error(e)
+      case e: AWTException => Log.error(e)
     }
   }
 
@@ -68,14 +68,14 @@ class VideoRecorder {
     Pause.pause(WAIT_TIME_FOR_ENDING_VIDEO_MS)
     try stop
     catch {
-      case e: IOException => Log.errorOnConsoleToo(e)
+      case e: IOException => Log.error(e)
     }
   }
 
   def stopAndDeleteVideo = {
     val videoFile = screenRecorder.getVideoFile // must be the first line, because screenRecorder set to null
     try stop
-    catch { case e: IOException => Log.errorOnConsoleToo(e) }
+    catch { case e: IOException => Log.error(e) }
     finally if (videoFile != null && videoFile.exists() && videoFile.isFile()) videoFile.delete()
   }
 

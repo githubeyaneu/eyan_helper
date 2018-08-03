@@ -4,6 +4,11 @@ import java.io.Closeable
 import eu.eyan.log.Log
 
 object CloseablePlus {
+  
+  implicit class CloseablePlusImplicit[CLOSEABLE <: Closeable](closeable:CLOSEABLE) {
+    def closeQuietly = CloseablePlus.closeQuietly(closeable)
+  }
+  
   // TODO write tests
   def closeQuietly(closeables: Closeable*) =
     if (closeables != null) {

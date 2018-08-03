@@ -15,20 +15,27 @@ import java.io.OutputStream
 import eu.eyan.util.io.OutputStreamPlus
 import java.util.Timer
 import java.util.TimerTask
+import eu.eyan.util.io.PrintStreamPlus.PrintStreamImplicit
 
 // FIXME: too many lines in textarea -> goes bad. show only configurable amount!
 object LogWindow {
-  val window = new LogWindow
+  private val window = new LogWindow
 
   def show(origin: Component = null) = {
     window.frame.packAndSetVisible
     window.frame.positionToRight
     if (origin != null) origin.positionToLeft
+
+    Log.logsObservable.subscribe(log => LogWindow.add(Log.logToConsoleText(log))) // TODO why map does not work?
+    Log.getAllLogs.foreach(log => LogWindow.add(Log.logToConsoleText(log)))
+    
+    Log.levelObservable.subscribe(level => LogWindow.setLevel(level)) // TODO why map does not work?
+    LogWindow.setLevel(Log.getActualLevel)
   }
 
   def add(text: String) = if (window != null && window.frame != null) window.textArea.append(text + "\n")
 
-  def outStream = OutputStreamPlus.carriageReturnReplacer(OutputStreamPlus.timebuffered(s => window.outTextArea.append(s)))
+  def outStreamAppender = OutputStreamPlus.carriageReturnReplacer(OutputStreamPlus.timebuffered(s => window.outTextArea.append(s)))
   def errStream = OutputStreamPlus.carriageReturnReplacer(OutputStreamPlus.timebuffered(s => window.errTextArea.append(s)))
 
   def setLevel(level: LogLevel) = if (window != null) window.level(level)
@@ -38,6 +45,20 @@ object LogWindow {
   def logs = window.textArea.getText
   def logsOut = window.outTextArea
   def logsErr = window.errTextArea.getText
+
+  //TODO refactor: special logic to exchange system.out and system.err with the copy algo do it for Console.out too
+  // then refact to more fp way: replaceSystemOut(outStreamAppender.carriageReturnReplacer.timebuffered)
+  private def redirectSystemOut = { System.setOut(System.out.copyToStream(outStreamAppender)); Log.logToConsole = false; this }
+  private def redirectSystemError = { System.setErr(System.err.copyToStream(errStream)); Log.errToConsole = false; this }
+  def redirectSystemOutAndErrToLogWindow = { redirectSystemOut; redirectSystemError }
+  
+  def getAllLogs = {
+    val loggerLogs = "Logger logs:\r\n" + logs
+    val out = "System.out:\r\n" + logsOut
+    val err = "System.err:\r\n" + logsErr
+    val logSum = List(loggerLogs, out, err).mkString("\r\n\r\n")
+    logSum
+  }
 }
 
 class LogWindow {
@@ -49,8 +70,9 @@ class LogWindow {
 
   val buttons = content.addPanelWithFormLayout().withSeparators.newColumn()
   buttons.addButton("Clear").onAction_disableEnable({ textArea.setText(""); outTextArea.setText(""); errTextArea.setText("") })
-  List(None, Fatal, Error, Warn, Info, Debug, Trace).foreach(
-    level => buttons.newColumn.addButton(level.toString).onAction_disableEnable(Log.activate(level)))
+
+  List(None, Fatal, Error, Warn, Info, Debug, Trace).foreach(level => buttons.newColumn.addButton(level.toString).onAction_disableEnable(Log.activate(level)))
+
   buttons.newColumn.addLabel("max rows:")
   val maxRowsTf = buttons.newColumn.addTextField("1000", 6).rememberValueInRegistry("LogWindowMaxRows").onTextChanged(limitLines.setLimitLines(maxRows))
 
@@ -74,7 +96,7 @@ class LogWindow {
 
 
 /*
-// FIXME: too many lines in textarea -> goes bad. show only configurable amount!
+// TODO: too many lines in textarea -> goes bad. show only configurable amount!
 
 package eu.eyan.log
 
@@ -94,7 +116,6 @@ import java.util.Timer
 import java.util.TimerTask
 import eu.eyan.util.swing.SwingPlus
 
-// FIXME: too many lines in textarea -> goes bad. show only configurable amount!
 object LogWindow {
   val window = new LogWindowImpl
 

@@ -274,7 +274,7 @@ trait Graph[VERTEX, EDGE] {
   /** Returns all the edges of the vertex in the graph. */
   def edges(vertex: VERTEX): EDGES
 		  
-  /** Returns all the edges of the vertex in the graph. */
+  /** Returns all the edges of the vertices in the graph. */
   def edges(vertices: VERTICES): EDGES
   
   /** Adds more edge to the graph according the properties of the graph. */

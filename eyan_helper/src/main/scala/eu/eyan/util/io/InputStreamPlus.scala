@@ -5,6 +5,7 @@ import eu.eyan.util.compress.ZipPlus
 import eu.eyan.util.compress.SevenZipPlus
 import eu.eyan.util.compress.CompressPlus
 import java.io.OutputStream
+import scala.annotation.tailrec
 
 object InputStreamPlus {
 
@@ -16,13 +17,17 @@ object InputStreamPlus {
         Some(new SevenZipPlus(inputStream))
       else None
 
-    def copyTo(output: OutputStream, buffer: Array[Byte], progressCallback: Int => Unit): Long = {
+    @tailrec
+    final def copyTo(output: OutputStream, buffer: Array[Byte], progressCallback: Long => Unit, progress: Long = 0): Long = {
       val n = inputStream.read(buffer)
-      if (n == -1) 0
+      if (n == -1) {
+    	  progressCallback(progress)
+        progress
+      }
       else {
         output.write(buffer, 0, n)
-        progressCallback(n)
-        n + copyTo(output, buffer, progressCallback)
+        progressCallback(progress+n)
+        copyTo(output, buffer, progressCallback, progress+n)
       }
     }
   }

@@ -34,8 +34,7 @@ object BackupHelper {
         ex.printStackTrace()
         throw new BackupException("Nem sikerült a biztonsági mentés")
     } finally {
-      CloseablePlus.closeQuietly(zipOutputStream)
-      CloseablePlus.closeQuietly(fileInputStream)
+      CloseablePlus.closeQuietly(zipOutputStream, fileInputStream)
     }
   }
 }
