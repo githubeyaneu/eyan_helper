@@ -27,6 +27,8 @@ object LogWindow {
     if (origin != null) origin.positionToLeft
 
     Log.logsObservable.subscribe(log => LogWindow.add(Log.logToConsoleText(log))) // TODO why map does not work?
+    Log.getAllLogs.foreach(log => LogWindow.add(Log.logToConsoleText(log)))
+    
     Log.levelObservable.subscribe(level => LogWindow.setLevel(level)) // TODO why map does not work?
     LogWindow.setLevel(Log.getActualLevel)
   }
@@ -44,8 +46,10 @@ object LogWindow {
   def logsOut = window.outTextArea
   def logsErr = window.errTextArea.getText
 
-  private def redirectSystemOut = { System.setOut(System.out.copyToStream(LogWindow.outStreamAppender)); Log.logToConsole = false; this }
-  private def redirectSystemError = { System.setErr(System.err.copyToStream(LogWindow.errStream)); Log.errToConsole = false; this }
+  //TODO refactor: special logic to exchange system.out and system.err with the copy algo do it for Console.out too
+  // then refact to more fp way: replaceSystemOut(outStreamAppender.carriageReturnReplacer.timebuffered)
+  private def redirectSystemOut = { System.setOut(System.out.copyToStream(outStreamAppender)); Log.logToConsole = false; this }
+  private def redirectSystemError = { System.setErr(System.err.copyToStream(errStream)); Log.errToConsole = false; this }
   def redirectSystemOutAndErrToLogWindow = { redirectSystemOut; redirectSystemError }
   
   def getAllLogs = {
@@ -92,7 +96,7 @@ class LogWindow {
 
 
 /*
-// FIXME: too many lines in textarea -> goes bad. show only configurable amount!
+// TODO: too many lines in textarea -> goes bad. show only configurable amount!
 
 package eu.eyan.log
 
@@ -112,7 +116,6 @@ import java.util.Timer
 import java.util.TimerTask
 import eu.eyan.util.swing.SwingPlus
 
-// FIXME: too many lines in textarea -> goes bad. show only configurable amount!
 object LogWindow {
   val window = new LogWindowImpl
 

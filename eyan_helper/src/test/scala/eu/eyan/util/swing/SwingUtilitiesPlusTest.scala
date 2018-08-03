@@ -12,6 +12,7 @@ import eu.eyan.testutil.TestPlus.waitFor
 import eu.eyan.util.jgoodies.FormLayoutPlus
 import javax.swing.JPanel
 import javax.swing.JTextPane
+import eu.eyan.util.swing.JTextComponentPlus.JTextComponentImplicit
 
 @RunWith(classOf[ScalaEclipseJunitRunner])
 class SwingUtilitiesPlusTest() {
@@ -36,7 +37,7 @@ class SwingUtilitiesPlusTest() {
         processKeyEvent(new KeyEvent(this, KeyEvent.KEY_TYPED, 0, KeyEvent.VK_UNDEFINED, KeyEvent.VK_UNDEFINED, KeyEvent.VK_UNDEFINED))
       }
     }
-    val listener = SwingPlus.addKeyPressedListener(textPane, e => called = true)
+    textPane.onKeyPressed(called = true)
     textPane.pressKey
     assertThat(called).isTrue
   }
@@ -110,7 +111,7 @@ class SwingUtilitiesPlusTest() {
   @Test
   def test_jProgressBarPercent = {
     val progressBar = SwingPlus.jProgressBarPercent("_%d%%_")
-    waitFor(() => assertThat(progressBar.getString).isEqualTo("..."))
+    waitFor(assertThat(progressBar.getString).isEqualTo("..."))
     assertThat(progressBar.getValue).isEqualTo(0)
     assertThat(progressBar.isVisible).isFalse
   }

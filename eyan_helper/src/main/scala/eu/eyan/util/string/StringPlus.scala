@@ -187,27 +187,6 @@ object StringPlus {
 
     def toIntOrElse(default: Int) = try s.toInt catch { case _: Throwable => default }
 
-    def splitLinesFromFile(splitCondition: String => Boolean): Stream[String] = splitLinesStream(splitCondition)(s.linesFromFile.toStream)
-
-    def splitLines(splitCondition: String => Boolean): Stream[String] = splitLinesStream(splitCondition)(s.lines.toStream)
-
-    //    def splitLines2(splitCondition: String => Boolean): Stream[String] = s.lines.toStream.split(splitCondition)
-  }
-
-  //FIXME: do not return empty as first item
-  def splitLinesStream(splitCondition: String => Boolean)(input: Stream[String], last: String = ""): Stream[String] = {
-    if (input.isEmpty) input //FIXME -> error? maybe last should be returned -> TEST IT
-    else if (splitCondition(input.head)) Stream.cons(last, splitLinesStream(splitCondition)(input.tail, input.head))
-    else splitLinesStream(splitCondition)(input.tail, last + "\r\n" + input.head)
-  }
-
-  //TODO: test
-  @deprecated
-  def splitLinesIntoStream2(splitCondition: String => Boolean, next: Stream[String] = Stream.Empty)(input: Stream[String]): Stream[Stream[String]] = {
-		  if (input.isEmpty && next.isEmpty) Stream.Empty
-		  else if (input.isEmpty) Stream(next)
-		  else if (splitCondition(input.head) && next.isEmpty) splitLinesIntoStream2(splitCondition, Stream(input.head))(input.tail)
-		  else if (splitCondition(input.head)) next #:: splitLinesIntoStream2(splitCondition, Stream(input.head))(input.tail)
-		  else splitLinesIntoStream2(splitCondition,  next :+ input.head)(input.tail)
+    def splitLinesFromFile(splitCondition: String => Boolean): Stream[String] = s.linesFromFile.toStream.splitToStreams(splitCondition).map(_.mkString("\r\n"))
   }
 }

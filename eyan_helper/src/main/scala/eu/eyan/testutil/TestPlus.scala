@@ -12,12 +12,12 @@ object TestPlus {
 
   val DEFAULT_SLEEP_TIME = 10
 
-  def waitFor(assertion: () => Unit, timeout: Long = DEFAULT_WAIT_TIME): Unit = {
+  def waitFor(assertion: => Unit, timeout: Long = DEFAULT_WAIT_TIME): Unit = {
     val start = System.currentTimeMillis()
     def elapsedTime = System.currentTimeMillis() - start
     var ok = false
     while (!ok)
-      try { assertion(); ok = true }
+      try { assertion; ok = true }
       catch { case c: AssertionError => if (timeout < elapsedTime) throw c else Thread.sleep(DEFAULT_SLEEP_TIME) }
   }
 }
@@ -59,6 +59,8 @@ trait TestPlus {
 
     /** assertThat(left).isNotEqualTo(right) */
     def !==(expected: Any) = assertThat(actual).isNotEqualTo(expected)
+
+    def shouldBeNull = shouldBe(null)
   }
 
   def collectOutput(action: => Unit) = {

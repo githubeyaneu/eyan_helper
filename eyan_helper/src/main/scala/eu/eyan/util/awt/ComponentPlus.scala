@@ -27,7 +27,6 @@ import eu.eyan.util.java.beans.BeansPlus
 import java.beans.PropertyChangeEvent
 import eu.eyan.util.awt.dnd.DndPlus
 import java.awt.dnd.DropTarget
-import eu.eyan.util.awt.dnd.DnD_FileDropTarget
 import java.io.File
 import java.awt.dnd.DnDConstants
 import java.awt.datatransfer.DataFlavor
@@ -201,61 +200,12 @@ object ComponentPlus {
     def onPropertyChangeEvent(propertyName: String, action: PropertyChangeEvent => Unit) = { component.addPropertyChangeListener(propertyName, BeansPlus.onPropertyChange(action)); component }
 
     //////////////////////////////////////////    DND Listeners     //////////////////////////////////////////
-    def onDragEnter(action: => Unit) = onDragEnterEvent { e => action }
-    def onDragEnterEvent(action: DropTargetDragEvent => Unit) = { DndPlus.onDragEnter(component, action); component }
-
-    def onDragOver(action: => Unit) = onDragOverEvent { e => action }
-    def onDragOverEvent(action: DropTargetDragEvent => Unit) = { DndPlus.onDragOver(component, action); component }
-
-    def onDropActionChanged(action: => Unit) = onDropActionChangedEvent { e => action }
-    def onDropActionChangedEvent(action: DropTargetDragEvent => Unit) = { DndPlus.onDropActionChanged(component, action); component }
-
-    def onDragExit(action: => Unit) = onDragExitEvent { e => action }
-    def onDragExitEvent(action: DropTargetEvent => Unit) = { DndPlus.onDragExit(component, action); component }
-
-    def onDrop(action: => Unit) = onDropEvent { e => action }
-    def onDropEvent(action: DropTargetDropEvent => Unit) = { DndPlus.onDrop(component, action); component }
-
     def onDropFileEnabledDisabled(action: File => Unit) = onDropFile(file => { component.disabled; SwingPlus.runInWorker(action(file), component.enabled) })
 
-    def onDropFile(action: File => Unit) = {
-      onDropEvent { evt =>
-        this.synchronized {
-          try {
-            evt.acceptDrop(DnDConstants.ACTION_COPY)
-            val transferable = evt.getTransferable()
-            val transferData = transferable.getTransferData(DataFlavor.javaFileListFlavor)
-            val droppedFiles = transferData.asInstanceOf[java.util.List[File]]
-            if (droppedFiles != null && !droppedFiles.isEmpty()) {
-              val file = droppedFiles.get(droppedFiles.size() - 1);
-              action(file);
-            }
-          } catch {
-            case ex: Exception => Log.error(ex); ex.printStackTrace
-          }
-        }
-      }
-      component
-    }
-
-    def onDropString(action: String => Unit) = {
-      onDropEvent { evt =>
-        this.synchronized {
-          try {
-            evt.acceptDrop(DnDConstants.ACTION_COPY)
-            val transferable = evt.getTransferable()
-            val transferData = transferable.getTransferData(DataFlavor.plainTextFlavor)
-            val reader = transferData.asInstanceOf[StringReader]
-            val array = new Array[Char](100)
-            reader.read(array)
-            action(new String(array))
-          } catch {
-            case ex: Exception => Log.error(ex); ex.printStackTrace
-          }
-        }
-      }
-      component
-    }
+    def onDropFile(action: File => Unit) = { DndPlus.onDropFile(component, action); component }
+    def onDropFiles(action: List[File] => Unit) = { DndPlus.onDropFiles(component, action); component }
+    def onDropString(action: String => Unit) = { DndPlus.onDropString(component, action); component }
+    //TODO implement other DND Flavors...
 
     def window = SwingUtilities.windowForComponent(component)
 
@@ -268,8 +218,5 @@ object ComponentPlus {
     def parentPath: String = if (component.getParent != null) component.getParent.componentPath + component.getParent.asInstanceOf[Container].getComponents.indexOf(component) else ""
 
     def componentPath: String = parentPath + "/" + component.getClass.getSimpleName + "." + component.getName
-
-    // TODO implement file list and...
-    //TODO implement other DND Flavors...
   }
 }

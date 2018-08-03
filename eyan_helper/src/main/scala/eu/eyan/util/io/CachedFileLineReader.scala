@@ -12,19 +12,30 @@ import eu.eyan.log.Log
 import eu.eyan.util.collection.MapsPlus
 import java.io.Closeable
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
+import scala.collection.mutable.ListBuffer
 
 object CachedFileLineReader {
-  def apply(file: String) =  new CachedFileLineReader().load(file.asFile)
+  def apply(file: String) = new CachedFileLineReader().load(file.asFile)
   def apply(file: File) = new CachedFileLineReader().load(file)
+  def apply() = new CachedFileLineReader()
 }
 
 class CachedFileLineReader extends Iterable[String] with Closeable {
 
   private val LINE_COUNT_EARLY_READ = 100
   // FIXME dont use java
-  protected var lineOffsets: java.util.List[Array[Long]] = new java.util.ArrayList()
+  //		  protected var lineOffsets: java.util.List[Array[Long]] = new java.util.ArrayList()
+  protected val lineOffsets = ListBuffer[Array[Long]]() // TODO make it immutable
+  def getLineOffsets = lineOffsets // FIMXE getter for java? for sortable  
+  def getLineOffsets(idx:Int) = lineOffsets(idx) // FIMXE getter for java? for sortable
+  def setLineOffsets(list: Array[Array[Long]]) = {
+    lineOffsets.clear
+    lineOffsets ++= list
+  }
+  
   // FIXME dont use java
   protected val lineCache: java.util.Map[Int, String] = MapsPlus.newMaxSizeHashMap(Runtime.getRuntime().availableProcessors() * LINE_COUNT_EARLY_READ)
+  // protected val lineCache = MapsPlus.newMaxSizeMutableMap[Int, String](Runtime.getRuntime().availableProcessors() * LINE_COUNT_EARLY_READ) // FIXME: this makes test errors immutable too... 
   val NL = "\r\n"
 
   private var fileChannel: FileChannel = null
@@ -33,8 +44,8 @@ class CachedFileLineReader extends Iterable[String] with Closeable {
   private var fileLength: Long = -1
 
   private def readFromFile(index: Int) = {
-    val start = lineOffsets.get(index)(0)
-    val end = lineOffsets.get(index)(1)
+    val start = lineOffsets(index)(0) // FIXME slow
+    val end = lineOffsets(index)(1) // FIXME slow
     val byteBuffer = ByteBuffer.allocate(Math.toIntExact(end - start))
     fileChannel.read(byteBuffer, start)
     val line = new String(byteBuffer.array, Charset.forName("UTF-8"))
@@ -54,7 +65,7 @@ class CachedFileLineReader extends Iterable[String] with Closeable {
     lineCache.get(index)
   }
 
-  def load(file: File, loadFileProgressChangedEvent: Int => Unit = i=> {}) = {
+  def load(file: File, loadFileProgressChangedEvent: Int => Unit = i => {}) = {
     fileLength = file.length()
 
     Log.info("Loading " + file + " " + fileLength + " bytes")
@@ -73,9 +84,9 @@ class CachedFileLineReader extends Iterable[String] with Closeable {
           startOffset = lnr.readLine
           if (startOffset != -1) {
             endIndex = lnr.getOffset
-            lineOffsets.add(Array(startOffset, endIndex))
+            lineOffsets += (Array(startOffset, endIndex)) // immutable is very slow... try to find a fp version
             if (endIndex - startOffset > longestLineLength) {
-              longestLineIndex = lineOffsets.size() - 1
+              longestLineIndex = lineOffsets.size - 1
               longestLineLength = endIndex - startOffset
             }
           }
@@ -96,8 +107,7 @@ class CachedFileLineReader extends Iterable[String] with Closeable {
           Log.error("special characters brake the offsets: " + file.getAbsolutePath)
           Log.error("Length: " + fileLength + " endOffset:" + endIndex + NL + "Error at loading file. There are newline problems! ")
         }
-      }
-      catch {
+      } catch {
         case e: IOException => e.printStackTrace()
       }
     }
@@ -111,8 +121,7 @@ class CachedFileLineReader extends Iterable[String] with Closeable {
       lineCache.clear
       longestLine = ""
       fileLength = 0
-    }
-    catch {
+    } catch {
       case e: IOException => e.printStackTrace
     }
   }
@@ -142,7 +151,6 @@ class CachedFileLineReader extends Iterable[String] with Closeable {
       val m = Pattern.compile(pattern).matcher(first.get.replaceAll(NL, ""))
       m.matches
       m
-    }
-    else null
+    } else null
   }
 }

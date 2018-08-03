@@ -116,7 +116,7 @@ class GraphTest {
     empty_AB.vertices shouldContain "B"
     empty_AB.edges shouldBe nonEmpty
     empty_AB.edges shouldHaveSize 1
-    empty_AB.edges shouldContain GraphEdgeUndirected("A", "B") // FIXME: GraphEdgeUndirected is implementation, use trait functions instead if possible(?)
+    empty_AB.edges shouldContain GraphEdgeUndirected("A", "B")
     empty_AB.edges shouldContain GraphEdgeUndirected("B", "A")
     empty_AB shouldNotBeEqualTo ab
 
@@ -127,7 +127,7 @@ class GraphTest {
     a_AB.vertices shouldContain "B"
     a_AB.edges shouldBe nonEmpty
     a_AB.edges shouldHaveSize 1
-    a_AB.edges shouldContain GraphEdgeUndirected("A", "B") // FIXME: GraphEdgeUndirected is implementation, use trait functions instead if possible(?)
+    a_AB.edges shouldContain GraphEdgeUndirected("A", "B") 
     a_AB.edges shouldContain GraphEdgeUndirected("B", "A")
     a_AB shouldNotBeEqualTo ab
 
@@ -168,7 +168,7 @@ class GraphTest {
     empty_AB.vertices shouldContain "B"
     empty_AB.edges shouldBe nonEmpty
     empty_AB.edges shouldHaveSize 1
-    empty_AB.edges shouldContain GraphEdgeDirected("A", "B") // FIXME: GraphEdgeUndirected is implementation, use trait functions instead if possible(?)
+    empty_AB.edges shouldContain GraphEdgeDirected("A", "B") 
     empty_AB.edges shouldNotContain GraphEdgeDirected("B", "A")
     empty_AB shouldNotBeEqualTo ab
 
@@ -179,7 +179,7 @@ class GraphTest {
     a_AB.vertices shouldContain "B"
     a_AB.edges shouldBe nonEmpty
     a_AB.edges shouldHaveSize 1
-    a_AB.edges shouldContain GraphEdgeDirected("A", "B") // FIXME: GraphEdgeUndirected is implementation, use trait functions instead if possible(?)
+    a_AB.edges shouldContain GraphEdgeDirected("A", "B")
     a_AB shouldNotBeEqualTo ab
 
     val ab_AB = ab.addDirectedEdge("A", "B")

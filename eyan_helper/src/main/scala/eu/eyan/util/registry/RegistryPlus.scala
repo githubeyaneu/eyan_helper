@@ -39,10 +39,13 @@ object RegistryPlus extends App {
   def read(key: String, name: String): String = {
     Log.debug(s"HKEY_CURRENT_USER, $keyRoot\\$key, $name")
     val valueHex = filterJavaBugErrorLines { WinRegistry.readString(hkey, s"$keyRoot\\$key", name, wow) }
+    Log.debug(s"valueHex=$valueHex")
     val value =
-      try { valueHex.toHexDecode }
-      catch { case t: Throwable => { Log.error("error converting from hex"); valueHex } }
-    Log.debug(s"$valueHex $value")
+      if (valueHex == null || valueHex== "") valueHex
+      else
+        try { valueHex.toHexDecode }
+        catch { case t: Throwable => { Log.error(s"error converting from hex valueHex=$valueHex", t); valueHex } }
+    Log.debug(s"value=$value")
     value
   }
 

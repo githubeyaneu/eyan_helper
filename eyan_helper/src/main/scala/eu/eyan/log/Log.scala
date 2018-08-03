@@ -94,7 +94,7 @@ object Log {
   
   val allLogs = MutableList[Log]() // TODO Memory leak, make fixed list / fixed size
   def saveLog(log: Log) = allLogs += log 
-  def getAllLogs = allLogs.map(logToConsoleText).mkString("\r\n") 
+  def getAllLogs = List(allLogs: _*)
 }
 
 abstract class LogLevel(val prio: Int) {
