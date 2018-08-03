@@ -25,7 +25,25 @@ class FileLineStartOffsetReader private (file: String, bufferSize: Int) extends 
 
   def getOffset = offset
 
-  override def close() = fis.close
+  /**
+   * TODO: this should be only used, the readline and get should not...
+   * @param progress
+   * @return
+   */
+  def iterator(progress: (Int, Long, Long) => Unit) = new Iterator[Array[Long]] {
+    var index = 0
+    var startOffset = readLine
+    def hasNext: Boolean = startOffset != -1
+    def next(): Array[Long] = {
+      val ret = Array(startOffset, offset)
+      progress(index, startOffset, offset)
+      index += 1
+      startOffset = readLine
+      ret
+    }
+  }
+
+  override def close = fis.close
 
   /**
    * @return start offset from the line. After calling this method the end
@@ -55,15 +73,13 @@ class FileLineStartOffsetReader private (file: String, bufferSize: Int) extends 
           offset += nextLineLength
           nextLineLength = 0
           result = ret
-        }
-        else if (lastChar == '\r') {
+        } else if (lastChar == '\r') {
           val ret = offset
           offset += nextLineLength
           nextLineLength = 1
           lastChar = nextChar
           result = ret
-        }
-        else {
+        } else {
           nextLineLength += 1
           lastChar = nextChar
         }

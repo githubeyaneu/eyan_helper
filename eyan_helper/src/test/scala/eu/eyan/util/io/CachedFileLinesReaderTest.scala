@@ -98,12 +98,16 @@ class CachedFileLinesReaderTest() {
   }
 
   @Test
-  def test_Size_100000Lines = {
-    writeFileLines(1000000, false)
-    cachedFileLineReader.load(file, null)
-    assertThat(cachedFileLineReader.size).isEqualTo(1000000)
+  def test_Size_1M_Lines = {
+    val SIZE = 10000000
+    writeFileLines(SIZE, false)
+    println("create complete")
     
-    for(i<-1 to 1000000) cachedFileLineReader.get(i)
+    cachedFileLineReader.load(file, null)
+    println("load complete")
+    assertThat(cachedFileLineReader.size).isEqualTo(SIZE)
+    
+    for(i<-1 to SIZE) cachedFileLineReader.get(i)
   }
 
   @Test

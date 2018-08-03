@@ -13,6 +13,8 @@ import eu.eyan.util.collection.MapsPlus
 import java.io.Closeable
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
 import scala.collection.mutable.ListBuffer
+import eu.eyan.util.scala.Try
+import eu.eyan.util.scala.TryFinallyClose
 
 object CachedFileLineReader {
   def apply(file: String) = new CachedFileLineReader().load(file.asFile)
@@ -23,25 +25,19 @@ object CachedFileLineReader {
 class CachedFileLineReader extends Iterable[String] with Closeable {
 
   private val LINE_COUNT_EARLY_READ = 100
-  // FIXME dont use java
-  //		  protected var lineOffsets: java.util.List[Array[Long]] = new java.util.ArrayList()
-  protected val lineOffsets = ListBuffer[Array[Long]]() // TODO make it immutable
+  protected var lineOffsets = Vector[Array[Long]]() // TODO make it immutable
   def getLineOffsets = lineOffsets // FIMXE getter for java? for sortable  
-  def getLineOffsets(idx:Int) = lineOffsets(idx) // FIMXE getter for java? for sortable
-  def setLineOffsets(list: Array[Array[Long]]) = {
-    lineOffsets.clear
-    lineOffsets ++= list
-  }
-  
+  def getLineOffsets(idx: Int) = lineOffsets(idx) // FIMXE getter for java? for sortable
+
   // FIXME dont use java
   protected val lineCache: java.util.Map[Int, String] = MapsPlus.newMaxSizeHashMap(Runtime.getRuntime().availableProcessors() * LINE_COUNT_EARLY_READ)
+  // FIXME must be thread safe!
   // protected val lineCache = MapsPlus.newMaxSizeMutableMap[Int, String](Runtime.getRuntime().availableProcessors() * LINE_COUNT_EARLY_READ) // FIXME: this makes test errors immutable too... 
   val NL = "\r\n"
 
   private var fileChannel: FileChannel = null
   private var fileInputStream: FileInputStream = null
   private var longestLine = ""
-  private var fileLength: Long = -1
 
   private def readFromFile(index: Int) = {
     val start = lineOffsets(index)(0) // FIXME slow
@@ -54,76 +50,57 @@ class CachedFileLineReader extends Iterable[String] with Closeable {
 
   def get(index: Int) = {
     val line = lineCache.get(index)
-    if (line == null) {
-      try lineOffsets.synchronized {
-        for { i <- index until index + LINE_COUNT_EARLY_READ if i < lineOffsets.size } lineCache.put(i, readFromFile(i))
-      }
-      catch {
-        case e: IOException => Log.error(e)
-      }
+    if (line == null) Try
+    lineOffsets.synchronized {
+      for { i <- index until index + LINE_COUNT_EARLY_READ if i < lineOffsets.size } lineCache.put(i, readFromFile(i))
     }
+
     lineCache.get(index)
   }
 
   def load(file: File, loadFileProgressChangedEvent: Int => Unit = i => {}) = {
-    fileLength = file.length()
+    val fileLength = file.length
 
     Log.info("Loading " + file + " " + fileLength + " bytes")
 
-    val lnr = FileLineStartOffsetReader(file)
-    var endIndex = 0L
-    var startOffset = 0L
     var progressPercent = 0L
     var longestLineIndex = 0
     var longestLineLength = 0L
+    var endIndex = 0L
 
-    lineOffsets.synchronized {
-      lineOffsets.clear
-      try {
-        while (startOffset != -1) {
-          startOffset = lnr.readLine
-          if (startOffset != -1) {
-            endIndex = lnr.getOffset
-            lineOffsets += (Array(startOffset, endIndex)) // immutable is very slow... try to find a fp version
-            if (endIndex - startOffset > longestLineLength) {
-              longestLineIndex = lineOffsets.size - 1
-              longestLineLength = endIndex - startOffset
-            }
-          }
-
-          val newProgressPercent = if (fileLength == 0) 100 else endIndex * 100 / fileLength
-          if (progressPercent != newProgressPercent && loadFileProgressChangedEvent != null) {
-            loadFileProgressChangedEvent(Math.toIntExact(newProgressPercent))
-            progressPercent = newProgressPercent
-          }
-        }
-        lnr.close
-
-        fileInputStream = new FileInputStream(file)
-        fileChannel = fileInputStream.getChannel()
-        longestLine = get(longestLineIndex);
-        if (fileLength != endIndex) {
-          // special characters brake the offsets
-          Log.error("special characters brake the offsets: " + file.getAbsolutePath)
-          Log.error("Length: " + fileLength + " endOffset:" + endIndex + NL + "Error at loading file. There are newline problems! ")
-        }
-      } catch {
-        case e: IOException => e.printStackTrace()
+    //TODO exchange to observable
+    def readerCallback(index: Int, startOffset: Long, endOffset: Long) = {
+      if (endOffset - startOffset > longestLineLength) {
+        longestLineIndex = index
+        longestLineLength = endOffset - startOffset
       }
+      val newProgressPercent = if (fileLength == 0) 100 else endOffset * 100 / fileLength
+      if (progressPercent != newProgressPercent && loadFileProgressChangedEvent != null) {
+        loadFileProgressChangedEvent(Math.toIntExact(newProgressPercent))
+        progressPercent = newProgressPercent
+      }
+      endIndex = endOffset
     }
+
+    TryFinallyClose(FileLineStartOffsetReader(file), { lnr: FileLineStartOffsetReader => { lineOffsets = lnr.iterator(readerCallback).toVector } })
+
+    fileInputStream = new FileInputStream(file)
+    fileChannel = fileInputStream.getChannel()
+    longestLine = get(longestLineIndex);
+    if (fileLength != endIndex) {
+      // special characters brake the offsets
+      Log.error("special characters brake the offsets: " + file.getAbsolutePath)
+      Log.error("Length: " + fileLength + " endOffset:" + endIndex + NL + "Error at loading file. There are newline problems! ")
+    }
+
     this
   }
 
-  def close = {
-    try {
-      CloseablePlus.closeQuietly(fileInputStream, fileChannel)
-      lineOffsets.clear
-      lineCache.clear
-      longestLine = ""
-      fileLength = 0
-    } catch {
-      case e: IOException => e.printStackTrace
-    }
+  def close = Try {
+    CloseablePlus.closeQuietly(fileInputStream, fileChannel)
+    lineOffsets = Vector[Array[Long]]()
+    lineCache.clear
+    longestLine = ""
   }
 
   def getLongestLine = longestLine
