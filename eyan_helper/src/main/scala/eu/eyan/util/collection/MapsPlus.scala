@@ -37,7 +37,7 @@ object MapsPlus {
 
   def newMaxSizeImmutableMap[K, V](maxSize: Int): Map[K, V] = new Map[K, V] {
     var map = Map[K, V]()
-    var keysOfMap = List[K]()
+    var keysOfMap = List[K]() /// TODO SLOW
 
     def +[V1 >: V](kv: (K, V1)): scala.collection.immutable.Map[K, V1] = {
       keysOfMap = keysOfMap :+ kv._1

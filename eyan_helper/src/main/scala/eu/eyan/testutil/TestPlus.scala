@@ -45,6 +45,16 @@ trait TestPlus {
     def <==(actual: => Unit) = expect(expectedThrowable, actual)
   }
 
+  implicit class IntTestImpicit[T <: Int](actual: T) {
+    def shouldBeLessThan(msg: String, other: Int) = assertThat(actual).as(msg).isLessThan(other)
+    def shouldBeMoreThan(msg: String, other: Int) = assertThat(actual).as(msg).isGreaterThan(other)
+  }
+
+  implicit class LongTestImpicit[T <: Long](actual: T) {
+    def shouldBeLessThan(msg: String, other: Long) = assertThat(actual).as(msg).isLessThan(other)
+    def shouldBeMoreThan(msg: String, other: Long) = assertThat(actual).as(msg).isGreaterThan(other)
+  }
+
   implicit class AnyTestImpicit[T <: Any](actual: T) {
     /** assertThat(left).isEqualTo(right) */
     def ==>(expected: Any) = assertThat(actual).isEqualTo(expected)

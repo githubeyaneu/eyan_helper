@@ -25,34 +25,58 @@ object CachedFileLineReader {
 class CachedFileLineReader extends Iterable[String] with Closeable {
 
   private val LINE_COUNT_EARLY_READ = 100
-  protected var lineOffsets = Vector[Array[Long]]() // TODO make it immutable
-  def getLineOffsets = lineOffsets // FIMXE getter for java? for sortable  
+  protected var lineOffsets = Vector[Array[Long]]()
+  var longestLineIndex = 0
+
+  def getLineOffsets = lineOffsets // FIMXE getter for java? for sortable
   def getLineOffsets(idx: Int) = lineOffsets(idx) // FIMXE getter for java? for sortable
 
-  // FIXME dont use java
-  protected val lineCache: java.util.Map[Int, String] = MapsPlus.newMaxSizeHashMap(Runtime.getRuntime().availableProcessors() * LINE_COUNT_EARLY_READ)
   // FIXME must be thread safe!
-  // protected val lineCache = MapsPlus.newMaxSizeMutableMap[Int, String](Runtime.getRuntime().availableProcessors() * LINE_COUNT_EARLY_READ) // FIXME: this makes test errors immutable too... 
+  protected val lineCache = MapsPlus.newMaxSizeMutableMap[Int, String](Runtime.getRuntime().availableProcessors() * LINE_COUNT_EARLY_READ) // FIXME: this makes test errors immutable too...
+//  protected var lineCache = MapsPlus.newMaxSizeImmutableMap[Int, String](Runtime.getRuntime().availableProcessors() * LINE_COUNT_EARLY_READ) // FIXME: this makes test errors immutable too...
   val NL = "\r\n"
 
   private var fileChannel: FileChannel = null
   private var fileInputStream: FileInputStream = null
-  private var longestLine = ""
 
   private def readFromFile(index: Int) = {
-    val start = lineOffsets(index)(0) // FIXME slow
-    val end = lineOffsets(index)(1) // FIXME slow
-    val byteBuffer = ByteBuffer.allocate(Math.toIntExact(end - start))
-    fileChannel.read(byteBuffer, start)
-    val line = new String(byteBuffer.array, Charset.forName("UTF-8"))
+    val startEnd = getLineStartEnd(index)
+    val start = startEnd(0)
+    val end = startEnd(1)
+    val byteBuffer = allocateBuffer(start, end)
+    fileChannelRead(byteBuffer, start)
+    val line = createLine(byteBuffer)
     line
   }
 
+  private def readFromFile(startLineIndex: Int, endLineIndex: Int) = {
+    val lastIndex = Math.min(endLineIndex, lineOffsets.size - 1)
+    val start = getLineStartEnd(startLineIndex)(0)
+    val end = getLineStartEnd(lastIndex)(1)
+
+    val byteBuffer = allocateBuffer(start, end)
+    fileChannelRead(byteBuffer, start)
+    val linesArray = byteBuffer.array
+    val lines = for (index <- startLineIndex to lastIndex) yield {
+      val lineArray = linesArray.slice((lineOffsets(index)(0) - start).toInt, (lineOffsets(index)(1) - start).toInt)
+      val line = createLine(lineArray)
+      (index, line)
+    }
+    lines
+  }
+
+  def getLineStartEnd(index: Int) = lineOffsets(index) // FIXME slow ?
+  def allocateBuffer(start: Long, end: Long) = ByteBuffer.allocate(Math.toIntExact(end - start))
+  def fileChannelRead(byteBuffer: ByteBuffer, start: Long) = fileChannel.read(byteBuffer, start)
+  def createLine(byteBuffer: ByteBuffer): String = createLine(byteBuffer.array)
+  def createLine(array: Array[Byte]) = new String(array, Charset.forName("UTF-8"))
+
   def get(index: Int) = {
     val line = lineCache.get(index)
-    if (line == null) Try
-    lineOffsets.synchronized {
-      for { i <- index until index + LINE_COUNT_EARLY_READ if i < lineOffsets.size } lineCache.put(i, readFromFile(i))
+    if (line.isEmpty) Try {
+      lineOffsets.synchronized {
+        lineCache ++= readFromFile(index, index + 1 + LINE_COUNT_EARLY_READ)
+      }
     }
 
     lineCache.get(index)
@@ -64,7 +88,6 @@ class CachedFileLineReader extends Iterable[String] with Closeable {
     Log.info("Loading " + file + " " + fileLength + " bytes")
 
     var progressPercent = 0L
-    var longestLineIndex = 0
     var longestLineLength = 0L
     var endIndex = 0L
 
@@ -86,7 +109,6 @@ class CachedFileLineReader extends Iterable[String] with Closeable {
 
     fileInputStream = new FileInputStream(file)
     fileChannel = fileInputStream.getChannel()
-    longestLine = get(longestLineIndex);
     if (fileLength != endIndex) {
       // special characters brake the offsets
       Log.error("special characters brake the offsets: " + file.getAbsolutePath)
@@ -100,10 +122,9 @@ class CachedFileLineReader extends Iterable[String] with Closeable {
     CloseablePlus.closeQuietly(fileInputStream, fileChannel)
     lineOffsets = Vector[Array[Long]]()
     lineCache.clear
-    longestLine = ""
   }
 
-  def getLongestLine = longestLine
+  def getLongestLine = get(longestLineIndex)
 
   override def size = lineOffsets.synchronized { lineOffsets.size }
 
@@ -115,7 +136,7 @@ class CachedFileLineReader extends Iterable[String] with Closeable {
       if (lineOffsets.size != 0) Log.debug("Line " + (index + 1) + " " + (100 * (index + 1) / lineOffsets.size) + "%")
       val line = get(index)
       index += 1
-      line
+      line.get
     }
   }
 

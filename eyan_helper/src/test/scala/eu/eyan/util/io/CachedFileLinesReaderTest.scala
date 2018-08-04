@@ -13,9 +13,11 @@ import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 
 import eu.eyan.testutil.ScalaEclipseJunitRunner
+import eu.eyan.util.time.TimeCounter._
+import eu.eyan.testutil.TestPlus
 
 @RunWith(classOf[ScalaEclipseJunitRunner])
-class CachedFileLinesReaderTest() {
+class CachedFileLinesReaderTest() extends TestPlus {
 
   val _folder = new TemporaryFolder
   @Rule def folder = _folder
@@ -71,7 +73,7 @@ class CachedFileLinesReaderTest() {
   def test_getLongestLine = {
     writeFileLines(11, false)
     cachedFileLineReader.load(file, null)
-    assertThat(cachedFileLineReader.getLongestLine).isEqualTo("line10\r\n")
+    cachedFileLineReader.getLongestLine ==> Some("line10\r\n")
   }
 
   @Test
@@ -94,38 +96,39 @@ class CachedFileLinesReaderTest() {
     cachedFileLineReader.load(file, null)
     cachedFileLineReader.load(file, null)
     assertThat(cachedFileLineReader.size).isEqualTo(1)
-    assertThat(cachedFileLineReader.get(0)).isEqualTo("line1\r\n")
+    assertThat(cachedFileLineReader.get(0).get).isEqualTo("line1\r\n")
   }
 
   @Test
   def test_Size_1M_Lines = {
-    val SIZE = 10000000
+    val SIZE = 1 * 1000 * 1000
     writeFileLines(SIZE, false)
-    println("create complete")
-    
-    cachedFileLineReader.load(file, null)
+    println("create complete " + (file.length / 1000 / 1000) + " MB")
+
+    millisecsOf { cachedFileLineReader.load(file, null) } shouldBeLessThan ("Loading file execution time", 1000)
+
     println("load complete")
     assertThat(cachedFileLineReader.size).isEqualTo(SIZE)
-    
-    for(i<-1 to SIZE) cachedFileLineReader.get(i)
+
+    millisecsOf { for (i <- 0 until SIZE) cachedFileLineReader.get(i) } shouldBeLessThan ("Reading file execution time", 1000)
   }
 
   @Test
   def test_Get_empty = {
     writeFile("")
     cachedFileLineReader.load(file, null)
-    assertThat(cachedFileLineReader.get(0)).isNull
-    assertThat(cachedFileLineReader.get(10)).isNull
+    cachedFileLineReader.get(0) ==> None
+    cachedFileLineReader.get(10) ==> None
   }
 
   @Test
   def test_Get = {
     writeFileLines(10000, false)
     cachedFileLineReader.load(file, null)
-    assertThat(cachedFileLineReader.get(0)).isEqualTo("line1\r\n")
-    assertThat(cachedFileLineReader.get(1)).isEqualTo("line2\r\n")
-    assertThat(cachedFileLineReader.get(999)).isEqualTo("line1000\r\n")
-    assertThat(cachedFileLineReader.get(1000000)).isNull
+    assertThat(cachedFileLineReader.get(0).get).isEqualTo("line1\r\n")
+    assertThat(cachedFileLineReader.get(1).get).isEqualTo("line2\r\n")
+    assertThat(cachedFileLineReader.get(999).get).isEqualTo("line1000\r\n")
+    cachedFileLineReader.get(1000000) ==> None
   }
 
   @Test
@@ -133,10 +136,10 @@ class CachedFileLinesReaderTest() {
     writeFileLines(10000, false)
     val channel = new RandomAccessFile(file, "rw").getChannel()
     cachedFileLineReader.load(file, null)
-    assertThat(cachedFileLineReader.get(0)).isEqualTo("line1\r\n")
+    cachedFileLineReader.get(0) ==> Some("line1\r\n")
 
     channel.lock()
-    assertThat(cachedFileLineReader.get(999)).isNull
+    cachedFileLineReader.get(999) ==> None
     channel.close()
   }
 
@@ -146,7 +149,6 @@ class CachedFileLinesReaderTest() {
     cachedFileLineReader.load(file, null)
     val iterator = cachedFileLineReader.iterator
     assertThat(iterator.hasNext).isFalse
-    assertThat(iterator.next).isNull
   }
 
   @Test
@@ -159,7 +161,6 @@ class CachedFileLinesReaderTest() {
     assertThat(iterator.hasNext).isTrue
     assertThat(iterator.next).isEqualTo("line2\r\n")
     assertThat(iterator.hasNext).isFalse
-    assertThat(iterator.next).isNull
   }
 
   @Test
@@ -177,7 +178,7 @@ class CachedFileLinesReaderTest() {
     file = folder.newFile
     val writer: PrintWriter = new PrintWriter(file)
 
-    for {i <- 1 to numberOfLines} {
+    for { i <- 1 to numberOfLines } {
       val line = if (sameLineLength)
         "line" + "%09d".format(i) + "\r\n"
       else
