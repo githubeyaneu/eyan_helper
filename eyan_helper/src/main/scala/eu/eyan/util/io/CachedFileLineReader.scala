@@ -9,12 +9,13 @@ import java.nio.charset.Charset
 import java.util.regex.Pattern
 
 import eu.eyan.log.Log
-import eu.eyan.util.collection.MapsPlus
+import eu.eyan.util.collection.MapsPlus._
 import java.io.Closeable
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
 import scala.collection.mutable.ListBuffer
 import eu.eyan.util.scala.Try
 import eu.eyan.util.scala.TryFinallyClose
+import eu.eyan.util.java.lang.RuntimePlus._
 
 object CachedFileLineReader {
   def apply(file: String) = new CachedFileLineReader().load(file.asFile)
@@ -32,8 +33,8 @@ class CachedFileLineReader extends Iterable[String] with Closeable {
   def getLineOffsets(idx: Int) = lineOffsets(idx) // FIMXE getter for java? for sortable
 
   // FIXME must be thread safe!
-  protected val lineCache = MapsPlus.newMaxSizeMutableMap[Int, String](Runtime.getRuntime().availableProcessors() * LINE_COUNT_EARLY_READ) // FIXME: this makes test errors immutable too...
-//  protected var lineCache = MapsPlus.newMaxSizeImmutableMap[Int, String](Runtime.getRuntime().availableProcessors() * LINE_COUNT_EARLY_READ) // FIXME: this makes test errors immutable too...
+//  private val lineCache = maxSizeMutableMap[Int, String](availableProcessors * LINE_COUNT_EARLY_READ) 
+  private var lineCache = maxSizeImmutableMap[Int, String](availableProcessors * LINE_COUNT_EARLY_READ) 
   val NL = "\r\n"
 
   private var fileChannel: FileChannel = null
@@ -83,6 +84,7 @@ class CachedFileLineReader extends Iterable[String] with Closeable {
   }
 
   def load(file: File, loadFileProgressChangedEvent: Int => Unit = i => {}) = {
+    close
     val fileLength = file.length
 
     Log.info("Loading " + file + " " + fileLength + " bytes")
@@ -121,7 +123,7 @@ class CachedFileLineReader extends Iterable[String] with Closeable {
   def close = Try {
     CloseablePlus.closeQuietly(fileInputStream, fileChannel)
     lineOffsets = Vector[Array[Long]]()
-    lineCache.clear
+    lineCache = Map()
   }
 
   def getLongestLine = get(longestLineIndex)

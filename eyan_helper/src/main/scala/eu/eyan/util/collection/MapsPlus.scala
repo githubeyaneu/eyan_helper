@@ -4,16 +4,11 @@ import scala.collection.mutable.MutableList
 import scala.collection.mutable.ListBuffer
 
 object MapsPlus {
-  // FIXME delete java
-  def newMaxSizeHashMap[K, V](maxSize: Int): java.util.Map[K, V] = new java.util.LinkedHashMap[K, V](maxSize) {
-    override def removeEldestEntry(eldest: java.util.Map.Entry[K, V]) = size() > maxSize
-  }
+  def maxSizeMutableMap[K, V](maxSize: Int) = new scala.collection.mutable.Map[K, V] {
+    private val map = scala.collection.mutable.Map[K, V]()
+    private val keysOfMap = ListBuffer[K]()
 
-  def newMaxSizeMutableMap[K, V](maxSize: Int): scala.collection.mutable.Map[K, V] = new scala.collection.mutable.Map[K, V] {
-    var map = scala.collection.mutable.Map[K, V]()
-    var keysOfMap = ListBuffer[K]()
-
-    def +=(kv: (K, V)) = {
+    def +=(kv: (K, V)) = map.synchronized {
       keysOfMap += kv._1
       if (keysOfMap.size > maxSize) {
         val keyToRemove = keysOfMap.head
@@ -24,40 +19,35 @@ object MapsPlus {
       this
     }
 
-    def get(key: K): Option[V] = map.get(key)
+    def get(key: K): Option[V] = map.synchronized { map.get(key) }
 
-    def iterator: Iterator[(K, V)] = map.iterator
+    def iterator: Iterator[(K, V)] = map.synchronized { map.iterator }
 
-    def -=(key: K) = {
+    def -=(key: K) = map.synchronized {
       keysOfMap -= key
       map -= key
       this
     }
   }
 
-  def newMaxSizeImmutableMap[K, V](maxSize: Int): Map[K, V] = new Map[K, V] {
-    var map = Map[K, V]()
-    var keysOfMap = List[K]() /// TODO SLOW
+  def maxSizeImmutableMap[K, V](
+    maxSize: Int, myMap: Map[K, V] = Map[K, V](), keysOfMap: List[K] = List[K]()): Map[K, V] = new Map[K, V] {
 
     def +[V1 >: V](kv: (K, V1)): scala.collection.immutable.Map[K, V1] = {
-      keysOfMap = keysOfMap :+ kv._1
-      if (keysOfMap.size > maxSize) {
-        val keyToRemove = keysOfMap.head
-        keysOfMap = keysOfMap.tail
-        map -= keyToRemove
-      }
-      map = map.updated(kv._1, kv._2.asInstanceOf[V])
-      this
+      val newKeys = if (keysOfMap.size == maxSize) keysOfMap.tail :+ kv._1
+      else keysOfMap :+ kv._1
+
+      val newMap = if (keysOfMap.size == maxSize) myMap - keysOfMap.head + kv
+      else myMap + kv
+
+      maxSizeImmutableMap(maxSize, newMap, newKeys)
     }
 
-    def -(key: K): scala.collection.immutable.Map[K, V] = {
-      keysOfMap = keysOfMap.filter(_ == key)
-      map -= key
-      this
-    }
+    def -(key: K): scala.collection.immutable.Map[K, V] =
+      maxSizeImmutableMap(maxSize, myMap - key, keysOfMap.filter(_ == key))
 
-    def get(key: K): Option[V] = map.get(key)
+    def get(key: K): Option[V] = myMap.get(key)
 
-    def iterator: Iterator[(K, V)] = map.iterator
+    def iterator: Iterator[(K, V)] = myMap.iterator
   }
 }
