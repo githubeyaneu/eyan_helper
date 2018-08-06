@@ -3,10 +3,12 @@ package eu.eyan.util.time
 import eu.eyan.log.Log
 
 object TimeCounter {
-  def countAndPrint(msg: String)(action: => Unit) = {
-    val start = System.currentTimeMillis
+  def now = System.currentTimeMillis
+  def countAndPrint(msg: String)(action: => Unit) = Log.info(s"$msg ${millisecsOf(action)} ms") 
+
+  def millisecsOf(action: => Unit) = {
+    val start = now
     action
-    val dur = System.currentTimeMillis - start
-    Log.info(s"$msg $dur ms")
+    now - start
   }
 }

@@ -33,7 +33,18 @@ object TryCatchFinallyClose {
     } catch { case e: Throwable => errorAction(e) }
 }
 
-//TODO: create TryFinallyClose without Catch, return is Try[T]
+//TODO: create TESTS TryFinallyClose without Catch, return is Try[T]
+object TryFinallyClose {
+  /** closes (quietly) the closeable afterwards. */
+  def apply[T, CLOSEABLE <: Closeable](closeable: => CLOSEABLE, action: => CLOSEABLE => T) = {
+    val toClose = closeable
+    try {
+      Try(action(toClose))
+    } finally {
+      closeQuietly(toClose)
+    }
+  }
+}
 
 // use try{} finally {} instead. This has no really use.
 //object TryFinally { def apply[T](action: => T, finaly: => Unit) = TryCatchFinally[scala.util.Try[T]](Success(action), e => { Log.error(e); Failure(e) }, finaly) }
@@ -61,16 +72,16 @@ private class TryCatchFinally[T](action: => T, errorAction: => Throwable => T, f
   //    case Success(res) => res
   //    case Failure(t)   => errorAction(t)
   //  }
-    
+
 }
 
 object TryPlus {
-  implicit class TryPlusImplicit[FROM](tri: scala.util.Try[FROM]){
-    
+  implicit class TryPlusImplicit[FROM](tri: scala.util.Try[FROM]) {
+
     // TODO: write tests....
-    def mapWithErrorHandler[TO](mapper: FROM => TO, errorHandler: Throwable => Unit):scala.util.Try[TO] = {
+    def mapWithErrorHandler[TO](mapper: FROM => TO, errorHandler: Throwable => Unit): scala.util.Try[TO] = {
       tri match {
-        case Success(value) => TryCatchThrowable(Success(mapper(value)), t=>Failure(t))
+        case Success(value)     => TryCatchThrowable(Success(mapper(value)), t => Failure(t))
         case Failure(throwable) => Failure(throwable)
       }
     }

@@ -43,4 +43,6 @@ object RuntimePlus {
 		  process.waitFor
 		  process.exitValue
   }
+  
+  def availableProcessors = Runtime.getRuntime.availableProcessors
 }

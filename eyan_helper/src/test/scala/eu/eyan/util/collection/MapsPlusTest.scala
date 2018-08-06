@@ -42,7 +42,7 @@ class MapsPlusTest extends TestPlus {
 //  }
 
   @Test def maxSize_MutableMap = {
-    val map = MapsPlus.newMaxSizeMutableMap[String, String](2)
+    val map = MapsPlus.maxSizeMutableMap[String, String](2)
     map.size ==> 0
 
     map.put("", "0")
@@ -76,7 +76,7 @@ class MapsPlusTest extends TestPlus {
   }
 
   @Test def maxSize_ImmutableMap = {
-    var map = MapsPlus.newMaxSizeImmutableMap[String, String](2)
+    var map = MapsPlus.maxSizeImmutableMap[String, String](2)
     map.size ==> 0
 
     map = map + ("" -> "0")
