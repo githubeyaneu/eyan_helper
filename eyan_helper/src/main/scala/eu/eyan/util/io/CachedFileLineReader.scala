@@ -23,18 +23,21 @@ object CachedFileLineReader {
   def apply() = new CachedFileLineReader()
 }
 
-class CachedFileLineReader extends Iterable[String] with Closeable {
+//FIXME make it immutable so dont need synchronized around lineOffsets
+class CachedFileLineReader extends Closeable with Iterable[String] {
 
   private val LINE_COUNT_EARLY_READ = 100
   protected var lineOffsets = Vector[Array[Long]]()
   var longestLineIndex = 0
 
-  def getLineOffsets = lineOffsets // FIMXE getter for java? for sortable
-  def getLineOffsets(idx: Int) = lineOffsets(idx) // FIMXE getter for java? for sortable
+  protected def getLineOffsets = lineOffsets // FIMXE getter for java? for sortable
+  protected def getLineOffsets(idx: Int) = lineOffsets(idx) // FIMXE getter for java? for sortable
+  protected def setLineOffsets(newLineOffsets: Array[Array[Long]]) = lineOffsets = newLineOffsets.toVector // FIMXE getter for java? for sortable
 
   // FIXME must be thread safe!
-//  private val lineCache = maxSizeMutableMap[Int, String](availableProcessors * LINE_COUNT_EARLY_READ) 
-  private var lineCache = maxSizeImmutableMap[Int, String](availableProcessors * LINE_COUNT_EARLY_READ) 
+  private var lineCache = maxSizeImmutableMap[Int, String](availableProcessors * LINE_COUNT_EARLY_READ)
+  protected def getLineCache = lineCache // FIMXE getter for java? for sortable
+  protected def clearLineCache = lineCache = Map()
   val NL = "\r\n"
 
   private var fileChannel: FileChannel = null
@@ -123,17 +126,18 @@ class CachedFileLineReader extends Iterable[String] with Closeable {
   def close = Try {
     CloseablePlus.closeQuietly(fileInputStream, fileChannel)
     lineOffsets = Vector[Array[Long]]()
-    lineCache = Map()
+    clearLineCache
   }
 
   def getLongestLine = get(longestLineIndex)
 
   override def size = lineOffsets.synchronized { lineOffsets.size }
+  /** For iterable trait */
+  override def iterator = lines
 
-  def lines = iterator
-  def iterator = new Iterator[String] {
+  def lines = new Iterator[String] {
     private var index = 0
-    def hasNext = lineOffsets.synchronized { index < lineOffsets.size }
+    def hasNext = index < CachedFileLineReader.this.size
     def next = {
       if (lineOffsets.size != 0) Log.debug("Line " + (index + 1) + " " + (100 * (index + 1) / lineOffsets.size) + "%")
       val line = get(index)
@@ -143,9 +147,9 @@ class CachedFileLineReader extends Iterable[String] with Closeable {
   }
 
   def findFirst(pattern: String) = {
-    val matcher = Pattern.compile(pattern).matcher("")
-
-    val first = this.iterator.find(s => { matcher.reset(s.replaceAll(NL, "")); matcher.matches })
+    val patternMatcher = Pattern.compile(pattern).matcher("")
+    def patternMatches(line: String) = { patternMatcher.reset(line.replaceAll(NL, "")); patternMatcher.matches }
+    val first = this.lines.find(patternMatches)
 
     if (first.nonEmpty) {
       val m = Pattern.compile(pattern).matcher(first.get.replaceAll(NL, ""))

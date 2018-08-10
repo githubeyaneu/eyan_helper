@@ -49,7 +49,7 @@ class AutocompleteDecorator(component: JTextComponent) {
     event.getKeyCode match {
       case KeyEvent.VK_DOWN   => selectNextInList
       case KeyEvent.VK_UP     => selectPreviousInList
-      case KeyEvent.VK_ENTER  => selectTextFromList()
+      case KeyEvent.VK_ENTER  => selectTextFromList
       case KeyEvent.VK_ESCAPE => hidePopup
       case _                  => showPopUp
     }
@@ -66,7 +66,8 @@ class AutocompleteDecorator(component: JTextComponent) {
     }
   })
 
-  private def selectTextFromList: () => Unit = () => {
+  private def selectTextFromList:Unit = {
+    println("select")
     if (popup.isVisible && isListEnabled && NO_SELECTION < autocompleteList.getSelectedIndex) component.setText(autocompleteList.getSelectedValue)
     hidePopup
   }

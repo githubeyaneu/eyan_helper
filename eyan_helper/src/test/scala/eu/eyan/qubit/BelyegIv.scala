@@ -1,7 +1,7 @@
-package eu.eyan.graph
+package eu.eyan.qubit
 
-import org.junit.Test
 import eu.eyan.graph.impl.GraphImplSimple
+import eu.eyan.graph.Graphs
 
 /**
  * https://qubit.hu/2018/03/26/esz-ventura-fel-tudod-darabolni-virtualisan-a-legertekesebb-magyar-belyegivet
@@ -10,9 +10,9 @@ import eu.eyan.graph.impl.GraphImplSimple
  *  15 16 17 18 19 20 21 22 23 24
  */
 
-class Feladat {
+class BelyegIv {
 
-  @Test def feladat() = {
+  /*@Test*/ def feladat() = {
 
     val vs =
       (1 to 1).map(i => List(i, i + 5)) ++

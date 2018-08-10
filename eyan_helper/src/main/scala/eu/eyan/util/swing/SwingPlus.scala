@@ -287,7 +287,7 @@ object SwingPlus {
   //TODO merge with other methods
   def swingWorkerTryCatchFinally[T](action: => T, error: => Throwable => T, finaly: => Unit) = {
     new SwingWorker[T, T]() {
-      override def doInBackground = try action catch { case t: Throwable => error(t) }
+      override def doInBackground = try action catch { case t: Throwable => { Log.error("Error in SwingWorker", t); error(t) } }
       override def done = finaly
     }.execute
   }

@@ -19,7 +19,7 @@ import eu.eyan.util.io.PrintStreamPlus.PrintStreamImplicit
 
 // FIXME: too many lines in textarea -> goes bad. show only configurable amount!
 object LogWindow {
-  private val window = new LogWindow
+  private lazy val window = new LogWindow
 
   def show(origin: Component = null) = {
     window.frame.packAndSetVisible
@@ -27,10 +27,14 @@ object LogWindow {
     if (origin != null) origin.positionToLeft
 
     Log.logsObservable.subscribe(log => LogWindow.add(Log.logToConsoleText(log))) // TODO why map does not work?
-    Log.getAllLogs.foreach(log => LogWindow.add(Log.logToConsoleText(log)))
     
-    Log.levelObservable.subscribe(level => LogWindow.setLevel(level)) // TODO why map does not work?
-    LogWindow.setLevel(Log.getActualLevel)
+//    Log.levelObservable.subscribe(level => LogWindow.setLevel(level)) // TODO why map does not work?
+//    Log.levelObservable.subscribe(level => LogWindow.setLevel(level), t=> {Log.error("Observable error",t)}) // TODO why map does not work?
+    def onNextLogLevel(level:LogLevel) = LogWindow.setLevel(level)
+    def onErrorLogLevel(t:Throwable) = Log.error("Observable error",t)
+    def onCompletedLogLevel = Log.error("levelObservable onCompleted")
+    Log.levelObservable.subscribe(onNextLogLevel, onErrorLogLevel, () => onCompletedLogLevel)
+//    LogWindow.setLevel(Log.getActualLevel)
   }
 
   def add(text: String) = if (window != null && window.frame != null) window.textArea.append(text + "\n")

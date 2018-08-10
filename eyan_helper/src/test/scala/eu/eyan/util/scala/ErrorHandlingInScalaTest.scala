@@ -33,14 +33,14 @@ class ErrorHandlingInScalaTest extends TestPlus {
   def err3(in: String): String = { log += "err3"; throw e3 }
 
   @Test def ok = {
-		  val result = try{
+		  val result = 
     //Try("0").map(ok1).map(ok2).get ==> "012"
 
         Try("0").map(ok1).map(err1)
 
     //    Try("0").map(err1).map(ok1).get ==> "012"
 
-		  } catch{case _=>}
+		  
       log ==> "ok1err1"
       result ==> Failure(e1)
 

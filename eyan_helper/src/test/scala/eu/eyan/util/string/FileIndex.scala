@@ -23,7 +23,7 @@ object FileIndex {
     println("loaded " + timerElapsed + " " + NumberFormat.getInstance.format(reader.size) + " lines.")
     printmem
 
-    val lineIterator = reader.iterator
+    val lineIterator = reader.lines
     val linesWithIndices = lineIterator.zipWithIndex
     //    val lines = for (lineIndex <- 0 to reader.size-1) yield (lineIndex, reader.get(lineIndex))
     println("lines done " + timerElapsed)

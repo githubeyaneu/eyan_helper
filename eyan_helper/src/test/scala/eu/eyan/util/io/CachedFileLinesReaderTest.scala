@@ -18,6 +18,7 @@ import eu.eyan.testutil.TestPlus
 import org.junit.After
 import eu.eyan.util.io.FilePlus.FilePlusImplicit
 
+// FIXME: refactor with try finallyClose to be able to delete the test files afterwards
 @RunWith(classOf[ScalaEclipseJunitRunner])
 class CachedFileLinesReaderTest() extends TestPlus {
 
@@ -170,7 +171,7 @@ class CachedFileLinesReaderTest() extends TestPlus {
   def test_iterator_emptyFile = {
     writeFile("")
     cachedFileLineReader.load(file, null)
-    val iterator = cachedFileLineReader.iterator
+    val iterator = cachedFileLineReader.lines
     assertThat(iterator.hasNext).isFalse
     cachedFileLineReader.close
   }
@@ -179,7 +180,7 @@ class CachedFileLinesReaderTest() extends TestPlus {
   def test_iterator = {
     writeFileLines(2, false)
     cachedFileLineReader.load(file, null)
-    val iterator = cachedFileLineReader.iterator
+    val iterator = cachedFileLineReader.lines
     assertThat(iterator.hasNext).isTrue
     assertThat(iterator.next).isEqualTo("line1\r\n")
     assertThat(iterator.hasNext).isTrue

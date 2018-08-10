@@ -214,7 +214,6 @@
 			<version>2.5.0</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/io.reactivex/rxscala -->
 		<dependency>
 			<groupId>io.reactivex</groupId>
 			<artifactId>rxscala_2.12</artifactId>
@@ -223,4 +222,5 @@
 
 
 	</dependencies>
+
 </project>
