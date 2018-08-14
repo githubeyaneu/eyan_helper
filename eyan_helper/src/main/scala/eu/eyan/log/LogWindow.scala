@@ -26,15 +26,14 @@ object LogWindow {
     window.frame.positionToRight
     if (origin != null) origin.positionToLeft
 
-    Log.logsObservable.subscribe(log => LogWindow.add(Log.logToConsoleText(log))) // TODO why map does not work?
+    def onErrorLogLevel(msg: String)(t:Throwable) = Log.error(s"$msg error",t)
+    def onCompletedLogLevel(msg: String) = Log.error(s"$msg onCompleted")
     
-//    Log.levelObservable.subscribe(level => LogWindow.setLevel(level)) // TODO why map does not work?
-//    Log.levelObservable.subscribe(level => LogWindow.setLevel(level), t=> {Log.error("Observable error",t)}) // TODO why map does not work?
+    def onNextLog(log:Log) = LogWindow.add(Log.logToConsoleText(log))
+    Log.logsObservable.subscribe(onNextLog, onErrorLogLevel("logsObservable"), () => onCompletedLogLevel("logsObservable")) // TODO why map does not work?
+    
     def onNextLogLevel(level:LogLevel) = LogWindow.setLevel(level)
-    def onErrorLogLevel(t:Throwable) = Log.error("Observable error",t)
-    def onCompletedLogLevel = Log.error("levelObservable onCompleted")
-    Log.levelObservable.subscribe(onNextLogLevel, onErrorLogLevel, () => onCompletedLogLevel)
-//    LogWindow.setLevel(Log.getActualLevel)
+    Log.levelObservable.subscribe(onNextLogLevel, onErrorLogLevel("levelObservable"), () => onCompletedLogLevel("levelObservable"))
   }
 
   def add(text: String) = if (window != null && window.frame != null) window.textArea.append(text + "\n")

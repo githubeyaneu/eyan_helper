@@ -5,6 +5,8 @@ import scala.collection.mutable.MutableList
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
 import rx.subjects.PublishSubject
 import rx.lang.scala.Observable
+import rx.subjects.ReplaySubject
+import rx.subjects.BehaviorSubject
 
 case class Log(level: LogLevel, text: String)
 
@@ -15,14 +17,12 @@ object Log {
   var errToConsole = true
 
   private var actualLevel: LogLevel = None
-  private val actualLevelPublisher = PublishSubject.create[LogLevel]
-  val levelObservable = actualLevelPublisher.asObservable.replay(1)
-  levelObservable.connect
-  actualLevelPublisher.onNext(actualLevel)
+  private val actualLevelPublisher = BehaviorSubject.create[LogLevel](actualLevel)
+  lazy val levelObservable = actualLevelPublisher.asObservable
 
-  private val logger = PublishSubject.create[Log]
-  val logsObservable = logger.asObservable.replay(1000 * 1000)
-  logsObservable.connect
+  
+  private val logger = ReplaySubject.create[Log](1000 * 1000)
+  lazy val logsObservable = logger.asObservable
 
   private def log(level: LogLevel, message: String = ""): Log.type = {
     def stackElementsNotToLog(stackTraceElement: StackTraceElement) = stackTraceElement.getClassName != LOG_CLASS_NAME
@@ -48,9 +48,10 @@ object Log {
   //  prevTime = System.currentTimeMillis
 
   def activate(level: LogLevel = Debug): Log.type = {
-    Log.info("activate log level: " + level)
-    actualLevel = level;
-    actualLevelPublisher.onNext(level);
+    Log.info("activating log level: " + level)
+    actualLevel = level
+    actualLevelPublisher.onNext(level)
+    Log.info("activated log level: " + level)
     this
   }
 
@@ -96,12 +97,6 @@ object Log {
   def logToConsoleText(log: Log) = f"${log.level}%-5s ${log.text}"
   logsObservable.filter(_.level > Error).subscribe(log => { logToConsoleText(log).println })
   logsObservable.filter(_.level <= Error).subscribe(log => { logToConsoleText(log).printlnErr })
-
-  // Log memory
-  //  val allLogs = MutableList[Log]() // TODO Memory leak, make fixed list / fixed size
-  //  def saveLog(log: Log) = allLogs += log
-  //  logsObservable.subscribe(log => saveLog(log))
-  //  def getAllLogs = List(allLogs: _*)
 }
 
 abstract class LogLevel(val prio: Int) {

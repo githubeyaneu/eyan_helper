@@ -5,6 +5,7 @@ import org.junit.Assert
 import eu.eyan.util.io.OutputStreamPlus
 import eu.eyan.util.io.PrintStreamPlus
 import eu.eyan.util.io.PrintStreamPlus.PrintStreamImplicit
+import eu.eyan.util.time.TimeCounter
 
 object TestPlus {
 
@@ -137,4 +138,11 @@ trait TestPlus {
   }
 
   case class OutAndErr(output: String, error: String)
+
+  def shouldBeFaster(expectedMaxMillisecs: Int, msg:String="execution time")(action: => Unit) = {
+    val executionTime = TimeCounter.millisecsOf(action)
+    println(s"$msg $executionTime ms")
+    executionTime shouldBeLessThan(msg, expectedMaxMillisecs)
+    executionTime.toInt
+  }
 }
