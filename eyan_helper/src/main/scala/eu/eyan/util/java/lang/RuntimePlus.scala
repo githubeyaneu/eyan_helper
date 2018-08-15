@@ -6,6 +6,7 @@ import scala.io.Source
 
 import eu.eyan.log.Log
 import scala.io.Codec
+import java.io.File
 
 object RuntimePlus {
   case class ProcessResult(exitValue: Int, output: Option[String], errorOutput: Option[String])
@@ -24,7 +25,7 @@ object RuntimePlus {
   //TODO: 
   def execAndProcessOutputs(cmd: String, callbackOut: String => Unit, callbackErr: String => Unit) = {
     //TODO params: copy out end arr to console and as a result...
-    Log.info("Executing process: " + cmd)
+    Log.info(s"Executing process: $cmd, File(.)=${new File(".").getAbsolutePath}")
     val process = Runtime.getRuntime.exec(cmd)
     def readStreamInThread(stream: InputStream, callback: String => Unit) = ThreadPlus.run(Source.fromInputStream(stream).getLines.foreach(callback))
     val outRunner = readStreamInThread(process.getInputStream, callbackOut)

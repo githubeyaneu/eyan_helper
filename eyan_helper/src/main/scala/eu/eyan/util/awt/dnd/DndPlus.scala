@@ -77,8 +77,16 @@ object DndPlus {
   }
 
   private def onDropType(component: Component, dataFlavor: DataFlavor, callback: scala.util.Try[Object] => Unit) = {
+
+    //FIXME duplicate of log
+    def stackElementsNotToLog(stackTraceElement: StackTraceElement) = !stackTraceElement.getClassName.contains("Plus")
+		def stackElementWhereLogWasCalled = Thread.currentThread.getStackTrace.filter(stackElementsNotToLog)(1) // TODO use lift
+    def stackClassAndMethod = stackElementWhereLogWasCalled.getClassName.substring(stackElementWhereLogWasCalled.getClassName.lastIndexOf(".") + 1) + "." + stackElementWhereLogWasCalled.getMethodName
+    val codeLocationDropWasSet = stackClassAndMethod
+
+    
     onDragEnter(component, dragEvent => {
-      Log.debug("onDragEnter")
+      Log.debug(s"onDragEnter $codeLocationDropWasSet")
       Log.debug(dragEvent)
       Log.debug(dragEvent.getCurrentDataFlavors.mkString("\r\n"))
       Log.debug(dragEvent.getDropAction + "")
@@ -89,10 +97,10 @@ object DndPlus {
       dragEvent.acceptDragBasedOnDataFlavor(dataFlavor)
     })
 
-    onDragOver(component, dragEvent => { Log.trace("onDragOver") })
-    onDropActionChanged(component, dragEvent => { Log.debug("onDropActionChanged") })
-    onDrop(component, dropEvent => { Log.info("onDrop"); callback(getTransferableData(dataFlavor)(dropEvent)) })
-    onDragExit(component, dropTargetEvent => { Log.debug("onDragExit") })
+    onDragOver(component, dragEvent => { Log.trace(s"onDragOver $codeLocationDropWasSet") })
+    onDropActionChanged(component, dragEvent => { Log.debug(s"onDropActionChanged $codeLocationDropWasSet") })
+    onDrop(component, dropEvent => { Log.info(s"onDrop $codeLocationDropWasSet"); callback(getTransferableData(dataFlavor)(dropEvent)) })
+    onDragExit(component, dropTargetEvent => { Log.debug(s"onDragExit $codeLocationDropWasSet") })
   }
 
   def getTransferableData(dataFlavor: DataFlavor)(dropEvent: DropTargetDropEvent) = Try {
