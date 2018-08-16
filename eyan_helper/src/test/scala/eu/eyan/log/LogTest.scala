@@ -29,24 +29,17 @@ class LogTest extends TestPlus {
 
   @Test
   def testActivateLevel = {
-    collectOutputAndError {
-      Log.activateTraceLevel
-    } ==> OutAndErr("Info  LogTest.$anonfun$testActivateLevel$1: activating log level: Trace\r\nInfo  LogTest.$anonfun$testActivateLevel$1: activated log level: Trace\r\n", "")
+    collectOutputAndError { Log.activateTraceLevel } ==>
+      OutAndErr("Info  LogTest.$anonfun$testActivateLevel$1: activating log level: Trace\r\nInfo  LogTest.$anonfun$testActivateLevel$1: activated log level: Trace\r\n", "")
 
     Log.activateNone
-    collectOutputAndError {
-      Log.info("abc")
-    } ==> OutAndErr("", "")
+    collectOutputAndError { Log.info("abc") } ==> OutAndErr("", "")
 
     Log.activateFatalLevel
-    collectOutputAndError {
-      Log.info("abc")
-    } ==> OutAndErr("", "")
+    collectOutputAndError { Log.info("abc") } ==> OutAndErr("", "")
 
     Log.activateFatalLevel
-    collectOutputAndError {
-      Log.fatal("abc")
-    } ==> OutAndErr("", "Fatal LogTest.$anonfun$testActivateLevel$6: abc\r\n")
+    collectOutputAndError { Log.fatal("abc") } ==> OutAndErr("", "Fatal LogTest.$anonfun$testActivateLevel$6: abc\r\n")
 
     Log.activateInfoLevel
     collectOutputAndError {
@@ -109,9 +102,7 @@ class LogTest extends TestPlus {
       "Error LogTest.$anonfun$testErrorException$1:  java.lang.Exception: abc\r\n  " + ex.getStackTrace.mkString("\r\n  ") + "\r\n"
 
     Log.activateAllLevel
-    collectOutputAndError {
-      Log.error(ex)
-    } ==> OutAndErr("", expectedError)
+    collectOutputAndError { Log.error(ex) } ==> OutAndErr("", expectedError)
   }
 
   @Test
@@ -122,9 +113,7 @@ class LogTest extends TestPlus {
       "Error LogTest.$anonfun$testError_ExcNoMsg$1:  java.lang.Exception: abc\r\n  " + ex.getStackTrace.mkString("\r\n  ") + "\r\n"
 
     Log.activateAllLevel
-    collectOutputAndError {
-      Log.error("", ex)
-    } ==> OutAndErr("", expectedError)
+    collectOutputAndError { Log.error("", ex) } ==> OutAndErr("", expectedError)
   }
 
   @Test
@@ -135,16 +124,14 @@ class LogTest extends TestPlus {
       "Error LogTest.$anonfun$testError_ExcMsg$1: abc - java.lang.Exception: abc\r\n  " + ex.getStackTrace.mkString("\r\n  ") + "\r\n"
 
     Log.activateAllLevel
-    collectOutputAndError {
-      Log.error("abc", ex)
-    } ==> OutAndErr("", expectedError)
+    collectOutputAndError { Log.error("abc", ex) } ==> OutAndErr("", expectedError)
   }
 
   @Test
   def testNoLogExecutionOnNone = {
     var counter = 0
 
-    Log.activateNone
+    Log.deactivate
 
     Log.fatal({ counter += 1; "log" })
     counter ==> 0
@@ -159,6 +146,10 @@ class LogTest extends TestPlus {
     Log.debug({ counter += 1; "log" })
     counter ==> 0
     Log.trace({ counter += 1; "log" })
+    counter ==> 0
+    Log.error("log", { counter += 1; new Exception })
+    counter ==> 0
+    Log.error({ counter += 1; "log" }, { counter += 1; new Exception })
     counter ==> 0
   }
 
@@ -184,5 +175,7 @@ class LogTest extends TestPlus {
     counter ==> 7
     Log.error("log", { counter += 1; new Exception })
     counter ==> 8
+    Log.error({ counter += 1; "log" }, { counter += 1; new Exception })
+    counter ==> 10
   }
 }
