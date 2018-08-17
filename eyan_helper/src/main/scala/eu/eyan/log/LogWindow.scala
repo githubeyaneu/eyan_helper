@@ -16,24 +16,30 @@ import eu.eyan.util.io.OutputStreamPlus
 import java.util.Timer
 import java.util.TimerTask
 import eu.eyan.util.io.PrintStreamPlus.PrintStreamImplicit
+import rx.Subscription
 
 // FIXME: too many lines in textarea -> goes bad. show only configurable amount!
 object LogWindow {
   private lazy val window = new LogWindow
+  private var logsObservableSubscription: Subscription = null
+  private var levelObservableSubscription: Subscription = null
 
   def show(origin: Component = null) = {
     window.frame.packAndSetVisible
     window.frame.positionToRight
     if (origin != null) origin.positionToLeft
 
-    def onErrorLogLevel(msg: String)(t:Throwable) = Log.error(s"$msg error",t)
+    def onErrorLogLevel(msg: String)(t: Throwable) = Log.error(s"$msg error", t)
     def onCompletedLogLevel(msg: String) = Log.error(s"$msg onCompleted")
-    
-    def onNextLog(log:Log) = LogWindow.add(Log.logToConsoleText(log))
-    Log.logsObservable.subscribe(onNextLog, onErrorLogLevel("logsObservable"), () => onCompletedLogLevel("logsObservable")) // TODO why map does not work?
-    
-    def onNextLogLevel(level:LogLevel) = LogWindow.setLevel(level)
-    Log.levelObservable.subscribe(onNextLogLevel, onErrorLogLevel("levelObservable"), () => onCompletedLogLevel("levelObservable"))
+
+    // FIXME subscribe only once!! show can be started more times!!!
+    def onNextLog(log: Log) = LogWindow.add(Log.logToConsoleText(log))
+    if (logsObservableSubscription == null)
+      logsObservableSubscription = Log.logsObservable.subscribe(onNextLog, onErrorLogLevel("logsObservable"), () => onCompletedLogLevel("logsObservable")) // TODO why map does not work?
+
+    def onNextLogLevel(level: LogLevel) = LogWindow.setLevel(level)
+    if (levelObservableSubscription == null)
+      levelObservableSubscription = Log.levelObservable.subscribe(onNextLogLevel, onErrorLogLevel("levelObservable"), () => onCompletedLogLevel("levelObservable"))
   }
 
   def add(text: String) = if (window != null && window.frame != null) window.textArea.append(text + "\n")
@@ -54,7 +60,7 @@ object LogWindow {
   private def redirectSystemOut = { System.setOut(System.out.copyToStream(outStreamAppender)); Log.logToConsole = false; this }
   private def redirectSystemError = { System.setErr(System.err.copyToStream(errStream)); Log.errToConsole = false; this }
   def redirectSystemOutAndErrToLogWindow = { redirectSystemOut; redirectSystemError }
-  
+
   def getAllLogs = {
     val loggerLogs = "Logger logs:\r\n" + logs
     val out = "System.out:\r\n" + logsOut
