@@ -211,6 +211,7 @@ object ComponentPlus {
 
     def windowName =
       if (window != null)
+        // FIXME!!! remember takes the title of the JFrame! should take name of JFrame!!!!
         if (window.isInstanceOf[JFrame]) window.asInstanceOf[JFrame].getTitle
         else window.getName
       else null

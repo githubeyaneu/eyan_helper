@@ -33,6 +33,7 @@ import eu.eyan.util.awt.ImagePlus
 import eu.eyan.util.swing.JMenuBarPlus.JMenuBarImplicit
 import javax.swing.JMenuItem
 import java.awt.event.MouseEvent
+import javax.swing.Icon
 
 object JFramePlus {
   implicit class JFramePlusImplicit[TYPE <: JFrame](jFrame: TYPE) extends FramePlusImplicit(jFrame) {
@@ -115,12 +116,20 @@ object JFramePlus {
       jFrame
     }
 
-    def menuItem(menuText: String, menuItemText: String, action: => Unit) = menuItemEvent(menuText: String, menuItemText, frame => action)
+    def menuItemSeparator(menuText: String) = {
+    		if (jFrame.getJMenuBar == null) jMenuBar(new JMenuBar())
+    		val menu = jFrame.getJMenuBar.getOrCreateMenu(menuText)
+    		menu.addSeparator
+    		jFrame
+    }
+    
+    def menuItem(menuText: String, menuItemText: String, action: => Unit, icon:Icon = null ) = menuItemEvent(menuText: String, menuItemText, frame => action, icon)
 
-    def menuItemEvent(menuText: String, menuItemText: String, action: TYPE => Unit) = {
+    def menuItemEvent(menuText: String, menuItemText: String, action: TYPE => Unit, icon:Icon = null) = {
     		if (jFrame.getJMenuBar == null) jMenuBar(new JMenuBar())
     		val menu = jFrame.getJMenuBar.getOrCreateMenu(menuText)
     		val menuItem = new JMenuItem(menuItemText)
+    		if(icon!=null) menuItem.setIcon(icon)
     		menu.add(menuItem)
     		menuItem.onAction(action(jFrame))
     		jFrame
