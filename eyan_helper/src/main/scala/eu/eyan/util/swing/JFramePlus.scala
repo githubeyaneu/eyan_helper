@@ -40,6 +40,10 @@ object JFramePlus {
     def onCloseHide = defaultCloseOperation(WindowConstants.HIDE_ON_CLOSE)
     def onCloseDispose = defaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
     def onCloseExit = defaultCloseOperation(JFrame.EXIT_ON_CLOSE)
+    def onCloseDisposeWithCondition(condition: TYPE => Boolean) = {
+    		onCloseDoNothing
+    		onWindowClosing(if(condition(jFrame)) jFrame.dispose)
+    }
 
     def defaultCloseOperation(operation: Int) = { jFrame.setDefaultCloseOperation(operation); jFrame }
     def jMenuBar(menubar: JMenuBar) = { jFrame.setJMenuBar(menubar); jFrame }
