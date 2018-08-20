@@ -71,6 +71,8 @@ object JFramePlus {
     def iconImageFromResources(path: String) = iconImage(new ImageIcon(getClass.getResource(path)).getImage)
 
     def withComponent(c: Component) = component(c)
+    def addFluent(c: Component) = { jFrame.add(c); jFrame }
+    def addFluent(c: Component, o: Any) = { jFrame.add(c, o); jFrame }
 
     private def systemTray = SystemTray.getSystemTray
 
@@ -100,7 +102,7 @@ object JFramePlus {
         val trayIcon = new TrayIcon(iconToUse, toolTip, popupMenu)
         trayIcon.setImageAutoSize(true)
         trayIcon.addMouseListener(AwtHelper.onClicked(e => if (e.getButton == MouseEvent.BUTTON1) (if (jFrame.isVisible) jFrame.invisible else { jFrame.visible; jFrame.setState(Frame.NORMAL); jFrame.toFront })))
-        
+
         systemTray.add(trayIcon)
         jFrame.onWindowStateChanged_ICONIFIED(jFrame.invisible)
         jFrame.onWindowStateChanged_NORMAL(jFrame.visible)
