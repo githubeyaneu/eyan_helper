@@ -115,13 +115,15 @@ object JFramePlus {
       jFrame
     }
 
-    def menuItem(menuText: String, menuItemText: String, action: => Unit) = {
-      if (jFrame.getJMenuBar == null) jMenuBar(new JMenuBar())
-      val menu = jFrame.getJMenuBar.getOrCreateMenu(menuText)
-      val menuItem = new JMenuItem(menuItemText)
-      menu.add(menuItem)
-      menuItem.onAction(action)
-      jFrame
+    def menuItem(menuText: String, menuItemText: String, action: => Unit) = menuItemEvent(menuText: String, menuItemText, frame => action)
+
+    def menuItemEvent(menuText: String, menuItemText: String, action: TYPE => Unit) = {
+    		if (jFrame.getJMenuBar == null) jMenuBar(new JMenuBar())
+    		val menu = jFrame.getJMenuBar.getOrCreateMenu(menuText)
+    		val menuItem = new JMenuItem(menuItemText)
+    		menu.add(menuItem)
+    		menuItem.onAction(action(jFrame))
+    		jFrame
     }
   }
 }
