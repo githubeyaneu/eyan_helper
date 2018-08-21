@@ -29,6 +29,7 @@ import scala.io.Codec
 import eu.eyan.util.java.lang.RuntimePlus.ProcessResult
 import java.io.InputStream
 import eu.eyan.util.java.lang.ThreadPlus
+import eu.eyan.util.scala.Try
 
 object StringPlus {
   lazy val reg = "[\\p{InCombiningDiacriticalMarks}]".r
@@ -114,9 +115,9 @@ object StringPlus {
       // TODO use try
       s.writeToFile(batName)
       Log.info("Executing a batch file: " + batName)
-      val result = batName.executeAsProcessWithResultAndOutputLineCallback(s=>{})
+      val result = batName.executeAsProcessWithResultAndOutputLineCallback(s => {})
       Log.info("Result: " + result)
-//      val res = bat.executeAsProcess.println
+      //      val res = bat.executeAsProcess.println
       if (deleteBatAfterwards) batName.deleteAsFile
     }
 
@@ -191,5 +192,11 @@ object StringPlus {
     def toIntOrElse(default: Int) = try s.toInt catch { case _: Throwable => default }
 
     def splitLinesFromFile(splitCondition: String => Boolean): Stream[String] = s.linesFromFile.toStream.splitToStreams(splitCondition).map(_.mkString("\r\n"))
+
+    def toResourceFile = Try {
+      val url = this.getClass.getClassLoader().getResource(s)
+      if (url == null) throw new IllegalArgumentException(s"resource $s not found.")
+      url.getFile.asFile
+    }
   }
 }
