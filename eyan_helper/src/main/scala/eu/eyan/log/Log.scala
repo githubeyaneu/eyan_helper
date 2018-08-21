@@ -3,12 +3,11 @@ package eu.eyan.log
 import scala.collection.mutable.MutableList
 
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
-import rx.subjects.PublishSubject
-import rx.lang.scala.Observable
-import rx.subjects.ReplaySubject
-import rx.subjects.BehaviorSubject
 import org.slf4j.Logger
 import org.slf4j.Marker
+import rx.lang.scala.subjects.BehaviorSubject
+import rx.lang.scala.subjects.ReplaySubject
+import rx.lang.scala.Observable
 
 case class Log(level: LogLevel, text: String)
 
@@ -20,11 +19,11 @@ object Log {
   var errToConsole = true
 
   private var actualLevel: LogLevel = None
-  private val actualLevelPublisher = BehaviorSubject.create[LogLevel](actualLevel)
-  lazy val levelObservable = actualLevelPublisher.asObservable
+  private lazy val actualLevelPublisher = BehaviorSubject[LogLevel](actualLevel)
+  lazy val levelObservable:Observable[LogLevel] = actualLevelPublisher
 
-  private val logger = ReplaySubject.create[Log](1000 * 1000)
-  lazy val logsObservable = logger.asObservable
+  private lazy val logger = ReplaySubject[Log](1000 * 1000)
+  lazy val logsObservable:Observable[Log] = logger
 
   def log(level: LogLevel, message: => String, t: => Throwable): Log.type = {
     lazy val throwable = t

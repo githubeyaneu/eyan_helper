@@ -6,6 +6,9 @@ import java.awt.MenuBar
 import java.awt.Shape
 import java.awt.Rectangle
 import java.awt.Color
+import eu.eyan.log.Log
+import rx.lang.scala.subjects.BehaviorSubject
+import rx.lang.scala.Observable
 
 object FramePlus {
   implicit class FramePlusImplicit[TYPE <: Frame](frame: TYPE) extends WindowPlusImplicit(frame) {
@@ -27,5 +30,9 @@ object FramePlus {
     def withUndecorated(undecorated: Boolean) = { frame.setUndecorated(undecorated); frame }
     
     def maximize = extendedState(Frame.MAXIMIZED_BOTH)
+    
+    // FIXME: refactor make easier
+    // FIXME: remove subscription if not visible: panel.addComponentListener ( new ComponentAdapter () { public void componentShown ( ComponentEvent e ) { System.out.println ( "Component shown" ); } public void componentHidden ( ComponentEvent e ) { System.out.println ( "Component hidden" ); } } );
+		def title(titleObservable: Observable[String]) = { titleObservable.subscribe(title=>frame.setTitle(title), t=>Log.error(t), () => {Log.warn("should ever end?...")}); frame }
   }
 }
