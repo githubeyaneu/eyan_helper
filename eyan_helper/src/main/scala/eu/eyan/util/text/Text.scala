@@ -5,21 +5,43 @@ import eu.eyan.util.scala.Try
 import rx.lang.scala.Observable
 import rx.lang.scala.subjects.BehaviorSubject
 
-/** An observable text that can be formatted with the also observable parameters 
- *  The text translation should not happen here, the template should be updated in this case.*/
+/**
+ * An observable text that can be formatted with the also observable parameters
+ *  The text translation should not happen here, the template should be updated in this case.
+ */
 abstract class Text(private val template: BehaviorSubject[String], private val args: Observable[Any]*) extends Observable[String] {
+  template.take(1).subscribe(string => Log.info("Text created " + string))
+  Log.info("Text created args:" + args.size)
 
-  template.take(1).subscribe(string => Log.info("Text created "+ string))
+  // TODO check string and param numbers
+  lazy val paramsCombined = Observable.combineLatest(args.toIterable)(_.toList)
   
-  if (args.nonEmpty) {
-	  Log.info("Text created args:"+args.size)
-
-    // TODO check string and param numbers
-    def toText(params: List[Any]) = Try(String.format(get, params.map(_.asInstanceOf[Object]): _*)).getOrElse("")
-    val observablesCombined = Observable.combineLatest(args.toIterable)(_.toList).map(toText)
-    observablesCombined.subscribe(template)
+  def countOccurrences(src: String, tgt: String): Int = src.sliding(tgt.length).count(window => window == tgt)
+  
+  def noMoreParams(template: String) = {
+    val ok = countOccurrences(template, "%s") <= args.size
+    if(!ok) Log.error(s"Wrong template. Template contains more params as given params. Template=$template, params=${args.size}")
+    ok
   }
-  val asJavaObservable: rx.Observable[_ <: String] = template.asJavaObservable
+  
+  lazy val onlyValidTemplates = template filter noMoreParams
+  
+  lazy val templateAndParams = onlyValidTemplates combineLatest paramsCombined
+  
+  def toText(templateAndParams: (String, List[Any])) = {
+    val template = templateAndParams._1
+    val params = templateAndParams._2
+    Log.debug(s"Format text. Template=$template, params=${params.mkString}")
+    val text = Try(String.format(template, params.map(_.asInstanceOf[Object]): _*)).getOrElse("")
+    Log.debug(s"Formatted text=$text")
+    text
+  }
+  lazy val textFormatter = templateAndParams map toText
 
-  def get:String
+  lazy val formattedText = if (args.nonEmpty) textFormatter else template
+
+  lazy val text = BehaviorSubject("")
+  formattedText subscribe text
+
+  lazy val asJavaObservable: rx.Observable[_ <: String] = text.asJavaObservable
 }
