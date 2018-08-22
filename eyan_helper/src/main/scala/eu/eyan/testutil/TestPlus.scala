@@ -24,6 +24,8 @@ object TestPlus {
 }
 
 trait TestPlus {
+  def waitFor(assertion: => Unit, timeout: Long = TestPlus.DEFAULT_WAIT_TIME): Unit =  TestPlus.waitFor(assertion, timeout)
+  
   /** Expect a Throwable of the method */
   def expect(expectedThrowable: Throwable, test: => Unit, same: Boolean = false) =
     try { test; Assert.fail("Exception(Throwable) was expected but none came.") }

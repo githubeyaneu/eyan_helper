@@ -33,6 +33,6 @@ object FramePlus {
     
     // FIXME: refactor make easier
     // FIXME: remove subscription if not visible: panel.addComponentListener ( new ComponentAdapter () { public void componentShown ( ComponentEvent e ) { System.out.println ( "Component shown" ); } public void componentHidden ( ComponentEvent e ) { System.out.println ( "Component hidden" ); } } );
-		def title(titleObservable: Observable[String]) = { titleObservable.subscribe(title=>frame.setTitle(title), t=>Log.error(t), () => {Log.warn("should ever end?...")}); frame }
+		def title(titleObservable: Observable[String]) = { titleObservable.subscribe(title=>frame.setTitle(title), Log.error, () => {Log.warn("should ever end?...")}); frame }
   }
 }

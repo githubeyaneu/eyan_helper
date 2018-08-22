@@ -8,5 +8,5 @@ class ScalaEclipseJunitRunner(klass: Class[_]) extends BlockJUnit4ClassRunner(kl
   override def validateInstanceMethods(errors: java.util.List[Throwable]) = {}
   override def collectInitializationErrors(errors: java.util.List[Throwable]) = {}
   
-  override def methodBlock(fm: FrameworkMethod) = {println("Test: " + testName(fm)); super.methodBlock(fm)}
+  override def methodBlock(fm: FrameworkMethod) = {println("\r\nTest: " + testName(fm)); super.methodBlock(fm)}
 }

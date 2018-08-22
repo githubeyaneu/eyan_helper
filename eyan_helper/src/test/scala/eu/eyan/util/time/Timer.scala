@@ -1,5 +1,7 @@
 package eu.eyan.util.time
 
+
+// TODO: remove it is in the TestPlus...
 object Timer {
   val SECOND = 1000L
   val MINUTE = 60L * SECOND

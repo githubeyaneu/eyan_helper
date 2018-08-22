@@ -20,10 +20,10 @@ object Log {
 
   private var actualLevel: LogLevel = None
   private lazy val actualLevelPublisher = BehaviorSubject[LogLevel](actualLevel)
-  lazy val levelObservable:Observable[LogLevel] = actualLevelPublisher
+  lazy val levelObservable: Observable[LogLevel] = actualLevelPublisher
 
   private lazy val logger = ReplaySubject[Log](1000 * 1000)
-  lazy val logsObservable:Observable[Log] = logger
+  lazy val logsObservable: Observable[Log] = logger
 
   def log(level: LogLevel, message: => String, t: => Throwable): Log.type = {
     lazy val throwable = t
@@ -83,10 +83,11 @@ object Log {
   def fatal(o: => Object) = log(Fatal, String.valueOf(o))
 
   def error = log(Error)
+  def error(t: Throwable): Unit = error("", t) // TODO: test it
   def error(message: => Any): Log.type = {
     if (actualLevel.shouldLog(Error))
       message match {
-        case t: Throwable => error("", t)
+        case t: Throwable => error(t)
         case o: Any       => log(Error, String.valueOf(o))
       }
     this

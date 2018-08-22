@@ -42,8 +42,8 @@ object JFramePlus {
     def onCloseDispose = defaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE)
     def onCloseExit = defaultCloseOperation(JFrame.EXIT_ON_CLOSE)
     def onCloseDisposeWithCondition(condition: TYPE => Boolean) = {
-    		onCloseDoNothing
-    		onWindowClosing(if(condition(jFrame)) jFrame.dispose)
+      onCloseDoNothing
+      onWindowClosing(if (condition(jFrame)) jFrame.dispose)
     }
 
     def defaultCloseOperation(operation: Int) = { jFrame.setDefaultCloseOperation(operation); jFrame }
@@ -116,23 +116,26 @@ object JFramePlus {
       jFrame
     }
 
-    def menuItemSeparator(menuText: String) = {
-    		if (jFrame.getJMenuBar == null) jMenuBar(new JMenuBar())
-    		val menu = jFrame.getJMenuBar.getOrCreateMenu(menuText)
-    		menu.addSeparator
-    		jFrame
-    }
-    
-    def menuItem(menuText: String, menuItemText: String, action: => Unit, icon:Icon = null ) = menuItemEvent(menuText: String, menuItemText, frame => action, icon)
+    private def getOrCreateJMenuBar = { if (jFrame.getJMenuBar == null) jMenuBar(new JMenuBar()); jFrame.getJMenuBar }
 
-    def menuItemEvent(menuText: String, menuItemText: String, action: TYPE => Unit, icon:Icon = null) = {
-    		if (jFrame.getJMenuBar == null) jMenuBar(new JMenuBar())
-    		val menu = jFrame.getJMenuBar.getOrCreateMenu(menuText)
-    		val menuItem = new JMenuItem(menuItemText)
-    		if(icon!=null) menuItem.setIcon(icon)
-    		menu.add(menuItem)
-    		menuItem.onAction(action(jFrame))
-    		jFrame
+    private def getOrCreateMenu(menuText: String) = getOrCreateJMenuBar.getOrCreateMenu(menuText)
+
+    def menuItemSeparator(menuText: String) = { getOrCreateMenu(menuText).addSeparator; jFrame }
+
+    def menuItems(menuText: String, menuItemTexts: Seq[String], action: String => Unit, icon: Icon = null) = {
+      def createMenuItem(menuItemText: String) = menuItemEvent(menuText, menuItemText, frame => action(menuItemText), icon)
+      menuItemTexts foreach createMenuItem
+      jFrame
+    }
+
+    def menuItem(menuText: String, menuItemText: String, action: => Unit, icon: Icon = null) = menuItemEvent(menuText: String, menuItemText, frame => action, icon)
+
+    def menuItemEvent(menuText: String, menuItemText: String, action: TYPE => Unit, icon: Icon = null) = {
+      val menuItem = new JMenuItem(menuItemText)
+      if (icon != null) menuItem.setIcon(icon)
+      getOrCreateMenu(menuText).add(menuItem)
+      menuItem.onAction(action(jFrame))
+      jFrame
     }
   }
 }
