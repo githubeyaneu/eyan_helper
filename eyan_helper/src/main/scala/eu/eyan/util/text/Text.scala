@@ -9,7 +9,7 @@ import rx.lang.scala.subjects.BehaviorSubject
  * An observable text that can be formatted with the also observable parameters
  *  The text translation should not happen here, the template should be updated in this case.
  */
-abstract class Text(private val template: BehaviorSubject[String], private val args: Observable[Any]*) extends Observable[String] {
+abstract class Text(protected val template: BehaviorSubject[String], private val args: Observable[Any]*) extends Observable[String] {
   template.take(1).subscribe(string => Log.info("Text created " + string))
   Log.info("Text created args:" + args.size)
 
