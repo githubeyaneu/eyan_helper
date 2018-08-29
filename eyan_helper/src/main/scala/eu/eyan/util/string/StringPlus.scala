@@ -198,5 +198,9 @@ object StringPlus {
       if (url == null) throw new IllegalArgumentException(s"resource $s not found.")
       url.getFile.asFile
     }
+    
+    def isNull = s == null
+    
+    def isNullOrEmpty = isNull || s.isEmpty  
   }
 }

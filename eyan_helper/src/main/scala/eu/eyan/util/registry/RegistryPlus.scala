@@ -36,6 +36,22 @@ object RegistryPlus extends App {
     }
   }
 
+  def readOption(key: String, name: String): Option[String] = {
+    Log.debug(s"HKEY_CURRENT_USER, $keyRoot\\$key, $name")
+    val valueHex = filterJavaBugErrorLines { WinRegistry.readString(hkey, s"$keyRoot\\$key", name, wow) }
+    Log.debug(s"valueHex=$valueHex")
+    val value =
+      if (valueHex == null) None
+      else if (valueHex== "") Option(valueHex)
+      else
+        try { Option(valueHex.toHexDecode) }
+        catch { case t: Throwable => { Log.error(s"error converting from hex valueHex=$valueHex", t); Option(valueHex) } }
+    Log.debug(s"value=$value")
+    value
+  }
+  
+  //TODO remove and use only readOption
+  @deprecated
   def read(key: String, name: String): String = {
     Log.debug(s"HKEY_CURRENT_USER, $keyRoot\\$key, $name")
     val valueHex = filterJavaBugErrorLines { WinRegistry.readString(hkey, s"$keyRoot\\$key", name, wow) }
