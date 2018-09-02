@@ -8,6 +8,7 @@ import java.awt.Component
 import javax.swing.SingleSelectionModel
 import javax.swing.plaf.MenuBarUI
 import javax.swing.JMenuItem
+import eu.eyan.util.text.Text
 
 object JMenuBarPlus {
   implicit class JMenuBarImplicit[TYPE <: JMenuBar](jMenuBar: TYPE) extends JComponentImplicit(jMenuBar) {
@@ -26,6 +27,21 @@ object JMenuBarPlus {
       def menuText(menu: JMenu) = menu.getText == text
       if (menus.exists(menuText)) menus.filter(menuText)(0)
       else { val menu = new JMenu(text); jMenuBar.add(menu); menu }
+    }
+
+    // FIXME: ??? is it possible that the text changes between?
+    def getOrCreateMenu2(text: Text) = {
+      val menuString = text.get
+      def menuText(menu: JMenu) = menu.getText == menuString
+      if (menus.exists(menuText)) menus.filter(menuText)(0)
+      else {
+        //TODO JMenuPlus
+        val menu = new JMenu(menuString)
+        menu.setName(menuString)
+        text.subscribe(menu.setText(_))
+        jMenuBar.add(menu)
+        menu
+      }
     }
   }
 }

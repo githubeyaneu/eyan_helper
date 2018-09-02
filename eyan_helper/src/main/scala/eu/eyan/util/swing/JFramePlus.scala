@@ -34,6 +34,8 @@ import eu.eyan.util.swing.JMenuBarPlus.JMenuBarImplicit
 import javax.swing.JMenuItem
 import java.awt.event.MouseEvent
 import javax.swing.Icon
+import eu.eyan.util.text.Text
+import rx.lang.scala.subjects.BehaviorSubject
 
 object JFramePlus {
   implicit class JFramePlusImplicit[TYPE <: JFrame](jFrame: TYPE) extends FramePlusImplicit(jFrame) {
@@ -122,8 +124,16 @@ object JFramePlus {
 
     def menuItemSeparator(menuText: String) = { getOrCreateMenu(menuText).addSeparator; jFrame }
 
+    def menuItemSeparator2(menuText: Text) = { getOrCreateMenu(menuText.get).addSeparator; jFrame }
+
     def menuItems(menuText: String, menuItemTexts: Seq[String], action: String => Unit, icon: Icon = null) = {
       def createMenuItem(menuItemText: String) = menuItemEvent(menuText, menuItemText, frame => action(menuItemText), icon)
+      menuItemTexts foreach createMenuItem
+      jFrame
+    }
+
+    def menuItems2(menuText: Text, menuItemTexts: Seq[String], action: String => Unit, icon: Icon = null) = {
+      def createMenuItem(menuItemText: String) = menuItemEvent2(menuText, new Text(BehaviorSubject(menuItemText)){}, frame => action(menuItemText), icon)
       menuItemTexts foreach createMenuItem
       jFrame
     }
@@ -137,5 +147,19 @@ object JFramePlus {
       menuItem.onAction(action(jFrame))
       jFrame
     }
+
+    def menuItem2(menuText: Text, menuItemText: Text, action:  => Unit, icon: Icon = null) = menuItemEvent2(menuText, menuItemText, frame => action, icon)
+    def menuItemEvent2(menuText: Text, menuItemText: Text, action: TYPE => Unit, icon: Icon = null) = {
+      // TODO JMenuItemPlus
+      val menuItem = new JMenuItem(menuItemText.get)
+      menuItem.setName(menuItemText.get)
+      menuItemText.subscribe(menuItem.setText(_))
+      if (icon != null) menuItem.setIcon(icon)
+      getOrCreateMenu2(menuText).add(menuItem)
+      menuItem.onAction(action(jFrame))
+      jFrame
+    }
+    private def getOrCreateMenu2(menuText: Text) = getOrCreateJMenuBar.getOrCreateMenu2(menuText)
+
   }
 }
