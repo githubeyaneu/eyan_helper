@@ -30,7 +30,7 @@ object JMenuBarPlus {
     }
 
     // FIXME: ??? is it possible that the text changes between?
-    def getOrCreateMenu2(text: Text) = {
+    def getOrCreateMenu(text: Text) = {
       val menuString = text.get
       def menuText(menu: JMenu) = menu.getText == menuString
       if (menus.exists(menuText)) menus.filter(menuText)(0)

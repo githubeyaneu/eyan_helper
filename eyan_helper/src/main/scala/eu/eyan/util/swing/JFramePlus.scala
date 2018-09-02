@@ -124,7 +124,6 @@ object JFramePlus {
 
     def menuItemSeparator(menuText: String) = { getOrCreateMenu(menuText).addSeparator; jFrame }
 
-    def menuItemSeparator2(menuText: Text) = { getOrCreateMenu(menuText.get).addSeparator; jFrame }
 
     def menuItems(menuText: String, menuItemTexts: Seq[String], action: String => Unit, icon: Icon = null) = {
       def createMenuItem(menuItemText: String) = menuItemEvent(menuText, menuItemText, frame => action(menuItemText), icon)
@@ -132,15 +131,9 @@ object JFramePlus {
       jFrame
     }
 
-    def menuItems2(menuText: Text, menuItemTexts: Seq[String], action: String => Unit, icon: Icon = null) = {
-      def createMenuItem(menuItemText: String) = menuItemEvent2(menuText, new Text(BehaviorSubject(menuItemText)){}, frame => action(menuItemText), icon)
-      menuItemTexts foreach createMenuItem
-      jFrame
-    }
+    def menuItem(menuText: String, menuItemText: String, action: => Unit) = menuItemEvent(menuText: String, menuItemText, frame => action, null)
 
-    def menuItem(menuText: String, menuItemText: String, action: => Unit, icon: Icon = null) = menuItemEvent(menuText: String, menuItemText, frame => action, icon)
-
-    def menuItemEvent(menuText: String, menuItemText: String, action: TYPE => Unit, icon: Icon = null) = {
+    def menuItemEvent(menuText: String, menuItemText: String, action: TYPE => Unit, icon: Icon) = {
       val menuItem = new JMenuItem(menuItemText)
       if (icon != null) menuItem.setIcon(icon)
       getOrCreateMenu(menuText).add(menuItem)
@@ -148,18 +141,25 @@ object JFramePlus {
       jFrame
     }
 
-    def menuItem2(menuText: Text, menuItemText: Text, action:  => Unit, icon: Icon = null) = menuItemEvent2(menuText, menuItemText, frame => action, icon)
-    def menuItemEvent2(menuText: Text, menuItemText: Text, action: TYPE => Unit, icon: Icon = null) = {
+    
+    def menuItem(menuText: Text, menuItemText: Text, action: => Unit) = menuItemEvent(menuText, menuItemText, frame => action)
+    def menuItemEvent(menuText: Text, menuItemText: Text, action: TYPE => Unit) = {
       // TODO JMenuItemPlus
       val menuItem = new JMenuItem(menuItemText.get)
       menuItem.setName(menuItemText.get)
       menuItemText.subscribe(menuItem.setText(_))
-      if (icon != null) menuItem.setIcon(icon)
-      getOrCreateMenu2(menuText).add(menuItem)
+//      if (icon != null) menuItem.setIcon(icon) // TODO
+      getOrCreateMenu(menuText).add(menuItem)
       menuItem.onAction(action(jFrame))
       jFrame
     }
-    private def getOrCreateMenu2(menuText: Text) = getOrCreateJMenuBar.getOrCreateMenu2(menuText)
+    def menuItems(menuText: Text, menuItemTexts: Seq[String], action: String => Unit) = {
+    		def createMenuItem(menuItemText: String) = menuItemEvent(menuText, new Text(BehaviorSubject(menuItemText)) {}, frame => action(menuItemText))
+    				menuItemTexts foreach createMenuItem
+    				jFrame
+    }
+    def menuItemSeparator(menuText: Text) = { getOrCreateMenu(menuText.get).addSeparator; jFrame }
+    private def getOrCreateMenu(menuText: Text) = getOrCreateJMenuBar.getOrCreateMenu(menuText)
 
   }
 }
