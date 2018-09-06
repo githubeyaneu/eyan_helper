@@ -116,7 +116,7 @@
 			<artifactId>rxscala_2.12</artifactId>
 			<version>0.26.5</version>
 		</dependency>
-		
+
 		<!-- <dependency> -->
 		<!-- <groupId>com.google.guava</groupId> -->
 		<!-- <artifactId>guava-collections</artifactId> -->
@@ -219,6 +219,14 @@
 			<groupId>org.snmp4j</groupId>
 			<artifactId>snmp4j</artifactId>
 			<version>2.5.0</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>2.20.1</version>
+			<scope>test</scope>
 		</dependency>
 
 

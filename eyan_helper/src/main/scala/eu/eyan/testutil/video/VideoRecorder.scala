@@ -22,12 +22,14 @@ import org.monte.media.FormatKeys.MediaType
 import org.monte.media.math.Rational
 import java.awt.AWTException
 import eu.eyan.log.Log
+import java.awt.Toolkit
+import java.awt.Point
 
 class VideoRecorder {
 
   private var screenRecorder: ScreenRecorderToFile = null
 
-  def start(component: Component, fileLocation: String, videoName: String) = {
+  def start(fullScreen: Boolean, component: Component, fileLocation: String, videoName: String) = {
     try {
       val gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration()
 
@@ -52,12 +54,13 @@ class VideoRecorder {
 
       val mouseFormat = new Format(MediaTypeKey, MediaType.VIDEO, EncodingKey, "black", FrameRateKey, Rational.valueOf(2 * FIFTEEN))
 
-      val capture = new Rectangle(component.getLocationOnScreen(), component.getSize())
+      val capture =
+        if (fullScreen) new Rectangle(new Point(0, 0), Toolkit.getDefaultToolkit.getScreenSize)
+        else new Rectangle(component.getLocationOnScreen(), component.getSize())
 
       screenRecorder = new ScreenRecorderToFile(gc, capture, fileFormat, screenFormat, mouseFormat, null, new File(fileLocation), videoName)
       screenRecorder.start()
-    }
-    catch {
+    } catch {
       case e: IOException  => Log.error(e)
       case e: AWTException => Log.error(e)
     }

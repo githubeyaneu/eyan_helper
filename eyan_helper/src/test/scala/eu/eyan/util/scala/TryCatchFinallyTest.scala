@@ -34,7 +34,7 @@ class TryCatchFinallyTest extends TestPlus {
 
   // Test test :)
   @Test def noException = { action ==> ActionResult; actionDone ==> true }
-  @Test def exception__ = { Exeption_Action <== actionError; actionDone ==> false }
+  @Test def exception__ = { actionError ==> Exeption_Action; actionDone ==> false }
 
   // Tests TryCatchFinally
   var catchDone = false
@@ -53,13 +53,13 @@ class TryCatchFinallyTest extends TestPlus {
     finallyDone ==> ("finallyDone", f)
   }
   @Test def tcf_ActionOk__CatchOk__FinallyOk_ = { TryCatchFinally(action, catcch, finaly) ==> ActionResult; actionCatchFinally(true, false, true) }
-  @Test def tcf_ActionOk__CatchOk__FinallyErr = { Exception_Finally <== TryCatchFinally(action, catcch, finallyError); actionCatchFinally(true, false, false) }
+  @Test def tcf_ActionOk__CatchOk__FinallyErr = { TryCatchFinally(action, catcch, finallyError)==> Exception_Finally; actionCatchFinally(true, false, false) }
   @Test def tcf_ActionOk__CatchErr_FinallyOk_ = { TryCatchFinally(action, catchError, finaly) ==> ActionResult; actionCatchFinally(true, false, true) }
-  @Test def tcf_ActionOk__CatchErr_FinallyErr = { Exception_Finally <== TryCatchFinally(action, catchError, finallyError); actionCatchFinally(true, false, false) }
+  @Test def tcf_ActionOk__CatchErr_FinallyErr = {  TryCatchFinally(action, catchError, finallyError)==>Exception_Finally; actionCatchFinally(true, false, false) }
   @Test def tcf_ActionErr_CatchOk__FinallyOk_ = { TryCatchFinally(actionError, catcch, finaly) ==> CatchResult; actionCatchFinally(false, true, true) }
-  @Test def tcf_ActionErr_CatchOk__FinallyErr = { Exception_Finally <== TryCatchFinally(actionError, catcch, finallyError); actionCatchFinally(false, true, false) }
-  @Test def tcf_ActionErr_CatchErr_FinallyOk_ = { Exception_Catch <== TryCatchFinally(actionError, catchError, finaly); actionCatchFinally(false, false, true) }
-  @Test def tcf_ActionErr_CatchErr_FinallyErr = { Exception_Finally <== TryCatchFinally(actionError, catchError, finallyError); actionCatchFinally(false, false, false) }
+  @Test def tcf_ActionErr_CatchOk__FinallyErr = { TryCatchFinally(actionError, catcch, finallyError)==>Exception_Finally; actionCatchFinally(false, true, false) }
+  @Test def tcf_ActionErr_CatchErr_FinallyOk_ = { TryCatchFinally(actionError, catchError, finaly) ==> Exception_Catch; actionCatchFinally(false, false, true) }
+  @Test def tcf_ActionErr_CatchErr_FinallyErr = { TryCatchFinally(actionError, catchError, finallyError)==>Exception_Finally; actionCatchFinally(false, false, false) }
 
   @Theory def tcf(actionOk: Boolean, catchOk: Boolean, finallyOk: Boolean) = {
     def testCall = TryCatchFinally(
@@ -67,8 +67,8 @@ class TryCatchFinallyTest extends TestPlus {
       if (catchOk) catcch else catchError,
       if (finallyOk) finaly else finallyError)
 
-    if (!finallyOk) Exception_Finally <== testCall
-    else if (!actionOk && !catchOk) Exception_Catch <== testCall
+    if (!finallyOk) testCall ==> Exception_Finally
+    else if (!actionOk && !catchOk) testCall ==> Exception_Catch
     else if (actionOk) testCall ==> ActionResult
     else testCall ==> CatchResult
 
@@ -108,19 +108,19 @@ class TryCatchFinallyTest extends TestPlus {
   @Test def tcfc_CloseableOk__ActionOk__CatchOk__CloseOk_ = { TryCatchFinallyClose(closeable1, closeable1Action, catcch) ==> Closeable1ActionResult; closeableActionCatchClose(true, true, false, true) }
   @Test def tcfc_CloseableOk__ActionOk__CatchErr_CloseOk_ = { TryCatchFinallyClose(closeable1, closeable1Action, catchError) ==> Closeable1ActionResult; closeableActionCatchClose(true, true, false, true) }
   @Test def tcfc_CloseableOk__ActionErr_CatchOk__CloseOk_ = { TryCatchFinallyClose(closeable1, closeable1ActionError, catcch) ==> CatchResult; closeableActionCatchClose(true, false, true, true) }
-  @Test def tcfc_CloseableOk__ActionErr_CatchErr_CloseOk_ = { Exception_Catch <== TryCatchFinallyClose(closeable1, closeable1ActionError, catchError); closeableActionCatchClose(true, false, false, true) }
+  @Test def tcfc_CloseableOk__ActionErr_CatchErr_CloseOk_ = { TryCatchFinallyClose(closeable1, closeable1ActionError, catchError)==> Exception_Catch; closeableActionCatchClose(true, false, false, true) }
   @Test def tcfc_CloseableErr_ActionOk__CatchOk__CloseOk_ = { TryCatchFinallyClose(closeable1Error, closeable1Action, catcch) ==> CatchResult; closeableActionCatchClose(false, false, true, false) }
-  @Test def tcfc_CloseableErr_ActionOk__CatchErr_CloseOk_ = { Exception_Catch <== TryCatchFinallyClose(closeable1Error, closeable1Action, catchError); closeableActionCatchClose(false, false, false, false) }
+  @Test def tcfc_CloseableErr_ActionOk__CatchErr_CloseOk_ = { TryCatchFinallyClose(closeable1Error, closeable1Action, catchError)==>Exception_Catch; closeableActionCatchClose(false, false, false, false) }
   @Test def tcfc_CloseableErr_ActionErr_CatchOk__CloseOk_ = { TryCatchFinallyClose(closeable1Error, closeable1ActionError, catcch) ==> CatchResult; closeableActionCatchClose(false, false, true, false) }
-  @Test def tcfc_CloseableErr_ActionErr_CatchErr_CloseOk_ = { Exception_Catch <== TryCatchFinallyClose(closeable1Error, closeable1ActionError, catchError); closeableActionCatchClose(false, false, false, false) }
+  @Test def tcfc_CloseableErr_ActionErr_CatchErr_CloseOk_ = { TryCatchFinallyClose(closeable1Error, closeable1ActionError, catchError)==> Exception_Catch; closeableActionCatchClose(false, false, false, false) }
   @Test def tcfc_CloseableOk__ActionOk__CatchOk__CloseErr = { close1Ok = false; TryCatchFinallyClose(closeable1, closeable1Action, catcch) ==> Closeable1ActionResult; closeableActionCatchClose(true, true, false, false) }
   @Test def tcfc_CloseableOk__ActionOk__CatchErr_CloseErr = { close1Ok = false; TryCatchFinallyClose(closeable1, closeable1Action, catchError) ==> Closeable1ActionResult; closeableActionCatchClose(true, true, false, false) }
   @Test def tcfc_CloseableOk__ActionErr_CatchOk__CloseErr = { close1Ok = false; TryCatchFinallyClose(closeable1, closeable1ActionError, catcch) ==> CatchResult; closeableActionCatchClose(true, false, true, false) }
-  @Test def tcfc_CloseableOk__ActionErr_CatchErr_CloseErr = { close1Ok = false; Exception_Catch <== TryCatchFinallyClose(closeable1, closeable1ActionError, catchError); closeableActionCatchClose(true, false, false, false) }
+  @Test def tcfc_CloseableOk__ActionErr_CatchErr_CloseErr = { close1Ok = false; TryCatchFinallyClose(closeable1, closeable1ActionError, catchError)==>Exception_Catch; closeableActionCatchClose(true, false, false, false) }
   @Test def tcfc_CloseableErr_ActionOk__CatchOk__CloseErr = { close1Ok = false; TryCatchFinallyClose(closeable1Error, closeable1Action, catcch) ==> CatchResult; closeableActionCatchClose(false, false, true, false) }
-  @Test def tcfc_CloseableErr_ActionOk__CatchErr_CloseErr = { close1Ok = false; Exception_Catch <== TryCatchFinallyClose(closeable1Error, closeable1Action, catchError); closeableActionCatchClose(false, false, false, false) }
+  @Test def tcfc_CloseableErr_ActionOk__CatchErr_CloseErr = { close1Ok = false; TryCatchFinallyClose(closeable1Error, closeable1Action, catchError)==>Exception_Catch; closeableActionCatchClose(false, false, false, false) }
   @Test def tcfc_CloseableErr_ActionErr_CatchOk__CloseErr = { close1Ok = false; TryCatchFinallyClose(closeable1Error, closeable1ActionError, catcch) ==> CatchResult; closeableActionCatchClose(false, false, true, false) }
-  @Test def tcfc_CloseableErr_ActionErr_CatchErr_CloseErr = { close1Ok = false; Exception_Catch <== TryCatchFinallyClose(closeable1Error, closeable1ActionError, catchError); closeableActionCatchClose(false, false, false, false) }
+  @Test def tcfc_CloseableErr_ActionErr_CatchErr_CloseErr = { close1Ok = false;  TryCatchFinallyClose(closeable1Error, closeable1ActionError, catchError)==>Exception_Catch; closeableActionCatchClose(false, false, false, false) }
 
   @Theory def closables(closeableOk: Boolean, actionOk: Boolean, catchOk: Boolean, _closeOk: Boolean) = {
     close1Ok = _closeOk;
@@ -129,7 +129,7 @@ class TryCatchFinallyTest extends TestPlus {
       if (actionOk) closeable1Action else closeable1ActionError,
       if (catchOk) catcch else catchError)
 
-    if (!catchOk && (!closeableOk || !actionOk)) Exception_Catch <== testCall
+    if (!catchOk && (!closeableOk || !actionOk))testCall==>Exception_Catch
     else if (catchOk && (!closeableOk || !actionOk)) testCall ==> ("result should be CatchResult", CatchResult)
     else testCall ==> ("result should be Closeable1ActionResult", Closeable1ActionResult)
 
@@ -167,70 +167,70 @@ class TryCatchFinallyTest extends TestPlus {
   @Test def tcfc2_Closeable1Ok__Closeable2Ok__ActionOk__CatchOk__Close1Ok__Close2Ok_ = { TryCatchFinallyClose(closeable1, closeable2, closeable2Action, catcch) ==> Closeable2ActionResult; checkClose2(true, true, true, false, true, true) }
   @Test def tcfc2_Closeable1Ok__Closeable2Ok__ActionOk__CatchErr_Close1Ok__Close2Ok_ = { TryCatchFinallyClose(closeable1, closeable2, closeable2Action, catchError) ==> Closeable2ActionResult; checkClose2(true, true, true, false, true, true) }
   @Test def tcfc2_Closeable1Ok__Closeable2Ok__ActionErr_CatchOk__Close1Ok__Close2Ok_ = { TryCatchFinallyClose(closeable1, closeable2, closeable2ActionError, catcch) ==> CatchResult; checkClose2(true, true, false, true, true, true) }
-  @Test def tcfc2_Closeable1Ok__Closeable2Ok__ActionErr_CatchErr_Close1Ok__Close2Ok_ = { Exception_Catch <== TryCatchFinallyClose(closeable1, closeable2, closeable2ActionError, catchError); checkClose2(true, true, false, false, true, true) }
+  @Test def tcfc2_Closeable1Ok__Closeable2Ok__ActionErr_CatchErr_Close1Ok__Close2Ok_ = { TryCatchFinallyClose(closeable1, closeable2, closeable2ActionError, catchError)==>Exception_Catch; checkClose2(true, true, false, false, true, true) }
   @Test def tcfc2_Closeable1Ok__Closeable2Err_ActionOk__CatchOk__Close1Ok__Close2Ok_ = { TryCatchFinallyClose(closeable1, closeable2Error, closeable2Action, catcch) ==> CatchResult; checkClose2(true, false, false, true, true, false) }
-  @Test def tcfc2_Closeable1Ok__Closeable2Err_ActionOk__CatchErr_Close1Ok__Close2Ok_ = { Exception_Catch <== TryCatchFinallyClose(closeable1, closeable2Error, closeable2Action, catchError); checkClose2(true, false, false, false, true, false) }
+  @Test def tcfc2_Closeable1Ok__Closeable2Err_ActionOk__CatchErr_Close1Ok__Close2Ok_ = { TryCatchFinallyClose(closeable1, closeable2Error, closeable2Action, catchError)==>Exception_Catch; checkClose2(true, false, false, false, true, false) }
   @Test def tcfc2_Closeable1Ok__Closeable2Err_ActionErr_CatchOk__Close1Ok__Close2Ok_ = { TryCatchFinallyClose(closeable1, closeable2Error, closeable2ActionError, catcch) ==> CatchResult; checkClose2(true, false, false, true, true, false) }
-  @Test def tcfc2_Closeable1Ok__Closeable2Err_ActionErr_CatchErr_Close1Ok__Close2Ok_ = { Exception_Catch <== TryCatchFinallyClose(closeable1, closeable2Error, closeable2ActionError, catchError); checkClose2(true, false, false, false, true, false) }
+  @Test def tcfc2_Closeable1Ok__Closeable2Err_ActionErr_CatchErr_Close1Ok__Close2Ok_ = { TryCatchFinallyClose(closeable1, closeable2Error, closeable2ActionError, catchError)==>Exception_Catch; checkClose2(true, false, false, false, true, false) }
   @Test def tcfc2_Closeable1Err_Closeable2Ok__ActionOk__CatchOk__Close1Ok__Close2Ok_ = { TryCatchFinallyClose(closeable1Error, closeable2, closeable2Action, catcch) ==> CatchResult; checkClose2(false, false, false, true, false, false) }
-  @Test def tcfc2_Closeable1Err_Closeable2Ok__ActionOk__CatchErr_Close1Ok__Close2Ok_ = { Exception_Catch <== TryCatchFinallyClose(closeable1Error, closeable2, closeable2Action, catchError); checkClose2(false, false, false, false, false, false) }
+  @Test def tcfc2_Closeable1Err_Closeable2Ok__ActionOk__CatchErr_Close1Ok__Close2Ok_ = { TryCatchFinallyClose(closeable1Error, closeable2, closeable2Action, catchError)==>Exception_Catch; checkClose2(false, false, false, false, false, false) }
   @Test def tcfc2_Closeable1Err_Closeable2Ok__ActionErr_CatchOk__Close1Ok__Close2Ok_ = { TryCatchFinallyClose(closeable1Error, closeable2, closeable2ActionError, catcch) ==> CatchResult; checkClose2(false, false, false, true, false, false) }
-  @Test def tcfc2_Closeable1Err_Closeable2Ok__ActionErr_CatchErr_Close1Ok__Close2Ok_ = { Exception_Catch <== TryCatchFinallyClose(closeable1Error, closeable2, closeable2ActionError, catchError); checkClose2(false, false, false, false, false, false) }
+  @Test def tcfc2_Closeable1Err_Closeable2Ok__ActionErr_CatchErr_Close1Ok__Close2Ok_ = { TryCatchFinallyClose(closeable1Error, closeable2, closeable2ActionError, catchError)==>Exception_Catch; checkClose2(false, false, false, false, false, false) }
   @Test def tcfc2_Closeable1Err_Closeable2Err_ActionOk__CatchOk__Close1Ok__Close2Ok_ = { TryCatchFinallyClose(closeable1Error, closeable2Error, closeable2Action, catcch) ==> CatchResult; checkClose2(false, false, false, true, false, false) }
-  @Test def tcfc2_Closeable1Err_Closeable2Err_ActionOk__CatchErr_Close1Ok__Close2Ok_ = { Exception_Catch <== TryCatchFinallyClose(closeable1Error, closeable2Error, closeable2Action, catchError); checkClose2(false, false, false, false, false, false) }
+  @Test def tcfc2_Closeable1Err_Closeable2Err_ActionOk__CatchErr_Close1Ok__Close2Ok_ = { TryCatchFinallyClose(closeable1Error, closeable2Error, closeable2Action, catchError)==>Exception_Catch; checkClose2(false, false, false, false, false, false) }
   @Test def tcfc2_Closeable1Err_Closeable2Err_ActionErr_CatchOk__Close1Ok__Close2Ok_ = { TryCatchFinallyClose(closeable1Error, closeable2Error, closeable2ActionError, catcch) ==> CatchResult; checkClose2(false, false, false, true, false, false) }
-  @Test def tcfc2_Closeable1Err_Closeable2Err_ActionErr_CatchErr_Close1Ok__Close2Ok_ = { Exception_Catch <== TryCatchFinallyClose(closeable1Error, closeable2Error, closeable2ActionError, catchError); checkClose2(false, false, false, false, false, false) }
+  @Test def tcfc2_Closeable1Err_Closeable2Err_ActionErr_CatchErr_Close1Ok__Close2Ok_ = { TryCatchFinallyClose(closeable1Error, closeable2Error, closeable2ActionError, catchError)==>Exception_Catch; checkClose2(false, false, false, false, false, false) }
 
   @Test def tcfc2_Closeable1Ok__Closeable2Ok__ActionOk__CatchOk__Close1Err_Close2Ok_ = { close1Ok = false; TryCatchFinallyClose(closeable1, closeable2, closeable2Action, catcch) ==> Closeable2ActionResult; checkClose2(true, true, true, false, false, true) }
   @Test def tcfc2_Closeable1Ok__Closeable2Ok__ActionOk__CatchErr_Close1Err_Close2Ok_ = { close1Ok = false; TryCatchFinallyClose(closeable1, closeable2, closeable2Action, catchError) ==> Closeable2ActionResult; checkClose2(true, true, true, false, false, true) }
   @Test def tcfc2_Closeable1Ok__Closeable2Ok__ActionErr_CatchOk__Close1Err_Close2Ok_ = { close1Ok = false; TryCatchFinallyClose(closeable1, closeable2, closeable2ActionError, catcch) ==> CatchResult; checkClose2(true, true, false, true, false, true) }
-  @Test def tcfc2_Closeable1Ok__Closeable2Ok__ActionErr_CatchErr_Close1Err_Close2Ok_ = { close1Ok = false; Exception_Catch <== TryCatchFinallyClose(closeable1, closeable2, closeable2ActionError, catchError); checkClose2(true, true, false, false, false, true) }
+  @Test def tcfc2_Closeable1Ok__Closeable2Ok__ActionErr_CatchErr_Close1Err_Close2Ok_ = { close1Ok = false; TryCatchFinallyClose(closeable1, closeable2, closeable2ActionError, catchError)==>Exception_Catch; checkClose2(true, true, false, false, false, true) }
   @Test def tcfc2_Closeable1Ok__Closeable2Err_ActionOk__CatchOk__Close1Err_Close2Ok_ = { close1Ok = false; TryCatchFinallyClose(closeable1, closeable2Error, closeable2Action, catcch) ==> CatchResult; checkClose2(true, false, false, true, false, false) }
-  @Test def tcfc2_Closeable1Ok__Closeable2Err_ActionOk__CatchErr_Close1Err_Close2Ok_ = { close1Ok = false; Exception_Catch <== TryCatchFinallyClose(closeable1, closeable2Error, closeable2Action, catchError); checkClose2(true, false, false, false, false, false) }
+  @Test def tcfc2_Closeable1Ok__Closeable2Err_ActionOk__CatchErr_Close1Err_Close2Ok_ = { close1Ok = false; TryCatchFinallyClose(closeable1, closeable2Error, closeable2Action, catchError)==>Exception_Catch; checkClose2(true, false, false, false, false, false) }
   @Test def tcfc2_Closeable1Ok__Closeable2Err_ActionErr_CatchOk__Close1Err_Close2Ok_ = { close1Ok = false; TryCatchFinallyClose(closeable1, closeable2Error, closeable2ActionError, catcch) ==> CatchResult; checkClose2(true, false, false, true, false, false) }
-  @Test def tcfc2_Closeable1Ok__Closeable2Err_ActionErr_CatchErr_Close1Err_Close2Ok_ = { close1Ok = false; Exception_Catch <== TryCatchFinallyClose(closeable1, closeable2Error, closeable2ActionError, catchError); checkClose2(true, false, false, false, false, false) }
+  @Test def tcfc2_Closeable1Ok__Closeable2Err_ActionErr_CatchErr_Close1Err_Close2Ok_ = { close1Ok = false; TryCatchFinallyClose(closeable1, closeable2Error, closeable2ActionError, catchError)==>Exception_Catch; checkClose2(true, false, false, false, false, false) }
   @Test def tcfc2_Closeable1Err_Closeable2Ok__ActionOk__CatchOk__Close1Err_Close2Ok_ = { close1Ok = false; TryCatchFinallyClose(closeable1Error, closeable2, closeable2Action, catcch) ==> CatchResult; checkClose2(false, false, false, true, false, false) }
-  @Test def tcfc2_Closeable1Err_Closeable2Ok__ActionOk__CatchErr_Close1Err_Close2Ok_ = { close1Ok = false; Exception_Catch <== TryCatchFinallyClose(closeable1Error, closeable2, closeable2Action, catchError); checkClose2(false, false, false, false, false, false) }
+  @Test def tcfc2_Closeable1Err_Closeable2Ok__ActionOk__CatchErr_Close1Err_Close2Ok_ = { close1Ok = false; TryCatchFinallyClose(closeable1Error, closeable2, closeable2Action, catchError)==>Exception_Catch; checkClose2(false, false, false, false, false, false) }
   @Test def tcfc2_Closeable1Err_Closeable2Ok__ActionErr_CatchOk__Close1Err_Close2Ok_ = { close1Ok = false; TryCatchFinallyClose(closeable1Error, closeable2, closeable2ActionError, catcch) ==> CatchResult; checkClose2(false, false, false, true, false, false) }
-  @Test def tcfc2_Closeable1Err_Closeable2Ok__ActionErr_CatchErr_Close1Err_Close2Ok_ = { close1Ok = false; Exception_Catch <== TryCatchFinallyClose(closeable1Error, closeable2, closeable2ActionError, catchError); checkClose2(false, false, false, false, false, false) }
+  @Test def tcfc2_Closeable1Err_Closeable2Ok__ActionErr_CatchErr_Close1Err_Close2Ok_ = { close1Ok = false; TryCatchFinallyClose(closeable1Error, closeable2, closeable2ActionError, catchError)==>Exception_Catch; checkClose2(false, false, false, false, false, false) }
   @Test def tcfc2_Closeable1Err_Closeable2Err_ActionOk__CatchOk__Close1Err_Close2Ok_ = { close1Ok = false; TryCatchFinallyClose(closeable1Error, closeable2Error, closeable2Action, catcch) ==> CatchResult; checkClose2(false, false, false, true, false, false) }
-  @Test def tcfc2_Closeable1Err_Closeable2Err_ActionOk__CatchErr_Close1Err_Close2Ok_ = { close1Ok = false; Exception_Catch <== TryCatchFinallyClose(closeable1Error, closeable2Error, closeable2Action, catchError); checkClose2(false, false, false, false, false, false) }
+  @Test def tcfc2_Closeable1Err_Closeable2Err_ActionOk__CatchErr_Close1Err_Close2Ok_ = { close1Ok = false; TryCatchFinallyClose(closeable1Error, closeable2Error, closeable2Action, catchError)==>Exception_Catch; checkClose2(false, false, false, false, false, false) }
   @Test def tcfc2_Closeable1Err_Closeable2Err_ActionErr_CatchOk__Close1Err_Close2Ok_ = { close1Ok = false; TryCatchFinallyClose(closeable1Error, closeable2Error, closeable2ActionError, catcch) ==> CatchResult; checkClose2(false, false, false, true, false, false) }
-  @Test def tcfc2_Closeable1Err_Closeable2Err_ActionErr_CatchErr_Close1Err_Close2Ok_ = { close1Ok = false; Exception_Catch <== TryCatchFinallyClose(closeable1Error, closeable2Error, closeable2ActionError, catchError); checkClose2(false, false, false, false, false, false) }
+  @Test def tcfc2_Closeable1Err_Closeable2Err_ActionErr_CatchErr_Close1Err_Close2Ok_ = { close1Ok = false; TryCatchFinallyClose(closeable1Error, closeable2Error, closeable2ActionError, catchError)==>Exception_Catch; checkClose2(false, false, false, false, false, false) }
 
   @Test def tcfc2_Closeable1Ok__Closeable2Ok__ActionOk__CatchOk__Close1Ok__Close2Err = { close2Ok = false; TryCatchFinallyClose(closeable1, closeable2, closeable2Action, catcch) ==> Closeable2ActionResult; checkClose2(true, true, true, false, true, false) }
   @Test def tcfc2_Closeable1Ok__Closeable2Ok__ActionOk__CatchErr_Close1Ok__Close2Err = { close2Ok = false; TryCatchFinallyClose(closeable1, closeable2, closeable2Action, catchError) ==> Closeable2ActionResult; checkClose2(true, true, true, false, true, false) }
   @Test def tcfc2_Closeable1Ok__Closeable2Ok__ActionErr_CatchOk__Close1Ok__Close2Err = { close2Ok = false; TryCatchFinallyClose(closeable1, closeable2, closeable2ActionError, catcch) ==> CatchResult; checkClose2(true, true, false, true, true, false) }
-  @Test def tcfc2_Closeable1Ok__Closeable2Ok__ActionErr_CatchErr_Close1Ok__Close2Err = { close2Ok = false; Exception_Catch <== TryCatchFinallyClose(closeable1, closeable2, closeable2ActionError, catchError); checkClose2(true, true, false, false, true, false) }
+  @Test def tcfc2_Closeable1Ok__Closeable2Ok__ActionErr_CatchErr_Close1Ok__Close2Err = { close2Ok = false; TryCatchFinallyClose(closeable1, closeable2, closeable2ActionError, catchError)==>Exception_Catch; checkClose2(true, true, false, false, true, false) }
   @Test def tcfc2_Closeable1Ok__Closeable2Err_ActionOk__CatchOk__Close1Ok__Close2Err = { close2Ok = false; TryCatchFinallyClose(closeable1, closeable2Error, closeable2Action, catcch) ==> CatchResult; checkClose2(true, false, false, true, true, false) }
-  @Test def tcfc2_Closeable1Ok__Closeable2Err_ActionOk__CatchErr_Close1Ok__Close2Err = { close2Ok = false; Exception_Catch <== TryCatchFinallyClose(closeable1, closeable2Error, closeable2Action, catchError); checkClose2(true, false, false, false, true, false) }
+  @Test def tcfc2_Closeable1Ok__Closeable2Err_ActionOk__CatchErr_Close1Ok__Close2Err = { close2Ok = false; TryCatchFinallyClose(closeable1, closeable2Error, closeable2Action, catchError)==>Exception_Catch; checkClose2(true, false, false, false, true, false) }
   @Test def tcfc2_Closeable1Ok__Closeable2Err_ActionErr_CatchOk__Close1Ok__Close2Err = { close2Ok = false; TryCatchFinallyClose(closeable1, closeable2Error, closeable2ActionError, catcch) ==> CatchResult; checkClose2(true, false, false, true, true, false) }
-  @Test def tcfc2_Closeable1Ok__Closeable2Err_ActionErr_CatchErr_Close1Ok__Close2Err = { close2Ok = false; Exception_Catch <== TryCatchFinallyClose(closeable1, closeable2Error, closeable2ActionError, catchError); checkClose2(true, false, false, false, true, false) }
+  @Test def tcfc2_Closeable1Ok__Closeable2Err_ActionErr_CatchErr_Close1Ok__Close2Err = { close2Ok = false; TryCatchFinallyClose(closeable1, closeable2Error, closeable2ActionError, catchError)==>Exception_Catch; checkClose2(true, false, false, false, true, false) }
   @Test def tcfc2_Closeable1Err_Closeable2Ok__ActionOk__CatchOk__Close1Ok__Close2Err = { close2Ok = false; TryCatchFinallyClose(closeable1Error, closeable2, closeable2Action, catcch) ==> CatchResult; checkClose2(false, false, false, true, false, false) }
-  @Test def tcfc2_Closeable1Err_Closeable2Ok__ActionOk__CatchErr_Close1Ok__Close2Err = { close2Ok = false; Exception_Catch <== TryCatchFinallyClose(closeable1Error, closeable2, closeable2Action, catchError); checkClose2(false, false, false, false, false, false) }
+  @Test def tcfc2_Closeable1Err_Closeable2Ok__ActionOk__CatchErr_Close1Ok__Close2Err = { close2Ok = false; TryCatchFinallyClose(closeable1Error, closeable2, closeable2Action, catchError)==>Exception_Catch; checkClose2(false, false, false, false, false, false) }
   @Test def tcfc2_Closeable1Err_Closeable2Ok__ActionErr_CatchOk__Close1Ok__Close2Err = { close2Ok = false; TryCatchFinallyClose(closeable1Error, closeable2, closeable2ActionError, catcch) ==> CatchResult; checkClose2(false, false, false, true, false, false) }
-  @Test def tcfc2_Closeable1Err_Closeable2Ok__ActionErr_CatchErr_Close1Ok__Close2Err = { close2Ok = false; Exception_Catch <== TryCatchFinallyClose(closeable1Error, closeable2, closeable2ActionError, catchError); checkClose2(false, false, false, false, false, false) }
+  @Test def tcfc2_Closeable1Err_Closeable2Ok__ActionErr_CatchErr_Close1Ok__Close2Err = { close2Ok = false; TryCatchFinallyClose(closeable1Error, closeable2, closeable2ActionError, catchError)==>Exception_Catch; checkClose2(false, false, false, false, false, false) }
   @Test def tcfc2_Closeable1Err_Closeable2Err_ActionOk__CatchOk__Close1Ok__Close2Err = { close2Ok = false; TryCatchFinallyClose(closeable1Error, closeable2Error, closeable2Action, catcch) ==> CatchResult; checkClose2(false, false, false, true, false, false) }
-  @Test def tcfc2_Closeable1Err_Closeable2Err_ActionOk__CatchErr_Close1Ok__Close2Err = { close2Ok = false; Exception_Catch <== TryCatchFinallyClose(closeable1Error, closeable2Error, closeable2Action, catchError); checkClose2(false, false, false, false, false, false) }
+  @Test def tcfc2_Closeable1Err_Closeable2Err_ActionOk__CatchErr_Close1Ok__Close2Err = { close2Ok = false; TryCatchFinallyClose(closeable1Error, closeable2Error, closeable2Action, catchError)==>Exception_Catch; checkClose2(false, false, false, false, false, false) }
   @Test def tcfc2_Closeable1Err_Closeable2Err_ActionErr_CatchOk__Close1Ok__Close2Err = { close2Ok = false; TryCatchFinallyClose(closeable1Error, closeable2Error, closeable2ActionError, catcch) ==> CatchResult; checkClose2(false, false, false, true, false, false) }
-  @Test def tcfc2_Closeable1Err_Closeable2Err_ActionErr_CatchErr_Close1Ok__Close2Err = { close2Ok = false; Exception_Catch <== TryCatchFinallyClose(closeable1Error, closeable2Error, closeable2ActionError, catchError); checkClose2(false, false, false, false, false, false) }
+  @Test def tcfc2_Closeable1Err_Closeable2Err_ActionErr_CatchErr_Close1Ok__Close2Err = { close2Ok = false; TryCatchFinallyClose(closeable1Error, closeable2Error, closeable2ActionError, catchError)==>Exception_Catch; checkClose2(false, false, false, false, false, false) }
 
   @Test def tcfc2_Closeable1Ok__Closeable2Ok__ActionOk__CatchOk__Close1Err_Close2Err = { close1Ok = false; close2Ok = false; TryCatchFinallyClose(closeable1, closeable2, closeable2Action, catcch) ==> Closeable2ActionResult; checkClose2(true, true, true, false, false, false) }
   @Test def tcfc2_Closeable1Ok__Closeable2Ok__ActionOk__CatchErr_Close1Err_Close2Err = { close1Ok = false; close2Ok = false; TryCatchFinallyClose(closeable1, closeable2, closeable2Action, catchError) ==> Closeable2ActionResult; checkClose2(true, true, true, false, false, false) }
   @Test def tcfc2_Closeable1Ok__Closeable2Ok__ActionErr_CatchOk__Close1Err_Close2Err = { close1Ok = false; close2Ok = false; TryCatchFinallyClose(closeable1, closeable2, closeable2ActionError, catcch) ==> CatchResult; checkClose2(true, true, false, true, false, false) }
-  @Test def tcfc2_Closeable1Ok__Closeable2Ok__ActionErr_CatchErr_Close1Err_Close2Err = { close1Ok = false; close2Ok = false; Exception_Catch <== TryCatchFinallyClose(closeable1, closeable2, closeable2ActionError, catchError); checkClose2(true, true, false, false, false, false) }
+  @Test def tcfc2_Closeable1Ok__Closeable2Ok__ActionErr_CatchErr_Close1Err_Close2Err = { close1Ok = false; close2Ok = false; TryCatchFinallyClose(closeable1, closeable2, closeable2ActionError, catchError)==>Exception_Catch; checkClose2(true, true, false, false, false, false) }
   @Test def tcfc2_Closeable1Ok__Closeable2Err_ActionOk__CatchOk__Close1Err_Close2Err = { close1Ok = false; close2Ok = false; TryCatchFinallyClose(closeable1, closeable2Error, closeable2Action, catcch) ==> CatchResult; checkClose2(true, false, false, true, false, false) }
-  @Test def tcfc2_Closeable1Ok__Closeable2Err_ActionOk__CatchErr_Close1Err_Close2Err = { close1Ok = false; close2Ok = false; Exception_Catch <== TryCatchFinallyClose(closeable1, closeable2Error, closeable2Action, catchError); checkClose2(true, false, false, false, false, false) }
+  @Test def tcfc2_Closeable1Ok__Closeable2Err_ActionOk__CatchErr_Close1Err_Close2Err = { close1Ok = false; close2Ok = false; TryCatchFinallyClose(closeable1, closeable2Error, closeable2Action, catchError)==>Exception_Catch; checkClose2(true, false, false, false, false, false) }
   @Test def tcfc2_Closeable1Ok__Closeable2Err_ActionErr_CatchOk__Close1Err_Close2Err = { close1Ok = false; close2Ok = false; TryCatchFinallyClose(closeable1, closeable2Error, closeable2ActionError, catcch) ==> CatchResult; checkClose2(true, false, false, true, false, false) }
-  @Test def tcfc2_Closeable1Ok__Closeable2Err_ActionErr_CatchErr_Close1Err_Close2Err = { close1Ok = false; close2Ok = false; Exception_Catch <== TryCatchFinallyClose(closeable1, closeable2Error, closeable2ActionError, catchError); checkClose2(true, false, false, false, false, false) }
+  @Test def tcfc2_Closeable1Ok__Closeable2Err_ActionErr_CatchErr_Close1Err_Close2Err = { close1Ok = false; close2Ok = false; TryCatchFinallyClose(closeable1, closeable2Error, closeable2ActionError, catchError)==>Exception_Catch; checkClose2(true, false, false, false, false, false) }
   @Test def tcfc2_Closeable1Err_Closeable2Ok__ActionOk__CatchOk__Close1Err_Close2Err = { close1Ok = false; close2Ok = false; TryCatchFinallyClose(closeable1Error, closeable2, closeable2Action, catcch) ==> CatchResult; checkClose2(false, false, false, true, false, false) }
-  @Test def tcfc2_Closeable1Err_Closeable2Ok__ActionOk__CatchErr_Close1Err_Close2Err = { close1Ok = false; close2Ok = false; Exception_Catch <== TryCatchFinallyClose(closeable1Error, closeable2, closeable2Action, catchError); checkClose2(false, false, false, false, false, false) }
+  @Test def tcfc2_Closeable1Err_Closeable2Ok__ActionOk__CatchErr_Close1Err_Close2Err = { close1Ok = false; close2Ok = false; TryCatchFinallyClose(closeable1Error, closeable2, closeable2Action, catchError)==>Exception_Catch; checkClose2(false, false, false, false, false, false) }
   @Test def tcfc2_Closeable1Err_Closeable2Ok__ActionErr_CatchOk__Close1Err_Close2Err = { close1Ok = false; close2Ok = false; TryCatchFinallyClose(closeable1Error, closeable2, closeable2ActionError, catcch) ==> CatchResult; checkClose2(false, false, false, true, false, false) }
-  @Test def tcfc2_Closeable1Err_Closeable2Ok__ActionErr_CatchErr_Close1Err_Close2Err = { close1Ok = false; close2Ok = false; Exception_Catch <== TryCatchFinallyClose(closeable1Error, closeable2, closeable2ActionError, catchError); checkClose2(false, false, false, false, false, false) }
+  @Test def tcfc2_Closeable1Err_Closeable2Ok__ActionErr_CatchErr_Close1Err_Close2Err = { close1Ok = false; close2Ok = false; TryCatchFinallyClose(closeable1Error, closeable2, closeable2ActionError, catchError)==>Exception_Catch; checkClose2(false, false, false, false, false, false) }
   @Test def tcfc2_Closeable1Err_Closeable2Err_ActionOk__CatchOk__Close1Err_Close2Err = { close1Ok = false; close2Ok = false; TryCatchFinallyClose(closeable1Error, closeable2Error, closeable2Action, catcch) ==> CatchResult; checkClose2(false, false, false, true, false, false) }
-  @Test def tcfc2_Closeable1Err_Closeable2Err_ActionOk__CatchErr_Close1Err_Close2Err = { close1Ok = false; close2Ok = false; Exception_Catch <== TryCatchFinallyClose(closeable1Error, closeable2Error, closeable2Action, catchError); checkClose2(false, false, false, false, false, false) }
+  @Test def tcfc2_Closeable1Err_Closeable2Err_ActionOk__CatchErr_Close1Err_Close2Err = { close1Ok = false; close2Ok = false; TryCatchFinallyClose(closeable1Error, closeable2Error, closeable2Action, catchError)==>Exception_Catch; checkClose2(false, false, false, false, false, false) }
   @Test def tcfc2_Closeable1Err_Closeable2Err_ActionErr_CatchOk__Close1Err_Close2Err = { close1Ok = false; close2Ok = false; TryCatchFinallyClose(closeable1Error, closeable2Error, closeable2ActionError, catcch) ==> CatchResult; checkClose2(false, false, false, true, false, false) }
-  @Test def tcfc2_Closeable1Err_Closeable2Err_ActionErr_CatchErr_Close1Err_Close2Err = { close1Ok = false; close2Ok = false; Exception_Catch <== TryCatchFinallyClose(closeable1Error, closeable2Error, closeable2ActionError, catchError); checkClose2(false, false, false, false, false, false) }
+  @Test def tcfc2_Closeable1Err_Closeable2Err_ActionErr_CatchErr_Close1Err_Close2Err = { close1Ok = false; close2Ok = false; TryCatchFinallyClose(closeable1Error, closeable2Error, closeable2ActionError, catchError)==>Exception_Catch; checkClose2(false, false, false, false, false, false) }
 
   @Theory def closables2(closeable1Ok: Boolean, closeable2Ok: Boolean, actionOk: Boolean, catchOk: Boolean, _close1Ok: Boolean, _close2Ok: Boolean) = {
     close1Ok = _close1Ok;
@@ -241,7 +241,7 @@ class TryCatchFinallyTest extends TestPlus {
       if (actionOk) closeable2Action else closeable2ActionError,
       if (catchOk) catcch else catchError)
 
-    if (!catchOk && (!closeable1Ok || !closeable2Ok || !actionOk)) Exception_Catch <== testCall
+    if (!catchOk && (!closeable1Ok || !closeable2Ok || !actionOk)) testCall==>Exception_Catch
     else if (catchOk && (!closeable1Ok || !closeable2Ok || !actionOk)) testCall ==> ("result should be CatchResult", CatchResult)
     else testCall ==> ("result should be Closeable2ActionResult", Closeable2ActionResult)
 

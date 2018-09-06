@@ -99,7 +99,7 @@ class LogWindow {
   outTextArea.getDocument().addDocumentListener(limitLines)
   errTextArea.getDocument().addDocumentListener(limitLines)
 
-  val frame = new JFrame("").withComponent(content).size(DEFAULT_WIDTH, DEFAULT_HEIGHT).onCloseDispose.modalExclusionType_ApplicationExclude
+  val frame = new JFrame("").withComponent(content).size(DEFAULT_WIDTH, DEFAULT_HEIGHT).onCloseDispose.modalExclusionType_ApplicationExclude.name(classOf[LogWindow].getName)
 }
 
 
