@@ -48,6 +48,7 @@ import java.awt.Container
 import java.io.StringReader
 import org.apache.commons.compress.utils.IOUtils
 import eu.eyan.util.swing.SwingPlus
+import java.awt.Frame
 
 object ComponentPlus {
 
@@ -211,13 +212,16 @@ object ComponentPlus {
 
     def windowName =
       if (window != null)
-        // FIXME!!! remember takes the title of the JFrame! should take name of JFrame!!!!
-        if (window.isInstanceOf[JFrame]) window.asInstanceOf[JFrame].getTitle
+        if (window.getName != null && window.getName.nonEmpty) window.getName
+        else if (window.isInstanceOf[Frame]) window.asInstanceOf[Frame].getTitle
         else window.getName
       else null
 
     def parentPath: String = if (component.getParent != null) component.getParent.componentPath + component.getParent.asInstanceOf[Container].getComponents.indexOf(component) else ""
 
     def componentPath: String = parentPath + "/" + component.getClass.getSimpleName + "." + component.getName
+
+    def focusInWindow = { component.requestFocusInWindow; component }
+    def focusComponentInWindow(c: Component) = { if (c != null) c.focusInWindow; component }
   }
 }

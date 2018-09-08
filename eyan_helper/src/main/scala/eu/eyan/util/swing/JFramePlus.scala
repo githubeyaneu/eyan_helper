@@ -36,6 +36,7 @@ import java.awt.event.MouseEvent
 import javax.swing.Icon
 import eu.eyan.util.text.Text
 import rx.lang.scala.subjects.BehaviorSubject
+import java.awt.event.WindowEvent
 
 object JFramePlus {
   implicit class JFramePlusImplicit[TYPE <: JFrame](jFrame: TYPE) extends FramePlusImplicit(jFrame) {
@@ -63,6 +64,8 @@ object JFramePlus {
     def transferHandler(newHandler: TransferHandler) = { jFrame.setTransferHandler(newHandler); jFrame }
     override def iconImage(image: Image) = { jFrame.setIconImage(image); jFrame }
 
+    def close = jFrame.dispatchEvent(new WindowEvent(jFrame, WindowEvent.WINDOW_CLOSING))
+    
     //TODO -> make it better...
     def iconFromChar(c: Char, color: Color = Color.GREEN.darker.darker) = {
       //      val off_Image = new BufferedImage(256, 256, BufferedImage.TYPE_INT_ARGB)
@@ -160,6 +163,8 @@ object JFramePlus {
     }
     def menuItemSeparator(menuText: Text) = { getOrCreateMenu(menuText.get).addSeparator; jFrame }
     private def getOrCreateMenu(menuText: Text) = getOrCreateJMenuBar.getOrCreateMenu(menuText)
-
+    		
   }
+  
+  def close(frame: JFrame) = frame.close
 }

@@ -76,5 +76,13 @@ object RegistryPlus extends App {
         """java.util.prefs.WindowsPreferences <init>""",
         """WARNING: Could not open/create prefs root node Software\JavaSoft\Prefs at root 0x80000002. Windows RegCreateKeyEx(...) returned error code 5."""))(
         action)
+        
+}
 
+object RegistryValue {
+  def apply(registryGroup: String, parameterName: String) = new RegistryValue(registryGroup, parameterName)
+}
+class RegistryValue(registryGroup: String, parameterName: String) {
+  def read = RegistryPlus.readOption(registryGroup, parameterName)
+  def save(value: String) = RegistryPlus.write(registryGroup, parameterName, value)
 }

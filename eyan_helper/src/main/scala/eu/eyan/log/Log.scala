@@ -122,6 +122,15 @@ object Log {
   }
 
   def isEnabled(level: LogLevel) = actualLevel.shouldLog(level)
+
+  def formatLog(log: Log) = Log.logToConsoleText(log) + "\r\n"
+  override def toString = {
+    var logs = new StringBuilder()
+    val s = Log.logsObservable.map(formatLog).subscribe(log => logs.append(log))
+    s.unsubscribe
+    logs.toString
+  }
+
 }
 
 abstract class LogLevel(val prio: Int) {
