@@ -19,12 +19,14 @@ import org.mockito.internal.matchers.CapturingMatcher
 import org.mockito.internal.util.Primitives
 import org.mockito.ArgumentMatchers
 import org.fest.assertions.ObjectAssert
+import eu.eyan.log.Log
+import org.fest.swing.timing.Pause
 
 object TestPlus {
 
-  val DEFAULT_WAIT_TIME = 1000
+  val DEFAULT_WAIT_TIME = 1500
 
-  val DEFAULT_SLEEP_TIME = 10
+  val DEFAULT_SLEEP_TIME = 100
 
   def waitFor[T](assertion: => T, timeout: Long = DEFAULT_WAIT_TIME): T = {
     val start = System.currentTimeMillis()
@@ -33,7 +35,11 @@ object TestPlus {
     var res: T = null.asInstanceOf[T]
     def checkTimeout(t: Throwable) = if (timeout < elapsedTime) throw t else Thread.sleep(DEFAULT_SLEEP_TIME)
     while (!ok)
-      try { res = assertion; ok = true }
+      try {
+        Log.debug("try")
+        res = assertion
+        ok = true 
+        }
       catch {
         case t: AssertionError           => checkTimeout(t)
         case t: ComponentLookupException => checkTimeout(t)
@@ -43,6 +49,8 @@ object TestPlus {
 }
 
 trait TestPlus {
+  def pause(ms: Long) = Pause.pause(ms)
+    
   def waitFor[T](assertion: => T, timeout: Long = TestPlus.DEFAULT_WAIT_TIME): T = TestPlus.waitFor(assertion, timeout)
 
   /** Expect a Throwable of the method */
@@ -60,7 +68,10 @@ trait TestPlus {
   def expectThrowable(expectedThrowableClass: Class[_], test: => Unit) =
     try { test; Assert.fail("Exception(Throwable) was expected but none came.") }
     catch {
-      case e: Throwable => e.getClass ==> ("expectedThrowable class", expectedThrowableClass)
+      case e: Throwable =>{
+        if(e.getClass != expectedThrowableClass) e.printStackTrace
+    	  e.getClass ==> ("expectedThrowable class", expectedThrowableClass)
+      }
     }
 
   /**

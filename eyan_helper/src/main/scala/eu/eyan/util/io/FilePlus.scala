@@ -123,6 +123,10 @@ object FilePlus {
       if (plus.notExists) plus
       else generateNewNameIfExists(ct + 1)
     }
+    
+    def lift = if (file.exists) Some(file) else None
+    def asResource = file.toString.toResourceFile.toOption
+    def orElseResource = lift orElse asResource
   }
 
   private def treeWithItself(f: File): Stream[File] =
@@ -133,4 +137,5 @@ object FilePlus {
   private def emptyArrayIfNull(list: Array[File]) = if (list == null) Array[File]() else list
 
   private def fileTreesWithItselfs(paths: String*): Stream[File] = (paths map { _.asFile } map treeWithItself).toStream.flatten
+  
 }

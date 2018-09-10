@@ -85,6 +85,7 @@ object StringPlus {
     def asDir = asFile
     def file = asFile
     def dir = asFile
+    def asFileOrResource = asFile.orElseResource
 
     def asUrl = new URL(s)
 

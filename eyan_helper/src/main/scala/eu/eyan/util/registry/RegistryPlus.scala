@@ -79,10 +79,13 @@ object RegistryPlus extends App {
         
 }
 
-object RegistryValue {
-  def apply(registryGroup: String, parameterName: String) = new RegistryValue(registryGroup, parameterName)
+object RegistryGroup {
+	def apply(groupName: String) = new RegistryGroup(groupName)
 }
-class RegistryValue(registryGroup: String, parameterName: String) {
-  def read = RegistryPlus.readOption(registryGroup, parameterName)
-  def save(value: String) = RegistryPlus.write(registryGroup, parameterName, value)
+class RegistryGroup(val groupName: String) {
+  def registryValue(parameterName: String) = new RegistryValue(this, parameterName)
+  class RegistryValue (registryGroup: RegistryGroup, parameterName: String) {
+	  def read = RegistryPlus.readOption(registryGroup.groupName, parameterName)
+	  def save(value: String) = RegistryPlus.write(registryGroup.groupName, parameterName, value)
+  }
 }

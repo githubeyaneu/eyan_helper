@@ -53,7 +53,7 @@ abstract class Text(protected val template: BehaviorSubject[String], private val
 
   lazy val templateAndParams = onlyValidTemplates combineLatest paramsCombined
 
-  lazy val textFormatter = templateAndParams map toText
+  lazy val textFormatter = templateAndParams map formatTextWithParams
 
   lazy val formattedText = if (args.nonEmpty) textFormatter else template
 
@@ -62,7 +62,13 @@ abstract class Text(protected val template: BehaviorSubject[String], private val
 
   lazy val asJavaObservable: rx.Observable[_ <: String] = text.asJavaObservable
 
-  def toText(templateAndParams: (String, List[Any])) = {
+  def get = {
+		  var result: String = null.asInstanceOf[String]
+				  this.take(1).subscribe(s => result = s)
+				  result
+  }
+  
+  private def formatTextWithParams(templateAndParams: (String, List[Any])) = {
     val template = templateAndParams._1
     val params = templateAndParams._2
     Log.debug(s"Format text. Template=$template, params=${params.mkString}")
@@ -71,15 +77,4 @@ abstract class Text(protected val template: BehaviorSubject[String], private val
     text
   }
 
-  def get[TYPE](action: String => TYPE) = {
-    var result: TYPE = null.asInstanceOf[TYPE]
-    this.take(1).subscribe(s => result = action(s))
-    result
-  }
-  
-  def get = {
-    var result: String = null.asInstanceOf[String]
-    this.take(1).subscribe(s => result = s)
-    result
-  }
 }
