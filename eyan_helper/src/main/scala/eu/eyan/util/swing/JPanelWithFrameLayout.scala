@@ -117,7 +117,7 @@ class JPanelWithFrameLayout() extends JPanel {
   def newRow: JPanelWithFrameLayout = newRow()
   def newRowFPG: JPanelWithFrameLayout = newRow("f:p:g")
   def newRowFPGForTextArea: JPanelWithFrameLayout = newRow("f:1px:g")
-  
+
   def newRow(spec: String = PREF): JPanelWithFrameLayout = {
 
     if (useBorders && actualRow == 0) {
@@ -269,5 +269,10 @@ class JPanelWithFrameLayout() extends JPanel {
 
   def addMore[COMPONENT <: JComponent](createComponent: => COMPONENT) = {
     //TODO
+  }
+
+  def addInScrollPane[C <: Component](c: C) = {
+    val scrollPane = new JScrollPane(c)
+    c
   }
 }
