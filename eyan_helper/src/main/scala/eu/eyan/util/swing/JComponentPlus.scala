@@ -23,6 +23,7 @@ import javax.swing.TransferHandler
 import javax.swing.AbstractButton
 import eu.eyan.util.swing.AbstractButtonPlus.AbstractButtonImplicit
 import eu.eyan.util.swing.AbstractButtonPlus.AbstractButtonImplicit
+import rx.lang.scala.Observable
 
 object JComponentPlus {
   implicit class JComponentImplicit[TYPE <: JComponent](jComponent: TYPE) extends ContainerPlusImplicit(jComponent) {
@@ -62,6 +63,11 @@ object JComponentPlus {
     def doubleBuffered(enabled: Boolean) = { jComponent.setDoubleBuffered(enabled); jComponent }
     def doubleBuffered: TYPE = doubleBuffered(true)
     def doubleBufferedDisabled = doubleBuffered(false)
+    def enabled(enabled: Observable[Boolean]) = {
+      val setDeleteEnabled = (enabled: Boolean) => jComponent.setEnabled(enabled) // TODO why def does not work???
+      enabled.subscribe(setDeleteEnabled)
+      jComponent
+    }
     override def enabled(enabled: Boolean) = { jComponent.setEnabled(enabled); jComponent }
     override def enabled: TYPE = enabled(true)
     override def disabled = enabled(false)

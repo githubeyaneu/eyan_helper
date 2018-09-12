@@ -223,5 +223,8 @@ object ComponentPlus {
 
     def focusInWindow = { component.requestFocusInWindow; component }
     def focusComponentInWindow(c: Component) = { if (c != null) c.focusInWindow; component }
+    
+    def heightSet(height: Int) = { component.setSize(component.getWidth, height); component }
+    def widthSet(width: Int) = { component.setSize(width, component.getHeight); component }
   }
 }

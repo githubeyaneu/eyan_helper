@@ -9,6 +9,7 @@ import javax.swing.SwingConstants
 import javax.swing.ImageIcon
 import eu.eyan.util.awt.ImagePlus
 import java.awt.Color
+import eu.eyan.util.text.Text
 
 object JLabelPlus {
   implicit class JLabelImplicit[TYPE <: JLabel](jLabel: TYPE) extends JComponentImplicit(jLabel) {
@@ -43,5 +44,10 @@ object JLabelPlus {
     def verticalTextPosition_Bottom = verticalTextPosition(SwingConstants.BOTTOM)
 
     def iconFromChar(c:Char, color:Color=Color.BLACK) = { jLabel.setIcon(new ImageIcon(ImagePlus.imageFromChar(c, color, 12,12))); jLabel }
+    
+    def text(text: Text) = {
+      text.subscribe(jLabel.setText _)
+      jLabel
+    }
   }
 }

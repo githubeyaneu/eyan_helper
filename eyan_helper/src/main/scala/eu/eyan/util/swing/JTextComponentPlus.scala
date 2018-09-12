@@ -49,6 +49,7 @@ object JTextComponentPlus {
     def onCaretUpdate(action: => Unit) = onCaretUpdateEvent(e => action)
     def onCaretUpdateEvent(action: CaretEvent => Unit) = { jTextComponent.addCaretListener(SwingPlus.onCaretUpdate(action)); jTextComponent }
 
+    def onTextChanged(action: String => Unit): TYPE = onTextChanged(action(jTextComponent.getText))
     def onTextChanged(action: => Unit): TYPE = onTextChangedEvent(e => action)
     def onTextChangedEvent(action: DocumentEvent => Unit) = { onChangedUpdateEvent(action); onRemoveUpdateEvent(action); onInsertUpdateEvent(action); jTextComponent }
 

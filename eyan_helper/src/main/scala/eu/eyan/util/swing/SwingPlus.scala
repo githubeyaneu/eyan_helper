@@ -142,6 +142,12 @@ object SwingPlus {
   def onIntervalAdded(action: ListDataEvent => Unit) = new ListDataAdapter() { override def intervalAdded(e: ListDataEvent) = action(e) }
   def onIntervalRemoved(action: ListDataEvent => Unit) = new ListDataAdapter() { override def intervalRemoved(e: ListDataEvent) = action(e) }
   def onContentsChanged(action: ListDataEvent => Unit) = new ListDataAdapter() { override def contentsChanged(e: ListDataEvent) = action(e) }
+  
+  def onListData(action: => Unit) = new ListDataListener {
+	  override def intervalAdded(e: ListDataEvent) = action
+	  override def intervalRemoved(e: ListDataEvent) = action
+	  override def contentsChanged(e: ListDataEvent) = action
+  }
 
   //  ListSelectionEvent
   //  ListSelectionListener

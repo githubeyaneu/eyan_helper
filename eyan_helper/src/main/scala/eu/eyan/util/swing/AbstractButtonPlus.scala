@@ -10,6 +10,9 @@ import eu.eyan.util.swingakka.ActionEventHandler
 import javax.swing.event.ChangeEvent
 import java.awt.event.ItemEvent
 import java.io.File
+import eu.eyan.util.text.Text
+import javax.swing.ImageIcon
+import eu.eyan.util.string.StringPlus.StringPlusImplicit
 
 object AbstractButtonPlus {
 
@@ -84,5 +87,17 @@ object AbstractButtonPlus {
     //setVerticalTextPosition(int)
     //updateUI()
 
+    def text(text: Text) = {
+      text.subscribe(abstractButton.setText _)
+      abstractButton
+    }
+    def icon(path: Text) = {
+      path.subscribe(path => abstractButton.setIcon(new ImageIcon(path.toResourceFile.get.toURL)))
+      abstractButton
+    }
+    def toolTip(tip: Text) = {
+      tip.subscribe(abstractButton.setToolTipText _)
+      abstractButton
+    }
   }
 }

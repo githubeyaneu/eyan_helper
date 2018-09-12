@@ -5,6 +5,8 @@ import javax.swing.JButton
 import javax.swing.AbstractButton
 import eu.eyan.util.awt.AwtHelper.onActionPerformed
 import eu.eyan.util.swing.AbstractButtonPlus.AbstractButtonImplicit
+import eu.eyan.util.text.Texts
+import eu.eyan.util.text.Text
 
 object JButtonPlus {
   implicit class JButtonImplicit[TYPE <: JButton](jButton: TYPE) extends AbstractButtonImplicit(jButton) {
@@ -12,9 +14,4 @@ object JButtonPlus {
     //setDefaultCapable(boolean)
     //updateUI()    
   }
-}
-
-class JButtonPlus(text: String) extends JButton(text) {
-  
-
 }

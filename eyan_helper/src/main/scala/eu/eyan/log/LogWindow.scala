@@ -17,6 +17,7 @@ import java.util.Timer
 import java.util.TimerTask
 import eu.eyan.util.io.PrintStreamPlus.PrintStreamImplicit
 import rx.lang.scala.Subscription
+import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
 
 // FIXME: too many lines in textarea -> goes bad. show only configurable amount!
 object LogWindow {

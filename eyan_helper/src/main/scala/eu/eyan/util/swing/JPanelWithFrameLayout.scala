@@ -32,6 +32,7 @@ import javax.swing.JOptionPane
 import eu.eyan.util.swing.JLabelPlus.JLabelImplicit
 import java.awt.Color
 import javax.swing.JComponent
+import javax.swing.JButton
 
 object JPanelPlus {
   implicit class JPanelImplicit[TYPE <: JPanel](jPanel: JPanel) extends JComponentImplicit(jPanel) {
@@ -173,7 +174,7 @@ class JPanelWithFrameLayout() extends JPanel {
   }
 
   def addButton(text: String) = {
-    val button = new JButtonPlus(text)
+    val button = new JButton(text)
     add(button)
     button
   }
