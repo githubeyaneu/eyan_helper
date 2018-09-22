@@ -4,6 +4,7 @@ import eu.eyan.log.Log
 import eu.eyan.util.scala.Try
 import rx.lang.scala.Observable
 import rx.lang.scala.subjects.BehaviorSubject
+import eu.eyan.util.rx.lang.scala.subjects.BehaviorSubjectPlus.BehaviorSubjectImplicit
 
 object Text {
   def emptySingularPlural(nr: Observable[Int], emptyText: Text, singularText: Text, pluralText: Text): Observable[String] = {
@@ -34,8 +35,9 @@ object Text {
  * An observable text that can be formatted with the also observable parameters
  *  The text translation should not happen here, the template should be updated in this case.
  */
-abstract class Text(protected val template: BehaviorSubject[String], private val args: Observable[Any]*) extends Observable[String] {
-  template.take(1).subscribe(string => Log.info("Text created " + string))
+class Text(protected val template: String, private val args: Observable[Any]*) extends Observable[String] {
+  protected val templateObservable = BehaviorSubject[String](template)
+  templateObservable.take(1).subscribe(string => Log.info("Text created " + string))
   Log.info("Text created args:" + args.size)
 
   // TODO check string and param numbers
@@ -49,25 +51,21 @@ abstract class Text(protected val template: BehaviorSubject[String], private val
     ok
   }
 
-  lazy val onlyValidTemplates = template filter noMoreParams
+  lazy val onlyValidTemplates = templateObservable filter noMoreParams
 
   lazy val templateAndParams = onlyValidTemplates combineLatest paramsCombined
 
   lazy val textFormatter = templateAndParams map formatTextWithParams
 
-  lazy val formattedText = if (args.nonEmpty) textFormatter else template
+  lazy val formattedText = if (args.nonEmpty) textFormatter else templateObservable
 
   lazy val text = BehaviorSubject("")
   formattedText subscribe text
 
   lazy val asJavaObservable: rx.Observable[_ <: String] = text.asJavaObservable
 
-  def get = {
-		  var result: String = null.asInstanceOf[String]
-				  this.take(1).subscribe(s => result = s)
-				  result
-  }
-  
+  def get = text.get[String]
+
   private def formatTextWithParams(templateAndParams: (String, List[Any])) = {
     val template = templateAndParams._1
     val params = templateAndParams._2
@@ -76,5 +74,6 @@ abstract class Text(protected val template: BehaviorSubject[String], private val
     Log.debug(s"Formatted text=$text")
     text
   }
+  
 
 }

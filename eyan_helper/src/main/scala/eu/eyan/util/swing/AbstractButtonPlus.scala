@@ -13,6 +13,7 @@ import java.io.File
 import eu.eyan.util.text.Text
 import javax.swing.ImageIcon
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
+import eu.eyan.util.text.TextsButton
 
 object AbstractButtonPlus {
 
@@ -87,15 +88,21 @@ object AbstractButtonPlus {
     //setVerticalTextPosition(int)
     //updateUI()
 
+    def texts(texts: TextsButton) = text(texts.text).toolTip(texts.tooltip).icon(texts.icon)
+    
     def text(text: Text) = {
+    		//FIXME make it safe!
       text.subscribe(abstractButton.setText _)
       abstractButton
     }
     def icon(path: Text) = {
+      //FIXME make it safe!
       path.subscribe(path => abstractButton.setIcon(new ImageIcon(path.toResourceFile.get.toURL)))
       abstractButton
     }
+    
     def toolTip(tip: Text) = {
+    		//FIXME make it safe!
       tip.subscribe(abstractButton.setToolTipText _)
       abstractButton
     }

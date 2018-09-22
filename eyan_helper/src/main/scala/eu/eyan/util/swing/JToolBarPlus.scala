@@ -17,6 +17,7 @@ import eu.eyan.util.text.Text
 import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
 import eu.eyan.util.swing.JLabelPlus.JLabelImplicit
 import java.awt.Component
+import eu.eyan.util.text.TextsButton
 
 object JToolBarPlus {
   implicit class JToolBarImplicit[TYPE <: JToolBar](jToolBar: TYPE) extends JComponentImplicit(jToolBar) {
@@ -41,8 +42,8 @@ object JToolBarPlus {
 
     def addFluent(c:Component) = {jToolBar.add(c); jToolBar}
     
-    def addButton(text: Text, name: String, tooltip: Text, icon: Text) = {
-      val button = new JButton().name(name).text(text).icon(icon).toolTip(tooltip)
+    def addButton(texts: TextsButton) = {
+      val button = new JButton().texts(texts)
       jToolBar.add(button)
       button
     }

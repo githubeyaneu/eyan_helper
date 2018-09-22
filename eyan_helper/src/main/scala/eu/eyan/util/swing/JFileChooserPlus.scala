@@ -58,6 +58,7 @@ object JFileChooserPlus {
     def updateUI = { jFileChooser.updateUI(); jFileChooser }
 
     def withCurrentDirectory(path: String) = { jFileChooser.setCurrentDirectory(new File(path)); jFileChooser }
+    def withCurrentDirectory(path: File) = { jFileChooser.setCurrentDirectory(path); jFileChooser }
 
     def withDialogTitle(title: String) = { jFileChooser.setDialogTitle(title); jFileChooser }
 

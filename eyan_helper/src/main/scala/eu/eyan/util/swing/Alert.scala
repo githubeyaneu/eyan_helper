@@ -8,7 +8,6 @@ import eu.eyan.util.text.Text
 import rx.lang.scala.Subscription
 
 object Alert {
-  def alert(title: Text, txt: Text, confirmText: Text) = alertOptions(title.get, txt.get, Array(confirmText.get))
   def alert(msg: String): Boolean = alertFalse(msg)
   def alertFalse(msg: String) = { JOptionPane.showMessageDialog(null, msg); false }
   def alertOptions[TYPE <: Object](title: String, msg: String, options: Array[TYPE]): Option[TYPE] = {

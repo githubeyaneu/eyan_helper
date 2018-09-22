@@ -16,31 +16,35 @@ class TextTest extends TestPlus {
 
   @Test
   def textNoParam = {
-    val text = BehaviorSubject("abc")
-    case object Test extends Text(text) {}
+    val text = "abc"
+    case object Test extends Text(text) {
+      def obs = templateObservable
+    }
 
     var actual = ""
 
     Test.subscribe(string => actual = string)
     actual ==> "abc"
 
-    text.onNext("cde")
+    Test.obs.onNext("cde")
     actual ==> "cde"
 
   }
 
   @Test
   def textOneParam = {
-    val text = BehaviorSubject("abc%s")
+    val text = "abc%s"
     val param = BehaviorSubject(123)
-    case object Test extends Text(text, param)
+    case object Test extends Text(text, param){
+      def obs = templateObservable
+    }
 
     var actual = ""
 
     Test.subscribe(string => actual = string)
     actual ==> "abc123"
 
-    text.onNext("cde%s")
+    Test.obs.onNext("cde%s")
     actual ==> "cde123"
 
     param.onNext(456)
@@ -50,10 +54,12 @@ class TextTest extends TestPlus {
 
   @Test
   def textTwoParams = {
-    val text = BehaviorSubject("a%sb%sc")
+    val text = "a%sb%sc"
     val param1 = BehaviorSubject(123)
     val param2 = BehaviorSubject("")
-    case object Test extends Text(text, param1, param2)
+    case object Test extends Text(text, param1, param2){
+      def obs = templateObservable
+    }
 
     var actual = ""
 
@@ -61,7 +67,7 @@ class TextTest extends TestPlus {
     actual ==> "a123bc"
 
     //more params ok
-    text.onNext("cde%s")
+    Test.obs.onNext("cde%s")
     actual ==> "cde123"
 
     param2.onNext("TT")
@@ -70,17 +76,19 @@ class TextTest extends TestPlus {
 
   @Test
   def badParamNumber = {
-    val text = BehaviorSubject("a%sb%sc")
+    val text = "a%sb%sc"
     val param = BehaviorSubject(123)
-    case object Test extends Text(text, param)
+    case object Test extends Text(text, param){
+      def obs = templateObservable
+    }
     var actual = ""
     Test.subscribe(string => actual = string)
     actual ==> ""
 
-    text.onNext("cde%s")
+    Test.obs.onNext("cde%s")
     actual ==> "cde123"
 
-    text.onNext("c %s %s %s")
+    Test.obs.onNext("c %s %s %s")
     actual ==> "cde123"
   }
 }

@@ -36,6 +36,16 @@ object RegistryPlus extends App {
     }
   }
 
+  def writeMore(key: String, name: String, values: Array[String]): Unit = {
+		  val valuesHex = values.map(_.toHexEncode)
+		  Log.debug(s"HKEY_CURRENT_USER, $keyRoot, $name, ${values.mkString}, ${valuesHex.mkString("_")}")
+				  
+		  filterJavaBugErrorLines {
+			  WinRegistry.createKey(hkey, s"$keyRoot\\$key")
+			  WinRegistry.writeStringValue(hkey, s"$keyRoot\\$key", name, valuesHex.mkString("_"), wow)
+		  }
+  }
+
   def readOption(key: String, name: String): Option[String] = {
     Log.debug(s"HKEY_CURRENT_USER, $keyRoot\\$key, $name")
     val valueHex = filterJavaBugErrorLines { WinRegistry.readString(hkey, s"$keyRoot\\$key", name, wow) }
@@ -48,6 +58,20 @@ object RegistryPlus extends App {
         catch { case t: Throwable => { Log.error(s"error converting from hex valueHex=$valueHex", t); Option(valueHex) } }
     Log.debug(s"value=$value")
     value
+  }
+
+  def readMoreOption(key: String, name: String): Option[Array[String]] = {
+		  Log.debug(s"HKEY_CURRENT_USER, $keyRoot\\$key, $name")
+		  val valuesHex = filterJavaBugErrorLines { WinRegistry.readString(hkey, s"$keyRoot\\$key", name, wow) }
+		  Log.debug(s"valuesHex=$valuesHex")
+		  val values =
+		  if (valuesHex == null) None
+		  else if (valuesHex== "") Option(Array(valuesHex))
+		  else
+			  try { Option(valuesHex.split("_").map(_.toHexDecode)) }
+		  catch { case t: Throwable => { Log.error(s"error converting from hex valuesHex=$valuesHex", t); Option(Array(valuesHex)) } }
+		  Log.debug(s"values=${values.map(_.mkString)}")
+		  values
   }
   
   //TODO remove and use only readOption
@@ -87,5 +111,8 @@ class RegistryGroup(val groupName: String) {
   class RegistryValue (registryGroup: RegistryGroup, parameterName: String) {
 	  def read = RegistryPlus.readOption(registryGroup.groupName, parameterName)
 	  def save(value: String) = RegistryPlus.write(registryGroup.groupName, parameterName, value)
+
+	  def readMore = RegistryPlus.readMoreOption(registryGroup.groupName, parameterName)
+	  def saveMore(values: Array[String]) = RegistryPlus.writeMore(registryGroup.groupName, parameterName, values)
   }
 }

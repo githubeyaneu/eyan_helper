@@ -37,6 +37,7 @@ import javax.swing.Icon
 import eu.eyan.util.text.Text
 import rx.lang.scala.subjects.BehaviorSubject
 import java.awt.event.WindowEvent
+import rx.lang.scala.Observable
 
 object JFramePlus {
   implicit class JFramePlusImplicit[TYPE <: JFrame](jFrame: TYPE) extends FramePlusImplicit(jFrame) {
@@ -65,7 +66,7 @@ object JFramePlus {
     override def iconImage(image: Image) = { jFrame.setIconImage(image); jFrame }
 
     def close = jFrame.dispatchEvent(new WindowEvent(jFrame, WindowEvent.WINDOW_CLOSING))
-    
+
     //TODO -> make it better...
     def iconFromChar(c: Char, color: Color = Color.GREEN.darker.darker) = {
       //      val off_Image = new BufferedImage(256, 256, BufferedImage.TYPE_INT_ARGB)
@@ -103,10 +104,11 @@ object JFramePlus {
 
       popup
     }
-
+    val NO_IMAGE:Image = null
+		val NO_ICON:Icon = null
     def addToSystemTray(icon: Image = jFrame.getIconImage, toolTip: String = jFrame.getTitle, popupMenu: PopupMenu = createOpenExitPopup) = {
       if (SystemTray.isSupported()) {
-        val iconToUse = if (icon != null) icon else Toolkit.getDefaultToolkit().getImage("/dontexists.jpg")
+        val iconToUse = if (icon != NO_IMAGE) icon else Toolkit.getDefaultToolkit().getImage("/dontexists.jpg")
 
         //TODO TrayIcon Implicit
         val trayIcon = new TrayIcon(iconToUse, toolTip, popupMenu)
@@ -121,50 +123,51 @@ object JFramePlus {
       jFrame
     }
 
-    private def getOrCreateJMenuBar = { if (jFrame.getJMenuBar == null) jMenuBar(new JMenuBar()); jFrame.getJMenuBar }
+    val NO_JMENU_BAR:JMenuBar = null
+    private def getOrCreateJMenuBar = { if (jFrame.getJMenuBar == NO_JMENU_BAR) jMenuBar(new JMenuBar()); jFrame.getJMenuBar }
 
     private def getOrCreateMenu(menuText: String) = getOrCreateJMenuBar.getOrCreateMenu(menuText)
 
     def menuItemSeparator(menuText: String) = { getOrCreateMenu(menuText).addSeparator; jFrame }
 
-
-    def menuItems(menuText: String, menuItemTexts: Seq[String], action: String => Unit, icon: Icon = null) = {
-      def createMenuItem(menuItemText: String) = menuItemEvent(menuText, menuItemText, frame => action(menuItemText), icon)
+    def menuItems(menuText: String, menuItemTexts: Seq[String], action: String => Unit, icon: Icon = NO_ICON) = {
+      def createMenuItem(menuItemText: String) = menuItemEvent(menuText, menuItemText, (frame: TYPE) => action(menuItemText), icon)
       menuItemTexts foreach createMenuItem
       jFrame
     }
 
-    def menuItem(menuText: String, menuItemText: String, action: => Unit) = menuItemEvent(menuText: String, menuItemText, frame => action, null)
+    def menuItem(menuText: String, menuItemText: String, action: => Unit) = menuItemEvent(menuText: String, menuItemText, (frame: TYPE) => action, NO_ICON)
 
     def menuItemEvent(menuText: String, menuItemText: String, action: TYPE => Unit, icon: Icon) = {
       val menuItem = new JMenuItem(menuItemText)
-      if (icon != null) menuItem.setIcon(icon)
+      if (icon != NO_ICON) menuItem.setIcon(icon)
       getOrCreateMenu(menuText).add(menuItem)
       menuItem.onAction(action(jFrame))
       jFrame
     }
 
-    
-    def menuItem(menuText: Text, menuItemText: Text, action: => Unit) = menuItemEvent(menuText, menuItemText, frame => action)
-    def menuItemEvent(menuText: Text, menuItemText: Text, action: TYPE => Unit) = {
+    val ALWAYS_ENABLED = BehaviorSubject(true)
+    def menuItem(menuText: Text, menuItemText: Text, action: => Unit, enabledObservable: Observable[Boolean]=ALWAYS_ENABLED) = menuItemEvent(menuText, menuItemText, (frame: TYPE) => action, enabledObservable)
+    def menuItemEvent(menuText: Text, menuItemText: Text, action: TYPE => Unit, enabledObservable: Observable[Boolean]=ALWAYS_ENABLED) = {
       // TODO JMenuItemPlus
       val menuItem = new JMenuItem(menuItemText.get)
       menuItem.setName(menuItemText.get)
       menuItemText.subscribe(menuItem.setText(_))
-//      if (icon != null) menuItem.setIcon(icon) // TODO
+      //      if (icon != null) menuItem.setIcon(icon) // TODO
       getOrCreateMenu(menuText).add(menuItem)
       menuItem.onAction(action(jFrame))
+      enabledObservable.subscribe(enabled => menuItem.setEnabled(enabled))
       jFrame
     }
     def menuItems(menuText: Text, menuItemTexts: Seq[String], action: String => Unit) = {
-    		def createMenuItem(menuItemText: String) = menuItemEvent(menuText, new Text(BehaviorSubject(menuItemText)) {}, frame => action(menuItemText))
-    				menuItemTexts foreach createMenuItem
-    				jFrame
+      def createMenuItem(menuItemText: String) = menuItemEvent(menuText, new Text(menuItemText) {}, (frame: TYPE) => action(menuItemText))
+      menuItemTexts foreach createMenuItem
+      jFrame
     }
     def menuItemSeparator(menuText: Text) = { getOrCreateMenu(menuText.get).addSeparator; jFrame }
     private def getOrCreateMenu(menuText: Text) = getOrCreateJMenuBar.getOrCreateMenu(menuText)
-    		
+
   }
-  
+
   def close(frame: JFrame) = frame.close
 }

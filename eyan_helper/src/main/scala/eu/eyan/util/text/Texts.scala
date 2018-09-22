@@ -19,3 +19,9 @@ abstract class Texts() {
   protected def noTranslation(technicalName: String) = s"**$technicalName**"
   protected def translate(technicalName: String)(language: Option[String]) = getTextTranslation(technicalName, language) // this.getClass.getSimpleName.replace("$", "")
 }
+
+class TextsDialogYes(val text: Text, val title: Text, val yes: Text)
+class TextsDialogYesNo(val text: Text, val title: Text, val yes: Text, val no: Text)
+class TextsDialogYesNoCancel(val text: Text, val title: Text, val yes: Text, val no: Text, val cancel: Text)
+class TextsDialogFileChooser(val title: Text, val approve: Text, val cancel: Text, val fileFilterText: Text)
+class TextsButton(val text: Text, val tooltip: Text, val icon: Text)

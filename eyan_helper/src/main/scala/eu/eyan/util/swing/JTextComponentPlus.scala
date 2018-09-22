@@ -25,6 +25,7 @@ import eu.eyan.log.Log
 import javax.swing.SwingUtilities
 import javax.swing.JFrame
 import eu.eyan.util.awt.remember.RememberInRegistry
+import rx.lang.scala.Observer
 
 object JTextComponentPlus {
   implicit class JTextComponentImplicit[TYPE <: JTextComponent](jTextComponent: TYPE) extends JComponentImplicit(jTextComponent) with RememberInRegistry[TYPE] {
@@ -49,6 +50,7 @@ object JTextComponentPlus {
     def onCaretUpdate(action: => Unit) = onCaretUpdateEvent(e => action)
     def onCaretUpdateEvent(action: CaretEvent => Unit) = { jTextComponent.addCaretListener(SwingPlus.onCaretUpdate(action)); jTextComponent }
 
+    def onTextChanged(observer: Observer[String]): TYPE = onTextChanged(observer.onNext _)
     def onTextChanged(action: String => Unit): TYPE = onTextChanged(action(jTextComponent.getText))
     def onTextChanged(action: => Unit): TYPE = onTextChangedEvent(e => action)
     def onTextChangedEvent(action: DocumentEvent => Unit) = { onChangedUpdateEvent(action); onRemoveUpdateEvent(action); onInsertUpdateEvent(action); jTextComponent }
