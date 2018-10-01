@@ -16,6 +16,7 @@ import java.awt.Dialog
 import java.awt.Shape
 import java.awt.Window.Type
 import java.awt.Frame
+import java.awt.GraphicsEnvironment
 
 object WindowPlus {
   implicit class WindowPlusImplicit[TYPE <: Window](window: TYPE) extends ContainerPlusImplicit(window) {
@@ -83,5 +84,10 @@ object WindowPlus {
 
     // own
     def packAndSetVisible = { window.pack; window.visible; window }
+    
+    def maximize = {
+      window.setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment.getMaximumWindowBounds)
+      window
+    }
   }
 }
