@@ -55,7 +55,7 @@ object JToolBarPlus {
       label
     }
 
-    def addTextField(size: Int, text: String, name: String) = {
+    def addTextField(size: Int, text: String, name: String) = {//TODO refact to fluent
       val comp = new JTextField(size)
       comp.setText(text)
       comp.setName(name)
