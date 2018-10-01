@@ -29,7 +29,7 @@ object FramePlus {
     def notUndecorated = withUndecorated(false)
     def withUndecorated(undecorated: Boolean) = { frame.setUndecorated(undecorated); frame }
 
-    def maximize = extendedState(Frame.MAXIMIZED_BOTH)
+    override def maximize = extendedState(Frame.MAXIMIZED_BOTH)
 
     // FIXME: refactor make easier
     // FIXME: remove subscription if not visible: panel.addComponentListener ( new ComponentAdapter () { public void componentShown ( ComponentEvent e ) { System.out.println ( "Component shown" ); } public void componentHidden ( ComponentEvent e ) { System.out.println ( "Component hidden" ); } } );

@@ -39,9 +39,9 @@ object JTabbedPanePlus {
       panel.setOpaque(false)
       val button = panel.newColumn.addButton("")
       button.setMargin(new Insets(0, 0, 0, 0))
-      button.setIcon(new ImageIcon("icons/tabs/close_inactive.png".toResourceFile.get.toURL))
-      button.setRolloverIcon(new ImageIcon("icons/tabs/close_onmouse.png".toResourceFile.get.toURL))
-      button.setRolloverSelectedIcon(new ImageIcon("icons/tabs/close_activetab.png".toResourceFile.get.toURL))
+      button.setIcon("icons/tabs/close_inactive.png".toIconAsResource)
+      button.setRolloverIcon("icons/tabs/close_onmouse.png".toIconAsResource)
+      button.setRolloverSelectedIcon("icons/tabs/close_activetab.png".toIconAsResource)
       button.onClicked(onCloseAction(component))
       panel.newRow("1px")
       

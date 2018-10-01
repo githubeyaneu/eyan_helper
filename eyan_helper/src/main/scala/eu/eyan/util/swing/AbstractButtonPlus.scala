@@ -14,6 +14,7 @@ import eu.eyan.util.text.Text
 import javax.swing.ImageIcon
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
 import eu.eyan.util.text.TextsButton
+import java.net.URL
 
 object AbstractButtonPlus {
 
@@ -97,7 +98,7 @@ object AbstractButtonPlus {
     }
     def icon(path: Text) = {
       //FIXME make it safe!
-      path.subscribe(path => abstractButton.setIcon(new ImageIcon(path.toResourceFile.get.toURL)))
+      path.subscribe(path => abstractButton.setIcon(path.toIconAsResource))
       abstractButton
     }
     

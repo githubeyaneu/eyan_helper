@@ -49,6 +49,7 @@ import java.io.StringReader
 import org.apache.commons.compress.utils.IOUtils
 import eu.eyan.util.swing.SwingPlus
 import java.awt.Frame
+import java.awt.GraphicsEnvironment
 
 object ComponentPlus {
 
@@ -65,7 +66,7 @@ object ComponentPlus {
       component.setLocation((screenSize.width - width) / 2, (screenSize.height - height) / 2)
       component
     }
-
+    
     val SCREEN_LEFT = 0
     val SCREEN_TOP = 0
 

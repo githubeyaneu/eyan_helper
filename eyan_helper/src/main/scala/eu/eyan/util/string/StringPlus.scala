@@ -30,6 +30,7 @@ import eu.eyan.util.java.lang.RuntimePlus.ProcessResult
 import java.io.InputStream
 import eu.eyan.util.java.lang.ThreadPlus
 import eu.eyan.util.scala.Try
+import javax.swing.ImageIcon
 
 object StringPlus {
   lazy val reg = "[\\p{InCombiningDiacriticalMarks}]".r
@@ -203,5 +204,12 @@ object StringPlus {
     def isNull = s == null
     
     def isNullOrEmpty = isNull || s.isEmpty  
+    
+    def toIconAsResource = {
+      //TODO refactor...
+      val is = ClassLoader.getSystemResourceAsStream(s)
+      val bytes = Stream.continually(is.read).takeWhile(_ != -1).map(_.toByte).toArray
+      new ImageIcon(bytes)
+    }
   }
 }
