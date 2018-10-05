@@ -37,13 +37,13 @@ object RegistryPlus extends App {
   }
 
   def writeMore(key: String, name: String, values: Array[String]): Unit = {
-		  val valuesHex = values.map(_.toHexEncode)
-		  Log.debug(s"HKEY_CURRENT_USER, $keyRoot, $name, ${values.mkString}, ${valuesHex.mkString("_")}")
-				  
-		  filterJavaBugErrorLines {
-			  WinRegistry.createKey(hkey, s"$keyRoot\\$key")
-			  WinRegistry.writeStringValue(hkey, s"$keyRoot\\$key", name, valuesHex.mkString("_"), wow)
-		  }
+    val valuesHex = values.map(_.toHexEncode)
+    Log.debug(s"HKEY_CURRENT_USER, $keyRoot, $name, ${values.mkString}, ${valuesHex.mkString("_")}")
+
+    filterJavaBugErrorLines {
+      WinRegistry.createKey(hkey, s"$keyRoot\\$key")
+      WinRegistry.writeStringValue(hkey, s"$keyRoot\\$key", name, valuesHex.mkString("_"), wow)
+    }
   }
 
   def readOption(key: String, name: String): Option[String] = {
@@ -52,7 +52,7 @@ object RegistryPlus extends App {
     Log.debug(s"valueHex=$valueHex")
     val value =
       if (valueHex == null) None
-      else if (valueHex== "") Option(valueHex)
+      else if (valueHex == "") Option(valueHex)
       else
         try { Option(valueHex.toHexDecode) }
         catch { case t: Throwable => { Log.error(s"error converting from hex valueHex=$valueHex", t); Option(valueHex) } }
@@ -61,19 +61,19 @@ object RegistryPlus extends App {
   }
 
   def readMoreOption(key: String, name: String): Option[Array[String]] = {
-		  Log.debug(s"HKEY_CURRENT_USER, $keyRoot\\$key, $name")
-		  val valuesHex = filterJavaBugErrorLines { WinRegistry.readString(hkey, s"$keyRoot\\$key", name, wow) }
-		  Log.debug(s"valuesHex=$valuesHex")
-		  val values =
-		  if (valuesHex == null) None
-		  else if (valuesHex== "") Option(Array(valuesHex))
-		  else
-			  try { Option(valuesHex.split("_").map(_.toHexDecode)) }
-		  catch { case t: Throwable => { Log.error(s"error converting from hex valuesHex=$valuesHex", t); Option(Array(valuesHex)) } }
-		  Log.debug(s"values=${values.map(_.mkString)}")
-		  values
+    Log.debug(s"HKEY_CURRENT_USER, $keyRoot\\$key, $name")
+    val valuesHex = filterJavaBugErrorLines { WinRegistry.readString(hkey, s"$keyRoot\\$key", name, wow) }
+    Log.debug(s"valuesHex=$valuesHex")
+    val values =
+      if (valuesHex == null) None
+      else if (valuesHex == "") Option(Array(valuesHex))
+      else
+        try { Option(valuesHex.split("_").map(_.toHexDecode)) }
+        catch { case t: Throwable => { Log.error(s"error converting from hex valuesHex=$valuesHex", t); Option(Array(valuesHex)) } }
+    Log.debug(s"values=${values.map(_.mkString)}")
+    values
   }
-  
+
   //TODO remove and use only readOption
   @deprecated
   def read(key: String, name: String): String = {
@@ -81,7 +81,7 @@ object RegistryPlus extends App {
     val valueHex = filterJavaBugErrorLines { WinRegistry.readString(hkey, s"$keyRoot\\$key", name, wow) }
     Log.debug(s"valueHex=$valueHex")
     val value =
-      if (valueHex == null || valueHex== "") valueHex
+      if (valueHex == null || valueHex == "") valueHex
       else
         try { valueHex.toHexDecode }
         catch { case t: Throwable => { Log.error(s"error converting from hex valueHex=$valueHex", t); valueHex } }
@@ -100,19 +100,19 @@ object RegistryPlus extends App {
         """java.util.prefs.WindowsPreferences <init>""",
         """WARNING: Could not open/create prefs root node Software\JavaSoft\Prefs at root 0x80000002. Windows RegCreateKeyEx(...) returned error code 5."""))(
         action)
-        
+
 }
 
 object RegistryGroup {
-	def apply(groupName: String) = new RegistryGroup(groupName)
+  def apply(groupName: String) = new RegistryGroup(groupName)
 }
 class RegistryGroup(val groupName: String) {
   def registryValue(parameterName: String) = new RegistryValue(this, parameterName)
-  class RegistryValue (registryGroup: RegistryGroup, parameterName: String) {
-	  def read = RegistryPlus.readOption(registryGroup.groupName, parameterName)
-	  def save(value: String) = RegistryPlus.write(registryGroup.groupName, parameterName, value)
+}
+class RegistryValue(registryGroup: RegistryGroup, parameterName: String) {
+  def read = RegistryPlus.readOption(registryGroup.groupName, parameterName)
+  def save(value: String) = RegistryPlus.write(registryGroup.groupName, parameterName, value)
 
-	  def readMore = RegistryPlus.readMoreOption(registryGroup.groupName, parameterName)
-	  def saveMore(values: Array[String]) = RegistryPlus.writeMore(registryGroup.groupName, parameterName, values)
-  }
+  def readMore = RegistryPlus.readMoreOption(registryGroup.groupName, parameterName)
+  def saveMore(values: Array[String]) = RegistryPlus.writeMore(registryGroup.groupName, parameterName, values)
 }

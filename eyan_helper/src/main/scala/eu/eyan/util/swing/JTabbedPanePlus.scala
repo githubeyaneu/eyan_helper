@@ -44,7 +44,6 @@ object JTabbedPanePlus {
       button.setRolloverSelectedIcon("icons/tabs/close_activetab.png".toIconAsResource)
       button.onClicked(onCloseAction(component))
       panel.newRow("1px")
-      
 
       jTabbedPane.add(component)
       def idx = jTabbedPane.indexOfComponent(component)
@@ -54,32 +53,36 @@ object JTabbedPanePlus {
   }
 }
 
-trait WithComponent{
-  def getComponent:Component
-}
-class JTabbedPanePlus[TYPE <: WithComponent] extends JTabbedPane {//TODO rename? new class
-  private val tabsMap = ListBuffer[TYPE]()
-  
-  val activeTab = BehaviorSubject[Option[TYPE]](None)
-  
+class JTabbedPanePlus[TYPE <: WithComponent] extends JTabbedPane { //TODO rename? new class
+  def tabsObservable = tabs.distinctUntilChanged
+
+  def activeTabObservable = activeTab.distinctUntilChanged
+
   def getActiveTab = activeTab.get[Option[TYPE]]
-  
-  this.onSelectionChanged(activeTab.onNext(tabsMap.lift(getSelectedIndex)))
-  
-  def addTab(item:TYPE, title: Text, toolTip: String, onCloseAction: TYPE => Unit) = {
+
+  def addTab(item: TYPE, title: Text, toolTip: String, onCloseAction: TYPE => Unit) = {
     tabsMap.+=(item)
+    tabs.onNext(tabsMap.toList)
     this.addTabWithCloseButton(item.getComponent, title, toolTip, component => onCloseAction(item))
     setSelectedComponent(item.getComponent)
   }
-  
+
   def removeTab(itemToRemove: TYPE) = {
-	  tabsMap  -=  itemToRemove
+    tabsMap -= itemToRemove
+    tabs.onNext(tabsMap.toList)
     remove(itemToRemove.getComponent)
   }
-  
+
   def notContainsTab(item: TYPE) = !containsTab(item)
-  
+
   def containsTab(item: TYPE) = tabsMap.contains(item)
-  
-  def items = tabsMap
+
+  def items = tabsMap.toList
+
+  private val tabsMap = ListBuffer[TYPE]() //TODO refactor: let as list in the tabs BehaviorSubject
+
+  private val tabs = BehaviorSubject[List[TYPE]](List[TYPE]())
+  private val activeTab = BehaviorSubject[Option[TYPE]](None)
+
+  this.onSelectionChanged(activeTab.onNext(tabsMap.lift(getSelectedIndex)))
 }

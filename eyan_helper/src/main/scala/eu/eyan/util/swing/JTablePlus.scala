@@ -29,6 +29,15 @@ import javax.swing.table.TableCellRenderer
 import javax.swing.table.TableColumn
 import javax.swing.table.TableColumnModel
 import javax.swing.table.TableModel
+import eu.eyan.util.registry.RegistryValue
+import eu.eyan.log.Log
+import java.awt.Graphics2D
+import java.awt.Graphics
+import rx.lang.scala.Observable
+import eu.eyan.util.rx.lang.scala.ObservablePlus.ObservableImplicit
+import eu.eyan.util.awt.Graphics2DPlus.Graphics2DImplicit
+import javax.swing.ListModel
+import com.jgoodies.binding.adapter.AbstractTableAdapter
 
 object JTablePlus {
   implicit class JTableImplicit[TYPE <: JTable](jTable: TYPE) extends JComponentImplicit(jTable) {
@@ -49,7 +58,7 @@ object JTablePlus {
     def onColumnSelectionChangedEvent(action: ListSelectionEvent => Unit) = { jTable.getColumnModel.addColumnModelListener(SwingPlus.onColumnSelectionChanged(action)); jTable }
     //    ListSelectionListener
     def onSelectionChanged(action: => Unit) = onValueChangedEvent(e => action)
-		def onSelectionChangedEvent(action: ListSelectionEvent => Unit) = onValueChangedEvent(action)
+    def onSelectionChangedEvent(action: ListSelectionEvent => Unit) = onValueChangedEvent(action)
     def onValueChanged(action: => Unit) = onValueChangedEvent(e => action)
     def onValueChangedEvent(action: ListSelectionEvent => Unit) = { jTable.getSelectionModel.addListSelectionListener(SwingPlus.onValueChanged(action)); jTable }
     //    CellEditorListener
@@ -63,7 +72,7 @@ object JTablePlus {
     def onEditingCanceledEvent(action: ChangeEvent => Unit) = { jTable.getCellEditor.addCellEditorListener(SwingPlus.onEditingCanceled(action)); jTable }
     //    RowSorterListener
     def onSorterChanged(action: => Unit) = onSorterChangedEvent(e => action)
-		def onSorterChangedEvent(action: RowSorterEvent => Unit) = { jTable.getRowSorter.addRowSorterListener(SwingPlus.onSorterChanged(action)); jTable }
+    def onSorterChangedEvent(action: RowSorterEvent => Unit) = { jTable.getRowSorter.addRowSorterListener(SwingPlus.onSorterChanged(action)); jTable }
 
     def column(col: TableColumn) = { jTable.addColumn(col); jTable }
     def addNotify = { jTable.addNotify; jTable }
@@ -91,7 +100,7 @@ object JTablePlus {
     def dragEnabled(b: Boolean) = { jTable.setDragEnabled(b); jTable }
     def dragEnabled: TYPE = dragEnabled(true)
     def dragDisabled: TYPE = dragEnabled(false)
-    def dropMode(dropMode: DropMode) = { jTable.setDropMode(dropMode); jTable }//TODO
+    def dropMode(dropMode: DropMode) = { jTable.setDropMode(dropMode); jTable } //TODO
     def editingColumn(aColumn: Int) = { jTable.setEditingColumn(aColumn); jTable }
     def editingRow(aRow: Int) = { jTable.setEditingRow(aRow); jTable }
     def fillsViewportHeight(fillsViewportHeight: Boolean) = { jTable.setFillsViewportHeight(fillsViewportHeight); jTable }
@@ -107,7 +116,7 @@ object JTablePlus {
     def rowSorter(sorter: RowSorter[_ <: TableModel]) = { jTable.setRowSorter(sorter); jTable }
     def selectionBackground(selectionBackground: Color) = { jTable.setSelectionBackground(selectionBackground); jTable }
     def selectionForeground(selectionForeground: Color) = { jTable.setSelectionForeground(selectionForeground); jTable }
-    def selectionMode(selectionMode: Int) = { jTable.setSelectionMode(selectionMode); jTable }// TODO
+    def selectionMode(selectionMode: Int) = { jTable.setSelectionMode(selectionMode); jTable } // TODO
     def selectionModel(newModel: ListSelectionModel) = { jTable.setSelectionModel(newModel); jTable }
     def showGrid(showGrid: Boolean) = { jTable.setShowGrid(showGrid); jTable }
     def showGrid: TYPE = showGrid(true)
@@ -127,7 +136,40 @@ object JTablePlus {
     def valueAt(aValue: Object, row: Int, column: Int) = { jTable.setValueAt(aValue, row, column); jTable }
     def sizeColumnsToFit(lastColumnOnly: Int) = { jTable.sizeColumnsToFit(lastColumnOnly); jTable }
     def updateUI = { jTable.updateUI; jTable }
+
+    def getWidth = jTable.getWidth
+    def getColumnCount = jTable.getColumnCount
+    def getColumn(idx: Int) = jTable.getColumnModel.getColumn(idx)
+    def getColumns = for (i <- 0 until getColumnCount) yield getColumn(i)
+
+    def rememberColumnWidhts(columnWidhtsInRegistry: RegistryValue) = {
+      var lastWidths = ""
+      jTable.getTableHeader.onMouseReleased(columnWidhtsInRegistry.save(lastWidths))
+      jTable.getTableHeader.onDoubleClick(columnWidhtsInRegistry.save(lastWidths))
+      jTable onColumnMarginChanged columnWidthChanged
+      jTable onComponentResized resetColumnWidths
+      jTable onTableChanged resetColumnWidths
+      def columnWidthChanged = {
+        Log.info("ColCount: " + jTable.getColumnCount)
+        if (getWidth > 0 && getColumnCount > 0) lastWidths = getColumns.map(_.getWidth).map(_ * 100 / getWidth).mkString(",")
+      }
+      def resetColumnWidths = if (getWidth > 0 && getColumnCount > 0) columnWidhtsInRegistry.read.map(_.split(",").map(_.toInt * getWidth / 100)).foreach(setColumnWidths)
+      def setColumnWidths(columnWidths: Array[Int]) = if (columnWidths.size == getColumnCount) for (i <- 0 until getColumnCount) getColumn(i).setPreferredWidth(columnWidths(i))
+      jTable
+    }
   }
+}
+
+case class Row(index: Int)
+case class Col(index: Int)
+
+class JTableModelPlus[T](listModel: ListModel[T], columns: List[String], cellValueGetter: (Row, Col) => String) extends AbstractTableAdapter[T](listModel, columns: _*) {
+  def getValueAt(rowIndex: Int, columnIndex: Int) = cellValueGetter(Row(rowIndex), Col(columnIndex))
+}
+
+class JXTableWithEmptyText(emptyTextObs: Observable[String]) extends JXTable {
+  override protected def paintComponent(g: Graphics) = paintOrTextIfEmpty(g.asInstanceOf[Graphics2D])
+  private def paintOrTextIfEmpty(g2d: Graphics2D) = { super.paintComponent(g2d); if (getRowCount() == 0) g2d.drawString(emptyTextObs.get[String], Color.BLACK, 10, 20) }
 }
 
 class JTablePlus[TYPE] extends JXTable {
