@@ -50,6 +50,11 @@ import org.apache.commons.compress.utils.IOUtils
 import eu.eyan.util.swing.SwingPlus
 import java.awt.Frame
 import java.awt.GraphicsEnvironment
+import javax.swing.JScrollPane
+import javax.swing.Scrollable
+import javax.swing.JPanel
+import eu.eyan.util.swing.JPanelWithFrameLayout
+import javax.swing.BorderFactory
 
 object ComponentPlus {
 
@@ -66,7 +71,7 @@ object ComponentPlus {
       component.setLocation((screenSize.width - width) / 2, (screenSize.height - height) / 2)
       component
     }
-    
+
     val SCREEN_LEFT = 0
     val SCREEN_TOP = 0
 
@@ -224,8 +229,15 @@ object ComponentPlus {
 
     def focusInWindow = { component.requestFocusInWindow; component }
     def focusComponentInWindow(c: Component) = { if (c != null) c.focusInWindow; component }
-    
+
     def heightSet(height: Int) = { component.setSize(component.getWidth, height); component }
     def widthSet(width: Int) = { component.setSize(width, component.getHeight); component }
+
+    /** to function properly the containing frames should use the following spec: fill:1px:grow*/
+    def inScrollPane = {
+      val scrollPane = new JScrollPane(component)
+      scrollPane.setBorder(BorderFactory.createEmptyBorder)
+      scrollPane
+    }
   }
 }

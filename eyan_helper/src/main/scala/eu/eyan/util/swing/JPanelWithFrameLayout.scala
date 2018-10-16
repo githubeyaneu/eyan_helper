@@ -33,6 +33,8 @@ import eu.eyan.util.swing.JLabelPlus.JLabelImplicit
 import java.awt.Color
 import javax.swing.JComponent
 import javax.swing.JButton
+import eu.eyan.util.text.Text
+import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
 
 object JPanelPlus {
   implicit class JPanelImplicit[TYPE <: JPanel](jPanel: JPanel) extends JComponentImplicit(jPanel) {
@@ -85,8 +87,9 @@ class JPanelWithFrameLayout() extends JPanel {
 
   def nextColumn = { if (useSeparators) actualColumn += 2 else actualColumn += 1; this }
   def newColumn: JPanelWithFrameLayout = newColumn()
-  def newColumnFPG: JPanelWithFrameLayout = newColumn("f:p:g")
-  def newColumnFPGForTextArea: JPanelWithFrameLayout = newColumn("f:1px:g")
+  def newColumnFPG = newColumn("f:p:g")
+  def newColumnFPGForTextArea = newColumn("f:1px:g")
+  def newColumnScrollable = newColumn("f:1px:g")
   def newColumn(spec: String = PREF): JPanelWithFrameLayout = {
     if (useBorders && actualColumn == 0) {
       appendColumnBorder
@@ -115,8 +118,9 @@ class JPanelWithFrameLayout() extends JPanel {
   }
 
   def newRow: JPanelWithFrameLayout = newRow()
-  def newRowFPG: JPanelWithFrameLayout = newRow("f:p:g")
-  def newRowFPGForTextArea: JPanelWithFrameLayout = newRow("f:1px:g")
+  def newRowFPG = newRow("f:p:g")
+  def newRowFPGForTextArea = newRow("f:1px:g")
+  def newRowScrollable = newRow("f:1px:g")
 
   def newRow(spec: String = PREF): JPanelWithFrameLayout = {
 
@@ -150,6 +154,11 @@ class JPanelWithFrameLayout() extends JPanel {
     this
   }
 
+  def addFluent(comp: Component) = {
+    add(comp)
+    this
+  }
+
   // TODO make it generic
   override def add(comp: Component) = {
     if (noRowYet) newRow
@@ -175,6 +184,12 @@ class JPanelWithFrameLayout() extends JPanel {
 
   def addButton(text: String) = {
     val button = new JButton(text)
+    add(button)
+    button
+  }
+
+  def addButton(text: Text) = {
+    val button = new JButton("").text(text)
     add(button)
     button
   }

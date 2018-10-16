@@ -119,35 +119,35 @@ object AwtHelper {
   //WindowListener
   //WindowStateListener
   //WindowFocusListener
-  def onWindowOpened(action: WindowEvent => Unit):WindowListener = new WindowAdapter { override def windowOpened(e: WindowEvent) = action(e) }
-  def onWindowClosing(action: WindowEvent => Unit):WindowListener = new WindowAdapter { override def windowClosing(e: WindowEvent) = action(e) }
-  def onWindowClosed(action: WindowEvent => Unit):WindowListener = new WindowAdapter { override def windowClosed(e: WindowEvent) = action(e) }
-  def onWindowIconified(action: WindowEvent => Unit):WindowListener = new WindowAdapter { override def windowIconified(e: WindowEvent) = action(e) }
-  def onWindowDeiconified(action: WindowEvent => Unit):WindowListener = new WindowAdapter { override def windowDeiconified(e: WindowEvent) = action(e) }
-  def onWindowActivated(action: WindowEvent => Unit):WindowListener = new WindowAdapter { override def windowActivated(e: WindowEvent) = action(e) }
-  def onWindowDeactivated(action: WindowEvent => Unit):WindowListener = new WindowAdapter { override def windowDeactivated(e: WindowEvent) = action(e) }
-  def onWindowStateChanged(action: WindowEvent => Unit):WindowStateListener = new WindowAdapter { override def windowStateChanged(e: WindowEvent) = action(e) }
-  def onWindowGainedFocus(action: WindowEvent => Unit):WindowFocusListener = new WindowAdapter { override def windowGainedFocus(e: WindowEvent) = action(e) }
-  def onWindowLostFocus(action: WindowEvent => Unit):WindowFocusListener = new WindowAdapter { override def windowLostFocus(e: WindowEvent) = action(e) }
+  def onWindowOpened(action: WindowEvent => Unit): WindowListener = new WindowAdapter { override def windowOpened(e: WindowEvent) = action(e) }
+  def onWindowClosing(action: WindowEvent => Unit): WindowListener = new WindowAdapter { override def windowClosing(e: WindowEvent) = action(e) }
+  def onWindowClosed(action: WindowEvent => Unit): WindowListener = new WindowAdapter { override def windowClosed(e: WindowEvent) = action(e) }
+  def onWindowIconified(action: WindowEvent => Unit): WindowListener = new WindowAdapter { override def windowIconified(e: WindowEvent) = action(e) }
+  def onWindowDeiconified(action: WindowEvent => Unit): WindowListener = new WindowAdapter { override def windowDeiconified(e: WindowEvent) = action(e) }
+  def onWindowActivated(action: WindowEvent => Unit): WindowListener = new WindowAdapter { override def windowActivated(e: WindowEvent) = action(e) }
+  def onWindowDeactivated(action: WindowEvent => Unit): WindowListener = new WindowAdapter { override def windowDeactivated(e: WindowEvent) = action(e) }
+  def onWindowStateChanged(action: WindowEvent => Unit): WindowStateListener = new WindowAdapter { override def windowStateChanged(e: WindowEvent) = action(e) }
+  def onWindowGainedFocus(action: WindowEvent => Unit): WindowFocusListener = new WindowAdapter { override def windowGainedFocus(e: WindowEvent) = action(e) }
+  def onWindowLostFocus(action: WindowEvent => Unit): WindowFocusListener = new WindowAdapter { override def windowLostFocus(e: WindowEvent) = action(e) }
 
   def screenSize = Toolkit.getDefaultToolkit.getScreenSize
-  
-  
+
   def newRunnable(runnable: () => Unit) = new Runnable() { override def run() = runnable() }
   def runnable(runnable: => Unit) = new Runnable() { override def run() = runnable }
 
   def tryToEnlargeWindow(window: Window) = {
-    val screenSize = Toolkit.getDefaultToolkit().getScreenSize()
-    val origPos = window.getBounds
-    Log.debug("orig: " + origPos)
-    window.pack
-    val newPos = window.getBounds
-    // Fuck hack :(
-    if (newPos.y + newPos.height > screenSize.height - 40) {
-      newPos.height = screenSize.height - 40 - newPos.y
-      newPos.width = newPos.width + 30
-      window.setBounds(newPos)
-    }
-    Log.debug("new: " + newPos)
+    if (window != null) {
+      val screenSize = Toolkit.getDefaultToolkit().getScreenSize()
+      val origPos = window.getBounds
+      Log.debug("orig: " + origPos)
+      window.pack
+      val newPos = window.getBounds
+      // Fuck hack :(
+      if (newPos.y + newPos.height > screenSize.height - 40) {
+        newPos.height = screenSize.height - 40 - newPos.y
+        newPos.width = newPos.width + 30
+        window.setBounds(newPos)
+      }
+    } else Log.warn("null")
   }
 }

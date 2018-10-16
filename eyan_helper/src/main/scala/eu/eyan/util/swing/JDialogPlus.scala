@@ -24,5 +24,8 @@ object JDialogPlus {
     def layeredPane(layeredPane: JLayeredPane) = { jDialog.setLayeredPane(layeredPane); jDialog }
     override def layout(manager: LayoutManager) = { jDialog.setLayout(manager); jDialog }
     def transferHandler(newHandler: TransferHandler) = { jDialog.setTransferHandler(newHandler); jDialog }
+    
+    def addFluent(c: Component) = { jDialog.add(c); jDialog }
+    def addFluent(c: Component, constraints: Any) = { jDialog.add(c, constraints); jDialog }
   }
 }

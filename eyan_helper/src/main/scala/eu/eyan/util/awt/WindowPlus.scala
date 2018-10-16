@@ -89,5 +89,7 @@ object WindowPlus {
       window.setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment.getMaximumWindowBounds)
       window
     }
+    
+    def packFluent = {window.pack; window}
   }
 }
