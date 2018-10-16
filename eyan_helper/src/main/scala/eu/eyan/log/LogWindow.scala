@@ -84,7 +84,7 @@ class LogWindow {
   List(None, Fatal, Error, Warn, Info, Debug, Trace).foreach(level => buttons.newColumn.addButton(level.toString).onAction_disableEnable(Log.activate(level)))
 
   buttons.newColumn.addLabel("max rows:")
-  val maxRowsTf = buttons.newColumn.addTextField("1000", 6).rememberValueInRegistry("LogWindowMaxRows").onTextChanged(limitLines.setLimitLines(maxRows))
+  val maxRowsTf = buttons.newColumn.addTextField("10000", 6).rememberValueInRegistry("LogWindowMaxRows").onTextChanged(limitLines.setLimitLines(maxRows))
 
   def maxRows: Int = try { maxRowsTf.getText.toInt } catch { case _: Throwable => 1000 }
 

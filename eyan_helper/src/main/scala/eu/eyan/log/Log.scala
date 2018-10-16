@@ -41,7 +41,7 @@ object Log {
       stackTraceElement.getClassName != LOG_CLASS_NAME &&
         !stackTraceElement.getClassName.contains("LogImplicit") &&
         stackTraceElement.getClassName != LOG_SLF4J_NAME
-    def stackElementWhereLogWasCalled = Thread.currentThread.getStackTrace.filter(stackElementsNotToLog)(1) // TODO use lift
+    def stackElementWhereLogWasCalled = Thread.currentThread.getStackTrace.filter(stackElementsNotToLog)(1) // TODO use lift //FIXME: this is very slow if dbg level on and lot of logs come (convert files)
     def stackClassAndMethod = stackElementWhereLogWasCalled.getClassName.substring(stackElementWhereLogWasCalled.getClassName.lastIndexOf(".") + 1) + "." + stackElementWhereLogWasCalled.getMethodName
     def logText = stackClassAndMethod + (if (messageText != "") { ": " + messageText } else "")
     if (actualLevel.shouldLog(level)) logger.onNext(new Log(level, logText))
@@ -80,7 +80,7 @@ object Log {
   def activateAllLevel = activateTraceLevel
 
   def fatal = log(Fatal)
-  def fatal(o: => Object) = log(Fatal, String.valueOf(o))
+  def fatal(o: => Any) = log(Fatal, String.valueOf(o))
 
   def error = log(Error)
   def error(t: Throwable): Unit = error("", t) // TODO: test it
@@ -96,16 +96,16 @@ object Log {
   def error(message: => String, t: => Throwable) = log(Error, message, t)
 
   def warn = log(Warn)
-  def warn(o: => Object) = log(Warn, String.valueOf(o))
+  def warn(o: => Any) = log(Warn, String.valueOf(o))
 
   def info = log(Info)
-  def info(o: => Object) = log(Info, String.valueOf(o))
+  def info(o: => Any) = log(Info, String.valueOf(o))
 
   def debug = log(Debug)
-  def debug(o: => Object) = log(Debug, String.valueOf(o))
+  def debug(o: => Any) = log(Debug, String.valueOf(o))
 
   def trace = log(Trace)
-  def trace(o: => Object) = log(Trace, String.valueOf(o))
+  def trace(o: => Any) = log(Trace, String.valueOf(o))
 
   def logToConsoleText(log: Log) = f"${log.level}%-5s ${log.text}"
   logsObservable.filter(_.level > Error).subscribe(log => { logToConsoleText(log).println })

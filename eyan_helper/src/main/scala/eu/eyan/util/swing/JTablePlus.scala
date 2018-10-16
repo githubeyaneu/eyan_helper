@@ -170,6 +170,7 @@ class JTableModelPlus[T](listModel: ListModel[T], columns: List[String], cellVal
 class JXTableWithEmptyText(emptyTextObs: Observable[String]) extends JXTable {
   override protected def paintComponent(g: Graphics) = paintOrTextIfEmpty(g.asInstanceOf[Graphics2D])
   private def paintOrTextIfEmpty(g2d: Graphics2D) = { super.paintComponent(g2d); if (getRowCount() == 0) g2d.drawString(emptyTextObs.get[String], Color.BLACK, 10, 20) }
+  emptyTextObs.foreach(x=> repaint())
 }
 
 class JTablePlus[TYPE] extends JXTable {

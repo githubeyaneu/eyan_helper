@@ -6,6 +6,8 @@ import javax.swing.text.Element
 import javax.swing.event.DocumentEvent
 import javax.swing.text.Document
 
+
+//FIXME: this is very slow if dbg level on and lot of logs come (convert files)
 class LimitLinesDocumentListener(var maximumLines: Int, var isRemoveFromStart: Boolean = true) extends DocumentListener {
 
   def setLimitLines(max: Int) =

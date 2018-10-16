@@ -2,6 +2,8 @@ package eu.eyan.util.rx.lang.scala
 
 import rx.lang.scala.subjects.BehaviorSubject
 import rx.lang.scala.Observable
+import rx.lang.scala.Subscription
+import eu.eyan.util.scala.BooleanPlus.BooleanImplicit
 
 object ObservablePlus {
   // FIXME: why cannot implicits have more types???
@@ -12,6 +14,45 @@ object ObservablePlus {
       var result = null.asInstanceOf[T]
       observable.take(1).subscribe(s => result = s.asInstanceOf[T])
       result
+    }
+  }
+
+  implicit class ObservableVarargsImplicit[T](observables: Observable[T]*) {
+    def combineLatest = ObservablePlus.toList(observables: _*) 
+  }
+
+  implicit class ObservableAnyVarargsImplicit(observables: Observable[Any]*) {
+	  def combineLatest = ObservablePlus.toList(observables: _*) 
+  }
+
+  implicit class ObservableListImplicit[T](observables: List[Observable[T]]) {
+	  def combineLatest = ObservablePlus.toList(observables: _*) 
+  }
+
+  def toList[T](observables: Observable[T]*): Observable[List[T]] = Observable.combineLatest(observables.toArray.toIterable)(_.toList)
+
+  implicit class ObservableImplicitBoolean[O <: Observable[Boolean]](observableBoolean: O) {
+    def ifElse[T](trueObs: Observable[T], falseObs: Observable[T]): Observable[T] = {
+      val textsCombined = ObservablePlus.toList(trueObs, falseObs)
+      val conditionAndTexts = observableBoolean combineLatest textsCombined
+      def selectText(conditionAndTexts: (Boolean, List[T])) = conditionAndTexts._2(conditionAndTexts._1 ? 0 | 1) 
+      conditionAndTexts map selectText
+    }
+  }
+
+  implicit class ObservableImplicitInt[O <: Observable[Int]](observableInt: O) {
+    def emptySingularPlural[T](empty: Observable[T], singular: Observable[T], plural: Observable[T]): Observable[T] = {
+      val textsCombined = ObservablePlus.toList(empty, singular, plural)
+
+      val nrAndTexts = observableInt combineLatest textsCombined
+
+      def selectTitleText(nrAndTexts: (Int, List[T])) = {
+        val nr = nrAndTexts._1
+        val texts = nrAndTexts._2
+        val idx = if (nr < 1) 0 else ((nr == 1) ? 1 | 2)
+        texts(idx)
+      }
+      nrAndTexts map selectTitleText
     }
   }
 }

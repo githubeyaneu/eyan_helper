@@ -30,7 +30,7 @@ class LogTest extends TestPlus {
   @Test
   def testActivateLevel = {
     collectOutputAndError { Log.activateTraceLevel } ==>
-      OutAndErr("Info  LogTest.$anonfun$testActivateLevel$1: activating log level: Trace\r\nInfo  LogTest.$anonfun$testActivateLevel$1: activated log level: Trace\r\n", "")
+      OutAndErr("Info  LogTest.$anonfun$testActivateLevel$2: activating log level: Trace\r\nInfo  LogTest.$anonfun$testActivateLevel$2: activated log level: Trace\r\n", "")
 
     Log.activateNone
     collectOutputAndError { Log.info("abc") } ==> OutAndErr("", "")
@@ -39,26 +39,26 @@ class LogTest extends TestPlus {
     collectOutputAndError { Log.info("abc") } ==> OutAndErr("", "")
 
     Log.activateFatalLevel
-    collectOutputAndError { Log.fatal("abc") } ==> OutAndErr("", "Fatal LogTest.$anonfun$testActivateLevel$6: abc\r\n")
+    collectOutputAndError { Log.fatal("abc") } ==> OutAndErr("", "Fatal LogTest.$anonfun$testActivateLevel$10: abc\r\n")
 
     Log.activateInfoLevel
     collectOutputAndError {
       Log.fatal("a")
       Log.debug("d")
-    } ==> OutAndErr("", "Fatal LogTest.$anonfun$testActivateLevel$8: a\r\n")
+    } ==> OutAndErr("", "Fatal LogTest.$anonfun$testActivateLevel$13: a\r\n")
   }
 
   @Test
   def testAllLevel = {
     val expectedError = "" +
-      "Fatal LogTest.$anonfun$testAllLevel$1: f\r\n" +
-      "Error LogTest.$anonfun$testAllLevel$1: e\r\n"
+      "Fatal LogTest.$anonfun$testAllLevel$2: f\r\n" +
+      "Error LogTest.$anonfun$testAllLevel$2: e\r\n"
 
     val expectedOutput = "" +
-      "Warn  LogTest.$anonfun$testAllLevel$1: w\r\n" +
-      "Info  LogTest.$anonfun$testAllLevel$1: i\r\n" +
-      "Debug LogTest.$anonfun$testAllLevel$1: d\r\n" +
-      "Trace LogTest.$anonfun$testAllLevel$1: t\r\n"
+      "Warn  LogTest.$anonfun$testAllLevel$2: w\r\n" +
+      "Info  LogTest.$anonfun$testAllLevel$2: i\r\n" +
+      "Debug LogTest.$anonfun$testAllLevel$2: d\r\n" +
+      "Trace LogTest.$anonfun$testAllLevel$2: t\r\n"
 
     Log.activateAllLevel
     collectOutputAndError {
@@ -74,14 +74,14 @@ class LogTest extends TestPlus {
   @Test
   def testAllLevel_NoText = {
     val expectedError = "" +
-      "Fatal LogTest.$anonfun$testAllLevel_NoText$1\r\n" +
-      "Error LogTest.$anonfun$testAllLevel_NoText$1\r\n"
+      "Fatal LogTest.$anonfun$testAllLevel_NoText$2\r\n" +
+      "Error LogTest.$anonfun$testAllLevel_NoText$2\r\n"
 
     val expectedOutput = "" +
-      "Warn  LogTest.$anonfun$testAllLevel_NoText$1\r\n" +
-      "Info  LogTest.$anonfun$testAllLevel_NoText$1\r\n" +
-      "Debug LogTest.$anonfun$testAllLevel_NoText$1\r\n" +
-      "Trace LogTest.$anonfun$testAllLevel_NoText$1\r\n"
+      "Warn  LogTest.$anonfun$testAllLevel_NoText$2\r\n" +
+      "Info  LogTest.$anonfun$testAllLevel_NoText$2\r\n" +
+      "Debug LogTest.$anonfun$testAllLevel_NoText$2\r\n" +
+      "Trace LogTest.$anonfun$testAllLevel_NoText$2\r\n"
 
     Log.activateAllLevel
     collectOutputAndError {
@@ -99,7 +99,7 @@ class LogTest extends TestPlus {
     val ex = new Exception("abc")
 
     val expectedError = "" +
-      "Error LogTest.$anonfun$testErrorException$1:  java.lang.Exception: abc\r\n  " + ex.getStackTrace.mkString("\r\n  ") + "\r\n"
+      "Error LogTest.$anonfun$testErrorException$2:  java.lang.Exception: abc\r\n  " + ex.getStackTrace.mkString("\r\n  ") + "\r\n"
 
     Log.activateAllLevel
     collectOutputAndError { Log.error(ex) } ==> OutAndErr("", expectedError)
@@ -110,7 +110,7 @@ class LogTest extends TestPlus {
     val ex = new Exception("abc")
 
     val expectedError = "" +
-      "Error LogTest.$anonfun$testError_ExcNoMsg$1:  java.lang.Exception: abc\r\n  " + ex.getStackTrace.mkString("\r\n  ") + "\r\n"
+      "Error LogTest.$anonfun$testError_ExcNoMsg$2:  java.lang.Exception: abc\r\n  " + ex.getStackTrace.mkString("\r\n  ") + "\r\n"
 
     Log.activateAllLevel
     collectOutputAndError { Log.error("", ex) } ==> OutAndErr("", expectedError)
@@ -121,7 +121,7 @@ class LogTest extends TestPlus {
     val ex = new Exception("abc")
 
     val expectedError = "" +
-      "Error LogTest.$anonfun$testError_ExcMsg$1: abc - java.lang.Exception: abc\r\n  " + ex.getStackTrace.mkString("\r\n  ") + "\r\n"
+      "Error LogTest.$anonfun$testError_ExcMsg$2: abc - java.lang.Exception: abc\r\n  " + ex.getStackTrace.mkString("\r\n  ") + "\r\n"
 
     Log.activateAllLevel
     collectOutputAndError { Log.error("abc", ex) } ==> OutAndErr("", expectedError)
