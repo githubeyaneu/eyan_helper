@@ -5,6 +5,7 @@ import eu.eyan.util.awt.WindowPlus.WindowPlusImplicit
 import java.awt.Dialog.ModalityType
 import java.awt.Shape
 import java.awt.Color
+import eu.eyan.util.text.Text
 
 object DialogPlus {
   implicit class DialogPlusImplicit[TYPE <: Dialog](dialog: TYPE) extends WindowPlusImplicit(dialog) {
@@ -27,6 +28,7 @@ object DialogPlus {
     override def shape(shape: Shape) = { dialog.setShape(shape); dialog }
 
     def title(title: String) = { dialog.setTitle(title); dialog }
+    def title(title: Text) = { title.subscribe(title => dialog.setTitle(title)); dialog }
 
     def undecorated = withUndecorated(true)
     def notUndecorated = withUndecorated(false)

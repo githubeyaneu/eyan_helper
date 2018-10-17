@@ -239,5 +239,9 @@ object ComponentPlus {
       scrollPane.setBorder(BorderFactory.createEmptyBorder)
       scrollPane
     }
+
+    def invalidateSafe = { if (component != null) component.invalidate(); component }
+    
+    def windowForComponent = if (component == null) null else SwingUtilities.windowForComponent(component) 
   }
 }

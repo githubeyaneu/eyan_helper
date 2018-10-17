@@ -35,6 +35,7 @@ import javax.swing.JComponent
 import javax.swing.JButton
 import eu.eyan.util.text.Text
 import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
+import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
 
 object JPanelPlus {
   implicit class JPanelImplicit[TYPE <: JPanel](jPanel: JPanel) extends JComponentImplicit(jPanel) {
@@ -286,8 +287,8 @@ class JPanelWithFrameLayout() extends JPanel {
     //TODO
   }
 
-  def addInScrollPane[C <: Component](c: C) = {
-    val scrollPane = new JScrollPane(c)
-    c
+  def addFluentInScrollPane[C <: Component](c: C) = {
+    add(c.inScrollPane)
+    this
   }
 }
