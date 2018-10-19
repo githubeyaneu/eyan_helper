@@ -160,11 +160,11 @@ object JTablePlus {
   }
 }
 
-case class Row(index: Int)
-case class Col(index: Int)
+case class TableRow(index: Int)
+case class TableCol(index: Int)
 
-class JTableModelPlus[T](listModel: ListModel[T], columns: List[String], cellValueGetter: (Row, Col) => String) extends AbstractTableAdapter[T](listModel, columns: _*) {
-  def getValueAt(rowIndex: Int, columnIndex: Int) = cellValueGetter(Row(rowIndex), Col(columnIndex))
+class JTableModelPlus[T](listModel: ListModel[T], columns: List[String], cellValueGetter: (TableRow, TableCol) => String) extends AbstractTableAdapter[T](listModel, columns: _*) {
+  def getValueAt(rowIndex: Int, columnIndex: Int) = cellValueGetter(TableRow(rowIndex), TableCol(columnIndex))
 }
 
 class JXTableWithEmptyText(emptyTextObs: Observable[String]) extends JXTable {
