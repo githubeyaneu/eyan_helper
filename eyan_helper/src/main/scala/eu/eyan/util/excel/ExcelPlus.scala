@@ -46,12 +46,12 @@ object ExcelPlus {
   }
 
   def sheetToExcel(sheet: Sheet) = {
-		  val columns = for (columnIndex <- 0 until sheet.getColumns) yield ExcelColumn(columnIndex)
-				  val rows = for (rowIndex <- 0 until sheet.getRows) yield ExcelRow(rowIndex)
-				  val table = for (column <- columns; row <- rows) yield ((column, row), sheet.getCell(column.index, row.index).getContents)
-				  ExcelSheet(columns, rows, table.toMap)
+    val columns = for (columnIndex <- 0 until sheet.getColumns) yield ExcelColumn(columnIndex)
+    val rows = for (rowIndex <- 0 until sheet.getRows) yield ExcelRow(rowIndex)
+    val table = for (column <- columns; row <- rows) yield ((column, row), sheet.getCell(column.index, row.index).getContents)
+    ExcelSheet(columns, rows, table.toMap)
   }
-  
+
   def WORKBOOK_SETTINGS = { val ws = new WorkbookSettings(); ws.setEncoding("Cp1252"); ws }
 
   private def workbookSheetToExcel(workbook: Workbook, sheetName: String) = {
@@ -65,5 +65,4 @@ object ExcelPlus {
     if (sheet == null) workbook.getSheet(string)
     else sheet
   }
-
 }

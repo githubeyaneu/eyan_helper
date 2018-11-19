@@ -31,6 +31,8 @@ import java.io.InputStream
 import eu.eyan.util.java.lang.ThreadPlus
 import eu.eyan.util.scala.Try
 import javax.swing.ImageIcon
+import eu.eyan.util.awt.clipboard.ClipboardPlus
+import scala.annotation.tailrec
 
 object StringPlus {
   lazy val reg = "[\\p{InCombiningDiacriticalMarks}]".r
@@ -200,16 +202,41 @@ object StringPlus {
       if (url == null) throw new IllegalArgumentException(s"resource $s not found.")
       url.getFile.asFile
     }
-    
+
     def isNull = s == null
-    
-    def isNullOrEmpty = isNull || s.isEmpty  
-    
+
+    def isNullOrEmpty = isNull || s.isEmpty
+
     def toIconAsResource = {
       //TODO refactor...
       val is = ClassLoader.getSystemResourceAsStream(s)
       val bytes = Stream.continually(is.read).takeWhile(_ != -1).map(_.toByte).toArray
       new ImageIcon(bytes)
     }
+
+    def toCamelCase = {
+      @tailrec def underScoreToCamel(s: String, output: String, first: Boolean, lastUnderScore: Boolean): String =
+        if (s.isEmpty) output
+        else {
+          val underScore = s.head == '_'
+          val plus = if (underScore) "" else if (lastUnderScore) s.head.toUpper else if(first) s.head else s.head.toLower
+          underScoreToCamel(s.tail, output + plus, false, underScore)
+        }
+
+      underScoreToCamel(s, "", true, false)
+    }
+
+    def toUnderScoreCase = {
+      @tailrec def camel2Underscore(s: String, output: String, first: Boolean): String =
+        if (s.isEmpty) output
+        else {
+          val plus = if (s.head.isUpper && !first) "_" else ""
+          camel2Underscore(s.tail, output + plus + s.head, false)
+        }
+
+      camel2Underscore(s, "", true)
+    }
+
+    def copyToClipboard = ClipboardPlus.copyToClipboard(s)
   }
 }

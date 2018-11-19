@@ -99,6 +99,7 @@ trait TestPlus {
     def shouldBeNull = shouldBe(null)
     def shouldBe(expected: Any) = ==>(expected)
     def ==>(expected: Any): A = ==>("", expected)
+    def ===(expected: Any): A = ==>("", expected)
     def ==>(descriptionAndExpected: Tuple2[String, Any]): A = {
       val description = descriptionAndExpected._1
       val expected= descriptionAndExpected._2

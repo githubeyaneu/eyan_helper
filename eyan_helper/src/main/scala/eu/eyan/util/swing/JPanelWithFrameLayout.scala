@@ -56,30 +56,46 @@ object JPanelWithFrameLayout {
 //TODO Rename to JPanelPlus...
 class JPanelWithFrameLayout() extends JPanel {
   private val counterForLog = JPanelWithFrameLayout.counterForLog
-  private val frameLayout = new FormLayout("", "")
-  this.setLayout(frameLayout)
 
   var separatorSizeBetweenColumns = DEFAULT_SEPARATOR_SIZE
   var separatorSizeBetweenRows = DEFAULT_SEPARATOR_SIZE
-  def withSeparators = { if (checkNotStarted("withSeparators can be used only after the constructor! Do not use after adding cols/rows/components!")) useSeparators = true; this }
+  var borderSize = DEFAULT_BORDER_SIZE
+  private var frameLayout = new FormLayout("", "")
   private var useSeparators = false
+  private var useBorders = false
+  private var actualColumn = 0
+  private var actualRow = 0
+  private var actualSpanColumns = 1
+
+  reset
+
+  def reset = {
+    removeAll
+    separatorSizeBetweenColumns = DEFAULT_SEPARATOR_SIZE
+    separatorSizeBetweenRows = DEFAULT_SEPARATOR_SIZE
+    borderSize = DEFAULT_BORDER_SIZE
+    frameLayout = new FormLayout("", "")
+    useSeparators = false
+    useBorders = false
+    actualColumn = 0
+    actualRow = 0
+    actualSpanColumns = 1
+    this.setLayout(frameLayout)
+    this
+  }
+
+  def withSeparators = { if (checkNotStarted("withSeparators can be used only after the constructor! Do not use after adding cols/rows/components!")) useSeparators = true; this }
   private def appendColumnSeparator = frameLayout.appendColumn(ColumnSpec.decode(separatorSizeBetweenColumns))
   private def appendRowSeparator = frameLayout.appendRow(RowSpec.decode(separatorSizeBetweenRows))
 
-  var borderSize = DEFAULT_BORDER_SIZE
   def withBorders = { if (checkNotStarted("withBorders can be used only after the constructor! Do not use after adding cols/rows/components!")) useBorders = true; this }
-  private var useBorders = false
   private def appendColumnBorder = frameLayout.appendColumn(ColumnSpec.decode(borderSize))
   private def appendRowBorder = frameLayout.appendRow(RowSpec.decode(borderSize))
 
   private def checkNotStarted(msg: String) = if (0 < actualColumn || 0 < actualRow) { Log.error(msg); false } else true
 
-  private var actualColumn = 0
-  private var actualRow = 0
-
   def span(columns: Int) = { actualSpanColumns = actualSpanColumns + columns; this }
   def span: JPanelWithFrameLayout = span(1)
-  private var actualSpanColumns = 1
 
   def notFirstRow = if (useBorders) actualRow >= 2 else actualRow >= 1
   def notFirstColumn = if (useBorders) actualColumn >= 2 else actualColumn >= 1
