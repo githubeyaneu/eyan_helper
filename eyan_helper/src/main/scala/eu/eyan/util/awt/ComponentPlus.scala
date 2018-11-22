@@ -55,6 +55,7 @@ import javax.swing.Scrollable
 import javax.swing.JPanel
 import eu.eyan.util.swing.JPanelWithFrameLayout
 import javax.swing.BorderFactory
+import java.awt.MouseInfo
 
 object ComponentPlus {
 
@@ -179,6 +180,7 @@ object ComponentPlus {
     def onMousePressed(action: => Unit) = onMousePressedEvent { e => action }
     def onMousePressedEvent(action: MouseEvent => Unit) = { component.addMouseListener(AwtHelper.onMousePressed(action)); component }
     def onMouseReleased(action: => Unit) = onMouseReleasedEvent { e => action }
+    def onMouseLeftReleased(action: => Unit) = onMouseReleasedEvent { e => if(e.getButton==MouseEvent.BUTTON1) action }
     def onMouseReleasedEvent(action: MouseEvent => Unit) = { component.addMouseListener(AwtHelper.onMouseReleased(action)); component }
     def onMouseEntered(action: => Unit) = onMouseEnteredEvent { e => action }
     def onMouseEnteredEvent(action: MouseEvent => Unit) = { component.addMouseListener(AwtHelper.onMouseEntered(action)); component }

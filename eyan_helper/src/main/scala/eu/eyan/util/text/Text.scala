@@ -26,8 +26,8 @@ object Text {
  */
 class Text(protected val template: String, private val args: Observable[Any]*) extends Observable[String] {
   protected val templateObservable = BehaviorSubject[String](template)
-  Log.info("Text created " + templateObservable.get)
-  Log.info("Text created args:" + args.size)
+  Log.debug("Text created " + templateObservable.get)
+  Log.debug("Text created args:" + args.size)
 
   // TODO check string and param numbers
   lazy val paramsCombined = args.toList.combineLatest

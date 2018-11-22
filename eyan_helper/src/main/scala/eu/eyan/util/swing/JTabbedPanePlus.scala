@@ -42,7 +42,7 @@ object JTabbedPanePlus {
       button.setIcon("icons/tabs/close_inactive.png".toIconAsResource)
       button.setRolloverIcon("icons/tabs/close_onmouse.png".toIconAsResource)
       button.setRolloverSelectedIcon("icons/tabs/close_activetab.png".toIconAsResource)
-      button.onClicked(onCloseAction(component))
+      button.onMouseReleased(onCloseAction(component))
       panel.newRow("1px")
 
       jTabbedPane.add(component)

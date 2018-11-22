@@ -55,7 +55,10 @@ class GolPanel(var gol: Gol = Gol(Set())) extends JPanel {
 }
 
 object Gol extends App {
-  val startingGoL = Gol(Set(Cell(2, 3), Cell(2, 2), Cell(3, 2), Cell(3, 3), Cell(3, 4)))
+  val oscillator = Set(Cell(-1, 0), Cell(0, 0), Cell(1, 0))
+  val glider = Set ( Cell(5, 5), Cell(6, 6), Cell(7, 6), Cell(7, 5), Cell(7, 4) )
+  def mirror(dx:Int, dy:Int)(cell:Cell) = Cell(cell.x*dx, cell.y * dy)
+  val startingGoL = Gol(oscillator ++ glider ++ glider.map(mirror(1,-1)) ++ glider.map(mirror(-1,1))++ glider.map(mirror(-1,-1)))
   val golPanel = new GolPanel(startingGoL)
   golPanel.onMouseReleased(golPanel.next)
   new JFrame().withComponent(golPanel).onCloseExit.packAndSetVisible.maximize
