@@ -203,7 +203,7 @@ class JTablePlus[TYPE] extends JXTable {
   }
 }
 
-class JTablePlus2[COLUMN_TYPE, ROW_TYPE](columns: List[COLUMN_TYPE], cellGetter: (ROW_TYPE, COLUMN_TYPE) => String) extends JXTable {
+class JTablePlus3[COLUMN_TYPE, ROW_TYPE](getters: Tuple2[COLUMN_TYPE, ROW_TYPE => String]*) extends JXTable {
 
   def +=(value: ROW_TYPE) = {
     rows += value
@@ -217,17 +217,17 @@ class JTablePlus2[COLUMN_TYPE, ROW_TYPE](columns: List[COLUMN_TYPE], cellGetter:
     rows.clear
     if (oldSize > 0) model.fireTableRowsDeleted(0, oldSize - 1)
   }
-  
-  def selection:Option[ROW_TYPE] = selectionObservable.get
-  
+
+  def selection: Option[ROW_TYPE] = selectionObservable.get
+
   private val selectionObservable = BehaviorSubject[Option[ROW_TYPE]](None)
 
   private val rows = MutableList[ROW_TYPE]()
   private val model = new AbstractTableModel {
-    def getColumnCount(): Int = columns.size
+    def getColumnCount(): Int = getters.size
     def getRowCount(): Int = rows.size
-    def getValueAt(rowIndex: Int, columnIndex: Int): Object = cellGetter(rows(rowIndex), columns(columnIndex))
-    override def getColumnName(index: Int) = columns(index).toString
+    def getValueAt(rowIndex: Int, columnIndex: Int): Object = getters(columnIndex)._2(rows(rowIndex))
+    override def getColumnName(columnIndex: Int) = getters(columnIndex)._1.toString
   }
 
   setModel(model)
