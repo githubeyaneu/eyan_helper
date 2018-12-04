@@ -38,6 +38,9 @@ import eu.eyan.util.rx.lang.scala.ObservablePlus.ObservableImplicit
 import eu.eyan.util.awt.Graphics2DPlus.Graphics2DImplicit
 import javax.swing.ListModel
 import com.jgoodies.binding.adapter.AbstractTableAdapter
+import scala.collection.mutable.MutableList
+import javax.swing.table.DefaultTableModel
+import rx.lang.scala.subjects.BehaviorSubject
 
 object JTablePlus {
   implicit class JTableImplicit[TYPE <: JTable](jTable: TYPE) extends JComponentImplicit(jTable) {
@@ -150,7 +153,7 @@ object JTablePlus {
       jTable onComponentResized resetColumnWidths
       jTable onTableChanged resetColumnWidths
       def columnWidthChanged = {
-        Log.info("ColCount: " + jTable.getColumnCount)
+        Log.debug("ColCount: " + jTable.getColumnCount)
         if (getWidth > 0 && getColumnCount > 0) lastWidths = getColumns.map(_.getWidth).map(_ * 100 / getWidth).mkString(",")
       }
       def resetColumnWidths = if (getWidth > 0 && getColumnCount > 0) columnWidhtsInRegistry.read.map(_.split(",").map(_.toInt * getWidth / 100)).foreach(setColumnWidths)
@@ -170,7 +173,7 @@ class JTableModelPlus[T](listModel: ListModel[T], columns: List[String], cellVal
 class JXTableWithEmptyText(emptyTextObs: Observable[String]) extends JXTable {
   override protected def paintComponent(g: Graphics) = paintOrTextIfEmpty(g.asInstanceOf[Graphics2D])
   private def paintOrTextIfEmpty(g2d: Graphics2D) = { super.paintComponent(g2d); if (getRowCount() == 0) g2d.drawString(emptyTextObs.get[String], Color.BLACK, 10, 20) }
-  emptyTextObs.foreach(x=> repaint())
+  emptyTextObs.foreach(x => repaint())
 }
 
 class JTablePlus[TYPE] extends JXTable {
@@ -198,4 +201,39 @@ class JTablePlus[TYPE] extends JXTable {
     })
     this
   }
+}
+
+class JTablePlus2[COLUMN_TYPE, ROW_TYPE](columns: List[COLUMN_TYPE], cellGetter: (ROW_TYPE, COLUMN_TYPE) => String) extends JXTable {
+
+  def +=(value: ROW_TYPE) = {
+    rows += value
+    new DefaultTableModel
+    model.fireTableRowsInserted(rows.size - 1, rows.size - 1)
+    this
+  }
+
+  def clear = {
+    val oldSize = rows.size
+    rows.clear
+    if (oldSize > 0) model.fireTableRowsDeleted(0, oldSize - 1)
+  }
+  
+  def selection:Option[ROW_TYPE] = selectionObservable.get
+  
+  private val selectionObservable = BehaviorSubject[Option[ROW_TYPE]](None)
+
+  private val rows = MutableList[ROW_TYPE]()
+  private val model = new AbstractTableModel {
+    def getColumnCount(): Int = columns.size
+    def getRowCount(): Int = rows.size
+    def getValueAt(rowIndex: Int, columnIndex: Int): Object = cellGetter(rows(rowIndex), columns(columnIndex))
+    override def getColumnName(index: Int) = columns(index).toString
+  }
+
+  setModel(model)
+
+  import eu.eyan.util.swing.JTablePlus.JTableImplicit
+  this onSelectionChanged selectionChanged
+
+  private def selectionChanged = selectionObservable.onNext(rows.get(getRowSorter.convertRowIndexToModel(getSelectedRow)))
 }
