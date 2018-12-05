@@ -8,6 +8,8 @@ import org.slf4j.Marker
 import rx.lang.scala.subjects.BehaviorSubject
 import rx.lang.scala.subjects.ReplaySubject
 import rx.lang.scala.Observable
+import org.apache.log4j.Appender
+import org.apache.log4j.Level
 
 case class Log(level: LogLevel, text: String)
 
@@ -131,6 +133,34 @@ object Log {
     logs.toString
   }
 
+  def log4jAppender:Appender = new Appender{
+    def addFilter(x$1: org.apache.log4j.spi.Filter): Unit = ??? 
+    def clearFilters(): Unit = ??? 
+    def close(): Unit = ??? 
+    def doAppend(event: org.apache.log4j.spi.LoggingEvent): Unit = {
+      val level = 
+      event.getLevel match {
+        case  Level.OFF    => None
+        case  Level.FATAL  => Fatal
+        case  Level.ERROR  => Error
+        case  Level.WARN   => Warn
+        case  Level.INFO   => Info
+        case  Level.DEBUG  => Debug
+        case  Level.TRACE  => Trace
+        case  Level.ALL    => Trace
+        case _ => Trace
+      }
+      log(level, event.getMessage.toString)
+    }
+    def getErrorHandler(): org.apache.log4j.spi.ErrorHandler = ???
+    def getFilter(): org.apache.log4j.spi.Filter = ??? 
+    def getLayout(): org.apache.log4j.Layout = ???
+    def getName(): String = ??? 
+    def requiresLayout(): Boolean = ??? 
+    def setErrorHandler(x$1: org.apache.log4j.spi.ErrorHandler): Unit = ??? 
+    def setLayout(x$1: org.apache.log4j.Layout): Unit = ??? 
+    def setName(x$1: String): Unit = ??? 
+  }
 }
 
 abstract class LogLevel(val prio: Int) {

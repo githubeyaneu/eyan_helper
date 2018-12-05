@@ -235,5 +235,7 @@ class JTablePlus3[COLUMN_TYPE, ROW_TYPE](getters: Tuple2[COLUMN_TYPE, ROW_TYPE =
   import eu.eyan.util.swing.JTablePlus.JTableImplicit
   this onSelectionChanged selectionChanged
 
-  private def selectionChanged = selectionObservable.onNext(rows.get(getRowSorter.convertRowIndexToModel(getSelectedRow)))
+  private def selectionChanged = selectionObservable.onNext(rows.get(if(getSelectedRow > -1) getRowSorter.convertRowIndexToModel(getSelectedRow) else -1))
+  
+  val isRowSelected = selectionObservable.map(_.nonEmpty) 
 }

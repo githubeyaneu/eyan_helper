@@ -18,15 +18,15 @@ object ObservablePlus {
   }
 
   implicit class ObservableVarargsImplicit[T](observables: Observable[T]*) {
-    def combineLatest = ObservablePlus.toList(observables: _*) 
+    def combineLatest = ObservablePlus.toList(observables: _*)
   }
 
   implicit class ObservableAnyVarargsImplicit(observables: Observable[Any]*) {
-	  def combineLatest = ObservablePlus.toList(observables: _*) 
+    def combineLatest = ObservablePlus.toList(observables: _*)
   }
 
   implicit class ObservableListImplicit[T](observables: List[Observable[T]]) {
-	  def combineLatest = ObservablePlus.toList(observables: _*) 
+    def combineLatest = ObservablePlus.toList(observables: _*)
   }
 
   def toList[T](observables: Observable[T]*): Observable[List[T]] = Observable.combineLatest(observables.toArray.toIterable)(_.toList)
@@ -35,9 +35,15 @@ object ObservablePlus {
     def ifElse[T](trueObs: Observable[T], falseObs: Observable[T]): Observable[T] = {
       val textsCombined = ObservablePlus.toList(trueObs, falseObs)
       val conditionAndTexts = observableBoolean combineLatest textsCombined
-      def selectText(conditionAndTexts: (Boolean, List[T])) = conditionAndTexts._2(conditionAndTexts._1 ? 0 | 1) 
+      def selectText(conditionAndTexts: (Boolean, List[T])) = conditionAndTexts._2(conditionAndTexts._1 ? 0 | 1)
       conditionAndTexts map selectText
     }
+
+    def negate = not
+    def not = observableBoolean.map(!_)
+
+    def and[O2 <: Observable[Boolean]](observableBoolean2: O2) = observableBoolean.combineLatest(observableBoolean2).map({ case (b1, b2) => b1 && b2 })
+    def or[O2 <: Observable[Boolean]](observableBoolean2: O2) = observableBoolean.combineLatest(observableBoolean2).map({ case (b1, b2) => b1 || b2 })
   }
 
   implicit class ObservableImplicitInt[O <: Observable[Int]](observableInt: O) {

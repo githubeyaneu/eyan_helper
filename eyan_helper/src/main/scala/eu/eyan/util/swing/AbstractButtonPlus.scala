@@ -15,6 +15,7 @@ import javax.swing.ImageIcon
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
 import eu.eyan.util.text.TextsButton
 import java.net.URL
+import rx.lang.scala.Observable
 
 object AbstractButtonPlus {
 
@@ -91,18 +92,18 @@ object AbstractButtonPlus {
 
     def texts(texts: TextsButton) = text(texts.text).toolTip(texts.tooltip).icon(texts.icon)
     
-    def text(text: Text) = {
+    def text(text: Observable[String]) = {
     		//FIXME make it safe!
       text.subscribe(abstractButton.setText _)
       abstractButton
     }
-    def icon(path: Text) = {
+    def icon(path: Observable[String]) = {
       //FIXME make it safe!
       path.subscribe(path => abstractButton.setIcon(path.toIconAsResource))
       abstractButton
     }
     
-    def toolTip(tip: Text) = {
+    def toolTip(tip: Observable[String]) = {
     		//FIXME make it safe!
       tip.subscribe(abstractButton.setToolTipText _)
       abstractButton
