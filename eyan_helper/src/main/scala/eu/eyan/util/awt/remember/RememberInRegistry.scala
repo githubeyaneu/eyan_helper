@@ -12,9 +12,9 @@ trait RememberInRegistry[T <: Component] {
       def remember = if (comp.windowName != null) RegistryPlus.write(comp.windowName, nameInRegistry, rememberValueGet)
       rememberEventListener(remember)
 
-      def regValue = RegistryPlus.read(comp.windowName, nameInRegistry)
+      def regValue = RegistryPlus.readOption(comp.windowName, nameInRegistry)
       comp.onHierarchyChanged(
-        if (regValue != null) rememberValueSet(regValue)
+        regValue foreach rememberValueSet
       //else Log.error(s"set name for the window to remember the value for component ${jTextComponent.windowName}, ${jTextComponent.componentPath}, $name")
       )
 

@@ -17,16 +17,14 @@ class TextTest extends TestPlus {
   @Test
   def textNoParam = {
     val text = "abc"
-    case object Test extends Text(text) {
-      def obs = templateObservable
-    }
+    case object Test extends Text(text) 
 
     var actual = ""
 
     Test.subscribe(string => actual = string)
     actual ==> "abc"
 
-    Test.obs.onNext("cde")
+    Test.setTemplate("cde")
     actual ==> "cde"
 
   }
@@ -35,16 +33,14 @@ class TextTest extends TestPlus {
   def textOneParam = {
     val text = "abc%s"
     val param = BehaviorSubject(123)
-    case object Test extends Text(text, param){
-      def obs = templateObservable
-    }
+    case object Test extends Text(text, param)
 
     var actual = ""
 
     Test.subscribe(string => actual = string)
     actual ==> "abc123"
 
-    Test.obs.onNext("cde%s")
+    Test.setTemplate("cde%s")
     actual ==> "cde123"
 
     param.onNext(456)
@@ -57,9 +53,7 @@ class TextTest extends TestPlus {
     val text = "a%sb%sc"
     val param1 = BehaviorSubject(123)
     val param2 = BehaviorSubject("")
-    case object Test extends Text(text, param1, param2){
-      def obs = templateObservable
-    }
+    case object Test extends Text(text, param1, param2)
 
     var actual = ""
 
@@ -67,7 +61,7 @@ class TextTest extends TestPlus {
     actual ==> "a123bc"
 
     //more params ok
-    Test.obs.onNext("cde%s")
+    Test.setTemplate("cde%s")
     actual ==> "cde123"
 
     param2.onNext("TT")
@@ -78,17 +72,16 @@ class TextTest extends TestPlus {
   def badParamNumber = {
     val text = "a%sb%sc"
     val param = BehaviorSubject(123)
-    case object Test extends Text(text, param){
-      def obs = templateObservable
-    }
+    case object Test extends Text(text, param)
+    
     var actual = ""
     Test.subscribe(string => actual = string)
     actual ==> ""
 
-    Test.obs.onNext("cde%s")
+    Test.setTemplate("cde%s")
     actual ==> "cde123"
 
-    Test.obs.onNext("c %s %s %s")
+    Test.setTemplate("c %s %s %s")
     actual ==> "cde123"
   }
 }

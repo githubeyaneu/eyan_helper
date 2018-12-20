@@ -33,6 +33,8 @@ import eu.eyan.util.scala.Try
 import javax.swing.ImageIcon
 import eu.eyan.util.awt.clipboard.ClipboardPlus
 import scala.annotation.tailrec
+import eu.eyan.util.awt.ImagePlus
+import java.awt.Color
 
 object StringPlus {
   lazy val reg = "[\\p{InCombiningDiacriticalMarks}]".r
@@ -219,7 +221,7 @@ object StringPlus {
         if (s.isEmpty) output
         else {
           val underScore = s.head == '_'
-          val plus = if (underScore) "" else if (lastUnderScore) s.head.toUpper else if(first) s.head else s.head.toLower
+          val plus = if (underScore) "" else if (lastUnderScore) s.head.toUpper else if (first) s.head else s.head.toLower
           underScoreToCamel(s.tail, output + plus, false, underScore)
         }
 
@@ -238,5 +240,9 @@ object StringPlus {
     }
 
     def copyToClipboard = ClipboardPlus.copyToClipboard(s)
+
+    def countOccurrences(tgt: String): Int = if (s != null) s.sliding(tgt.length).count(window => window == tgt) else 0
+
+    def toSmallIcon(color: Color = Color.gray, width: Int = s.length * 16, height: Int = 16) = new ImageIcon(ImagePlus.imageFromString(s, color, width, height))
   }
 }

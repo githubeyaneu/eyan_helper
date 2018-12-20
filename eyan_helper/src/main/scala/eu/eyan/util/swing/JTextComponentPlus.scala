@@ -117,5 +117,8 @@ object JTextComponentPlus {
     protected def rememberEventListener(action: => Unit) = onTextChanged(action)
     protected def rememberValueGet = jTextComponent.getText
     protected def rememberValueSet(value: String) = jTextComponent.setText(value)
+    
+    def nonEmpty = jTextComponent.getText.nonEmpty
+    def isEmpty = jTextComponent.getText.nonEmpty
   }
 }
