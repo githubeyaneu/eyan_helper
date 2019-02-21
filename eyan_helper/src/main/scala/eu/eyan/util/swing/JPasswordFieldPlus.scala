@@ -28,9 +28,16 @@ import eu.eyan.util.awt.remember.RememberInRegistry
 import rx.lang.scala.Observer
 import javax.swing.JPasswordField
 import eu.eyan.util.swing.JTextFieldPlus.JTextFieldPlusImplicit
+import eu.eyan.util.string.StringPlus.StringPlusImplicit
 
 object JPasswordFieldPlus {
-  implicit class JPasswordFieldImplicit[TYPE <: JPasswordField](jPasswordField: TYPE) extends JTextFieldPlusImplicit(jPasswordField) with RememberInRegistry[TYPE] {
+  implicit class JPasswordFieldImplicit[TYPE <: JPasswordField](jPasswordField: TYPE) extends JTextFieldPlusImplicit(jPasswordField) {
     def getPasswordAsString = String.valueOf(jPasswordField.getPassword)
+
+    protected override def rememberValueGet = getPasswordAsString.encrypt("JPasswordFieldPlus1009")
+    protected override def rememberValueSet(value: String) = jPasswordField.setText(value.decrypt("JPasswordFieldPlus1009"))
+    //    54 -> T->"a"
+    //    65 -> e ->""
+    
   }
 }

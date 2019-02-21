@@ -29,9 +29,16 @@ object OutputStreamPlus {
   def apply(writer: Writer): OutputStream = OutputStreamPlus(i => writer.write(i), writer.flush, writer.close)
 
   def timebuffered(callback: String => Unit, time: Int = 100) = {
+    val lock = new Object
     var chars = MutableList[Char]()
-    def newChar(i: Int) = chars.synchronized { chars += i.toChar }
-    def flushCars = chars.synchronized { callback(new String(chars.toArray.map(_.toChar))); chars.clear }
+    def newChar(i: Int) = lock.synchronized { chars += i.toChar }
+    def flushCars = {
+      
+       
+      val charArray = lock.synchronized {val array=chars.toArray; chars.clear; array}
+       
+      callback(new String(charArray.map(_.toChar)))
+    }
     val timer = new Timer("OutputStream timebuffered")
     val task = new TimerTask { def run = flushCars }
     timer.scheduleAtFixedRate(task, time, time)

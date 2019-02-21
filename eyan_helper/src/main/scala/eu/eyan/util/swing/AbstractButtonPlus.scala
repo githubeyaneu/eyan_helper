@@ -16,6 +16,7 @@ import eu.eyan.util.string.StringPlus.StringPlusImplicit
 import eu.eyan.util.text.TextsButton
 import java.net.URL
 import rx.lang.scala.Observable
+import rx.lang.scala.subjects.BehaviorSubject
 
 object AbstractButtonPlus {
 
@@ -39,6 +40,12 @@ object AbstractButtonPlus {
     def onItemStateChangeEvent(action: ItemEvent => Unit) = { abstractButton.addItemListener(SwingPlus.onItemStateChanged(action)); abstractButton }
 
     def onSelectionChange(action: Boolean => Unit) = onChange(action(abstractButton.isSelected))
+    
+    def selectedObservable = {
+      val subject = BehaviorSubject(abstractButton.isSelected)
+      onSelectionChange { subject.onNext(_) }
+      subject.distinctUntilChanged
+    }
 
     //addChangeListener(ChangeListener)
     //    addItemListener(ItemListener)

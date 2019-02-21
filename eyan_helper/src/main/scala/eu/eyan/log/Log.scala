@@ -24,8 +24,8 @@ object Log {
   private lazy val actualLevelPublisher = BehaviorSubject[LogLevel](actualLevel)
   lazy val levelObservable: Observable[LogLevel] = actualLevelPublisher
 
-  private lazy val logger = ReplaySubject[Log](1000 * 1000)
-  lazy val logsObservable: Observable[Log] = logger
+  private val logger = ReplaySubject[Log](1000 * 1000)
+  val logsObservable: Observable[Log] = logger
 
   def log(level: LogLevel, message: => String, t: => Throwable): Log.type = {
     lazy val throwable = t

@@ -284,8 +284,8 @@ class JPanelWithFrameLayout() extends JPanel {
 
   def addSeparatorRow(title: String, span: Int) = newRow("5px").newRow.span(span).addSeparatorWithTitle(title)
 
-  def addCheckBox(text: String = "") = {
-    val cb = new JCheckBox(text)
+  def addCheckBox(text: String = "", selected: Boolean = false) = {
+    val cb = new JCheckBox(text, selected)
     add(cb)
     cb
   }

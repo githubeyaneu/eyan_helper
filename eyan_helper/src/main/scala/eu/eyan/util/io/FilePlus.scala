@@ -67,7 +67,7 @@ object FilePlus {
 
     def containsFileWithExtension(extension: String) = file.exists && file.isDirectory && file.listFiles.exists(_.endsWith(extension))
 
-    def mkDirs = { file.mkdirs; file }
+    def mkDirs = { if (file.notExists) file.mkdirs; file }
 
     def hash = {
       if (file.isFile()) {

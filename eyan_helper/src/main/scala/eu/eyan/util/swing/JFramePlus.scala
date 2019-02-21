@@ -38,6 +38,8 @@ import eu.eyan.util.text.Text
 import rx.lang.scala.subjects.BehaviorSubject
 import java.awt.event.WindowEvent
 import rx.lang.scala.Observable
+import java.awt.TrayIcon.MessageType
+import eu.eyan.log.Log
 
 object JFramePlus {
   implicit class JFramePlusImplicit[TYPE <: JFrame](jFrame: TYPE) extends FramePlusImplicit(jFrame) {
@@ -104,9 +106,9 @@ object JFramePlus {
 
       popup
     }
-    val NO_IMAGE:Image = null
-		val NO_ICON:Icon = null
-    def addToSystemTray(icon: Image = jFrame.getIconImage, toolTip: String = jFrame.getTitle, popupMenu: PopupMenu = createOpenExitPopup) = {
+    val NO_IMAGE: Image = null
+    val NO_ICON: Icon = null
+    def addToSystemTray(icon: Image = jFrame.getIconImage, toolTip: String = jFrame.getTitle, popupMenu: PopupMenu = createOpenExitPopup, minimizeMessageTitle: String = "", minimizeMessageText: String = "" ) = {
       if (SystemTray.isSupported()) {
         val iconToUse = if (icon != NO_IMAGE) icon else Toolkit.getDefaultToolkit().getImage("/dontexists.jpg")
 
@@ -114,16 +116,23 @@ object JFramePlus {
         val trayIcon = new TrayIcon(iconToUse, toolTip, popupMenu)
         trayIcon.setImageAutoSize(true)
         trayIcon.addMouseListener(AwtHelper.onClicked(e => if (e.getButton == MouseEvent.BUTTON1) (if (jFrame.isVisible) jFrame.invisible else { jFrame.visible; jFrame.setState(Frame.NORMAL); jFrame.toFront })))
-
         systemTray.add(trayIcon)
-        jFrame.onWindowStateChanged_ICONIFIED(jFrame.invisible)
+        
+        var userNotifiedOfMinimize = false
+        def notifyUserOfMinimized = {
+        		if (!userNotifiedOfMinimize && (minimizeMessageTitle.length >0 || minimizeMessageText.length >0)) trayIcon.displayMessage(minimizeMessageTitle, minimizeMessageText, MessageType.INFO)
+        		userNotifiedOfMinimize = true
+        }
+        jFrame.onWindowIconified(notifyUserOfMinimized)
+        jFrame.onWindowClosing(notifyUserOfMinimized)
+        jFrame.onWindowStateChanged_ICONIFIED({ jFrame.invisible; notifyUserOfMinimized })
         jFrame.onWindowStateChanged_NORMAL(jFrame.visible)
         jFrame.onWindowStateChanged_MAXIMIZED_BOTH(jFrame.visible)
       }
       jFrame
     }
 
-    val NO_JMENU_BAR:JMenuBar = null
+    val NO_JMENU_BAR: JMenuBar = null
     private def getOrCreateJMenuBar = { if (jFrame.getJMenuBar == NO_JMENU_BAR) jMenuBar(new JMenuBar()); jFrame.getJMenuBar }
 
     private def getOrCreateMenu(menuText: String) = getOrCreateJMenuBar.getOrCreateMenu(menuText)
@@ -147,8 +156,8 @@ object JFramePlus {
     }
 
     val ALWAYS_ENABLED = BehaviorSubject(true)
-    def menuItem(menuText: Text, menuItemText: Text, action: => Unit, enabledObservable: Observable[Boolean]=ALWAYS_ENABLED) = menuItemEvent(menuText, menuItemText, (frame: TYPE) => action, enabledObservable)
-    def menuItemEvent(menuText: Text, menuItemText: Text, action: TYPE => Unit, enabledObservable: Observable[Boolean]=ALWAYS_ENABLED) = {
+    def menuItem(menuText: Text, menuItemText: Text, action: => Unit, enabledObservable: Observable[Boolean] = ALWAYS_ENABLED) = menuItemEvent(menuText, menuItemText, (frame: TYPE) => action, enabledObservable)
+    def menuItemEvent(menuText: Text, menuItemText: Text, action: TYPE => Unit, enabledObservable: Observable[Boolean] = ALWAYS_ENABLED) = {
       // TODO JMenuItemPlus
       val menuItem = new JMenuItem(menuItemText.get)
       menuItem.setName(menuItemText.get)

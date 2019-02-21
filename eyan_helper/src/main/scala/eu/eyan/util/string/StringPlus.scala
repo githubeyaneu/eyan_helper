@@ -35,6 +35,11 @@ import eu.eyan.util.awt.clipboard.ClipboardPlus
 import scala.annotation.tailrec
 import eu.eyan.util.awt.ImagePlus
 import java.awt.Color
+import javax.crypto.Cipher
+import javax.crypto.KeyGenerator
+import javax.crypto.spec.IvParameterSpec
+import javax.crypto.spec.SecretKeySpec
+import java.util.Base64
 
 object StringPlus {
   lazy val reg = "[\\p{InCombiningDiacriticalMarks}]".r
@@ -91,6 +96,7 @@ object StringPlus {
     def file = asFile
     def dir = asFile
     def asFileOrResource = asFile.orElseResource
+    def mkDirs = { asDir.mkdirs; s }
 
     def asUrl = new URL(s)
 
@@ -189,11 +195,45 @@ object StringPlus {
     def toHexEncode = s.getBytes.map(_.toHexString).mkString(",")
     def toHexDecode = new String(s.split(",").map(Integer.parseUnsignedInt(_, 16).toByte).toArray)
 
+    private def encryptDecryptIvParameterSpec = new IvParameterSpec(new Array[Byte](16))
+    private def encryptDecryptKey(salt:String) = new SecretKeySpec(Base64.getDecoder.decode(salt), "AES")
+    private def encryptDecryptCipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
+    
+    def encrypt(salt: String): String = {
+      val cipher = encryptDecryptCipher
+      cipher.init(Cipher.ENCRYPT_MODE, encryptDecryptKey(salt), encryptDecryptIvParameterSpec)
+      new String(Base64.getEncoder.encode(cipher.doFinal(s.getBytes("utf-8"))), "utf-8")
+    }
+
+    def decrypt(salt: String): String = {
+  		val cipher = encryptDecryptCipher
+      cipher.init(Cipher.DECRYPT_MODE, encryptDecryptKey(salt), encryptDecryptIvParameterSpec)
+      new String(cipher.doFinal(Base64.getDecoder.decode(s.getBytes("utf-8"))), "utf-8")
+    }
+
     def openAsFile = if (s.asFile.exists()) Desktop.getDesktop.open(asFile)
     def openAsURL = Desktop.getDesktop.browse(new URI(s))
 
     //    def findGroup(regex: String, group: Int = 1):Option[String] = findGroup(regex.r, group)
-    def findGroup(regex: Regex, group: Int = 1) = regex.findAllIn(s).matchData.toList.lift(0).map(_.group(group))
+    def findGroup(regex: Regex, group: Int = 1) = {
+      Log.debug("string: "+s)
+      Log.debug("regex: "+regex)
+      Log.debug("group: "+group)
+      
+      val findAll = regex.findAllIn(s)
+      Log.debug("findAll: "+findAll)
+      val matchData = findAll.matchData
+      Log.debug("matchData: "+matchData)
+      val matchDataList = matchData.toList
+      Log.debug("matchDataList: "+matchDataList)
+      val lift = matchDataList.lift(0)
+      Log.debug("lift: "+lift)
+      val groupFilter = lift.filter(mach => mach.groupCount >0)
+      Log.debug("groupFilter: "+groupFilter)
+      val res = groupFilter.map(mach => mach.group(group))
+      Log.debug("Res: "+res)
+      res
+    }
 
     def toIntOrElse(default: Int) = try s.toInt catch { case _: Throwable => default }
 

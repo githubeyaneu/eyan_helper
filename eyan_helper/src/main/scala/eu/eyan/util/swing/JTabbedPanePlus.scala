@@ -18,6 +18,9 @@ import rx.lang.scala.subjects.BehaviorSubject
 import eu.eyan.util.rx.lang.scala.subjects.BehaviorSubjectPlus.BehaviorSubjectImplicit
 import scala.collection.mutable.ListBuffer
 import eu.eyan.util.text.Text
+import javax.swing.Icon
+import rx.lang.scala.Observable
+import eu.eyan.log.Log
 
 object JTabbedPanePlus {
   implicit class JTabbedPaneImplicit[TYPE <: JTabbedPane](jTabbedPane: TYPE) extends RememberInRegistry[TYPE] {
@@ -48,6 +51,30 @@ object JTabbedPanePlus {
       jTabbedPane.add(component)
       def idx = jTabbedPane.indexOfComponent(component)
       jTabbedPane.setTabComponentAt(idx, panel)
+      jTabbedPane
+    }
+
+    def addTabWithCondition(condition: Observable[Boolean], title: String, icon: Icon, component: Component, tip: String) = {
+      condition.foreach(tabVisible => {
+        val componentAlreadyAdded = jTabbedPane.getComponents.contains(component)
+        Log.debug(s"title=$title, tabVisible=$tabVisible, componentAlreadyAdded=$componentAlreadyAdded")
+
+        if (tabVisible) {
+          if (!componentAlreadyAdded) {
+            Log.debug(s"add tab")
+            SwingPlus.invokeLater(jTabbedPane.addTab(title, icon, component, tip))
+          } else {
+            Log.debug(s"already added")
+          }
+        } else {
+          if (componentAlreadyAdded) {
+            Log.debug(s"remove tab")
+            SwingPlus.invokeLater(jTabbedPane.remove(component))
+          } else {
+            Log.debug(s"already removed")
+          }
+        }
+      })
       jTabbedPane
     }
   }

@@ -118,7 +118,7 @@ object JTextComponentPlus {
     protected def rememberValueGet = jTextComponent.getText
     protected def rememberValueSet(value: String) = jTextComponent.setText(value)
     
-    def nonEmpty = jTextComponent.getText.nonEmpty
-    def isEmpty = jTextComponent.getText.nonEmpty
+    def nonEmpty:Boolean = jTextComponent.getText.nonEmpty
+    def isEmpty:Boolean = jTextComponent.getText.nonEmpty
   }
 }

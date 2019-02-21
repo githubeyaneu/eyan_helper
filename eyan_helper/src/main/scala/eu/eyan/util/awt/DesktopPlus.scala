@@ -15,14 +15,14 @@ object DesktopPlus {
     createInternetShortcut(name, path, target, icon)
   }
 
-  def createInternetShortcut(name: String, dir: String, url: String):Unit = {
-    println(("createInternetShortcut",name, dir, url))
-		  val path = dir + "/" + name + ".url"
-		  createInternetShortcut(name, path, url, "")
+  def createInternetShortcut(name: String, dir: String, url: String): Unit = {
+    println(("createInternetShortcut", name, dir, url))
+    val path = dir + "/" + name + ".url"
+    createInternetShortcut(name, path, url, "")
   }
 
   private def createInternetShortcut(name: String, where: String, target: String, icon: String) = {
-		  println(("createInternetShortcut",name, where, target, icon))
+    println(("createInternetShortcut", name, where, target, icon))
     val fw = new FileWriter(where, false)
     fw.write("[InternetShortcut]\r\n")
     fw.write("URL=" + target + "\r\n")
