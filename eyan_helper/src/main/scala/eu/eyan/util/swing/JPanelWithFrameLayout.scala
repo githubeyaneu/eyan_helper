@@ -36,6 +36,7 @@ import javax.swing.JButton
 import eu.eyan.util.text.Text
 import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
 import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
+import eu.eyan.util.awt.MultiField
 
 object JPanelPlus {
   implicit class JPanelImplicit[TYPE <: JPanel](jPanel: JPanel) extends JComponentImplicit(jPanel) {
@@ -299,8 +300,17 @@ class JPanelWithFrameLayout() extends JPanel {
     progressBar
   }
 
-  def addMore[COMPONENT <: JComponent](createComponent: => COMPONENT) = {
-    //TODO
+  def addTextFieldMulti(name: String, size: Int, values: List[String]) = {
+    val tfm = new MultiFieldJTextField(name, size)
+    tfm.setValues(values)
+    add(tfm)
+    tfm
+  }
+
+  def addAutocompleteMulti(name: String, hint: String, noItemsFoundHint: String) = {
+    val mfa = new MultiFieldAutocomplete(name, hint, noItemsFoundHint)
+    add(mfa)
+    mfa
   }
 
   def addFluentInScrollPane[C <: Component](c: C) = {
