@@ -1,0 +1,46 @@
+<html>
+<body>
+	<form>
+		<button type="button" id="wsstart">start ws</button>
+	</form>
+	<div id="buttons"></div>
+	<div id="log"></div>
+	<script>
+		function el(id) {
+			return document.getElementById(id);
+		}
+		function log(msg) {
+			el("log").innerHTML += msg + "<br/>";
+		}
+
+		el("wsstart").addEventListener('click', add_ws);
+
+		var ws = 0;
+
+		function add_ws() {
+			ws += 1;
+			log("Start ws" + ws);
+			var wsock = new WebSocket("ws://localhost:12345/");
+			wsock.onopen = function(event) {
+				log("Opened: " + ws);
+			};
+			wsock.onmessage = function(event) {
+				log("msg from server: " + event.data);
+			}
+			wsock.onclose = function(event) {
+				log("Closed: " + ws);
+			}
+			el("buttons").innerHTML += '<button type="button" id="wsmsg'+ws+'">send msg ws'
+					+ ws + '</button>'
+			el("buttons").innerHTML += '<button type="button" id="wsclose'+ws+'">stop ws'
+					+ ws + '</button>' + "<br/>"
+			el("wsmsg" + ws).addEventListener('click', function() {
+				wsock.send("client -> server")
+			});
+			el("wsclose" + ws).addEventListener('click', function() {
+				wsock.close()
+			});
+		}
+	</script>
+</body>
+</html>

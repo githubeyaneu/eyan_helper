@@ -40,6 +40,7 @@ import javax.crypto.KeyGenerator
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 import java.util.Base64
+import rx.lang.scala.Observable
 
 object StringPlus {
   lazy val reg = "[\\p{InCombiningDiacriticalMarks}]".r
@@ -284,5 +285,7 @@ object StringPlus {
     def countOccurrences(tgt: String): Int = if (s != null) s.sliding(tgt.length).count(window => window == tgt) else 0
 
     def toSmallIcon(color: Color = Color.gray, width: Int = s.length * 16, height: Int = 16) = new ImageIcon(ImagePlus.imageFromString(s, color, width, height))
+    
+    def asSingle = Observable[String](emitter => {emitter.onNext(s);emitter.onCompleted})
   }
 }

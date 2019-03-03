@@ -25,9 +25,10 @@ case class Get(url: String, param: String, value: String)
 
 class HttpServer(
   port: Int, getHandler: Get => String, websocketHandler: WebSocket => Unit) extends Closeable {
-  def start = if (!active) { active = true; ThreadPlus run listenTheSocket }
+
+  def start = { if (!active) { active = true; ThreadPlus run listenTheSocket }; this }
   def close = { active = false; serverSocket.close }
-  def stop = close
+  def stop = { close; this }
 
   private var active = false
   private val serverSocket = new ServerSocket(port)
@@ -51,7 +52,7 @@ class HttpServer(
 
         // WEBSOCKET TODO
         if (requestMap.contains("Sec-WebSocket-Key") && WebSocket.handshake(socketOut, requestMap("Sec-WebSocket-Key"))) {
-          websocketHandler(new WebSocket(get.getOrElse(Get("","","")), requestMap, socket))//FIXME: does it have always a get param?
+          websocketHandler(new WebSocket(get.getOrElse(Get("", "", "")), requestMap, socket)) //FIXME: does it have always a get param?
         } else {
 
           val selectedResource = get.map(_.url).getOrElse("").toResourceFile
@@ -82,7 +83,7 @@ class HttpServer(
           CloseablePlus.closeQuietly(socketOut, socketIn, socket)
         }
       } catch {
-        case t: Throwable => Log.error(t)
+        case t: Throwable => Log.error("listenTheSocket", t)
       }
     }
   }

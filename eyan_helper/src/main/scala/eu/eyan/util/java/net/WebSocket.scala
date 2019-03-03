@@ -12,6 +12,16 @@ import java.io.InputStream
 import sun.misc.BASE64Encoder
 import rx.lang.scala.Observable
 import eu.eyan.util.scala.TryCatch
+import rx.Completable
+import rx.lang.scala.subjects.BehaviorSubject
+import rx.lang.scala.Observer
+import eu.eyan.util.rx.lang.scala.subjects.BehaviorSubjectPlus.BehaviorSubjectImplicit
+import java.io.Closeable
+import java.util.UUID
+import rx.lang.scala.Scheduler
+import rx.lang.scala.Scheduler
+import rx.lang.scala.schedulers.IOScheduler
+import eu.eyan.util.io.CloseablePlus
 
 object WebSocket {
   private def logBytes(title: String, bytes: Array[Byte]): Unit = Log.trace(title + bytes.map(b => String.format("%02X ", b.asInstanceOf[Object])).mkString)
@@ -76,24 +86,48 @@ object WebSocket {
     hash.isSuccess
   }
 }
-case class WebSocket(val get: Get, val parameters: Map[String, String], private val socket: Socket) {
-  def receivedMessages = receivedMessages_
-  def sendMessage(message: String) = WebSocket.sendMessage(socketOut, message)
-  //TODO close???
-
-  private val socketOut = socket.getOutputStream
+case class WebSocket(val get: Get, val parameters: Map[String, String], private val socket: Socket) extends Closeable {
+  def receivedMessages = receivedMessages_.distinctUntilChanged.subscribeOn(IOScheduler())
+  def socketClosed = socketClosed_.distinctUntilChanged.subscribeOn(IOScheduler())
+  def sendMessageObserver = Observer[String](onSendMessageNext: String => Unit, onSendMessageError: Throwable => Unit, onSendMessageCompleted: () => Unit)
+  def close = closeWebSocket
   
-  private val receivedMessages_ = Observable.apply[String](emitter => {
-    //FIXME do somehow better threading.
-    ThreadPlus.run(TryCatch(
-      while (true) {
+  private val socketOut = socket.getOutputStream
+  private val socketClosed_ = BehaviorSubject[String]()
+  private val receivedMessages_ = BehaviorSubject[String]()
+  
+  private val socketId = parameters.get("Sec-WebSocket-Key").getOrElse(UUID.randomUUID.toString)
+
+  //FIXME do somehow better threading.
+  ThreadPlus run
+    TryCatch(
+      while ("closed" != socketClosed_.get) {
         val receivedMessage = WebSocket.reiceveMessage(socket.getInputStream)
         if (receivedMessage.nonEmpty) {
-          Log.info("Recieved from client: " + receivedMessage.get)
-          emitter.onNext(receivedMessage.get)
-        } else { socket.close; emitter.onCompleted }
+          Log.debug(s"$socketId Recieved from client: " + receivedMessage.get)
+          receivedMessages_.onNext(receivedMessage.get)
+        } else {
+          Log.debug(s"$socketId socket ended")
+          close
+          receivedMessages_ onCompleted ()
+          Log.debug(s"$socketId socket receiver completed")
+        }
       },
-      emitter.onError(_)))
-  })
+      (t: Throwable) => {
+        close
+        Log.error(s"$socketId socket problem", t)
+        receivedMessages_ onError t
+      })
 
+  private def onSendMessageNext(message: String) = WebSocket.sendMessage(socketOut, message)
+  private def onSendMessageError(throwable: Throwable) = WebSocket.sendMessage(socketOut, "Error "+throwable.getMessage+"<br/>\r\n"+throwable.getStackTrace.mkString("<br/>\r\n"))
+  private def onSendMessageCompleted(): Unit = Log.trace("Nothing to do.")
+  
+  private def closeWebSocket = {
+    CloseablePlus closeQuietly socket
+    Log info "socket closed"
+    socketClosed_ onNext "closed"
+    socketClosed_ onCompleted ()
+    Log info "socket closed sent"
+  }
 }
