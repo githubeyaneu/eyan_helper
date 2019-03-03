@@ -6,6 +6,10 @@ import eu.eyan.util.compress.SevenZipPlus
 import eu.eyan.util.compress.CompressPlus
 import java.io.OutputStream
 import scala.annotation.tailrec
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import eu.eyan.log.Log
+import eu.eyan.util.java.io.BufferedReaderPlus.BufferedReaderImplicit
 
 object InputStreamPlus {
 
@@ -21,14 +25,15 @@ object InputStreamPlus {
     final def copyTo(output: OutputStream, buffer: Array[Byte], progressCallback: Long => Unit, progress: Long = 0): Long = {
       val n = inputStream.read(buffer)
       if (n == -1) {
-    	  progressCallback(progress)
+        progressCallback(progress)
         progress
-      }
-      else {
+      } else {
         output.write(buffer, 0, n)
-        progressCallback(progress+n)
-        copyTo(output, buffer, progressCallback, progress+n)
+        progressCallback(progress + n)
+        copyTo(output, buffer, progressCallback, progress + n)
       }
     }
+
+    def readLinesUntilEmtpyLine = new BufferedReader(new InputStreamReader(inputStream)).readLinesUntilEmtpy 
   }
 }

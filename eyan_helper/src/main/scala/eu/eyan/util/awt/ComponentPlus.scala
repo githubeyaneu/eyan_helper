@@ -56,6 +56,7 @@ import javax.swing.JPanel
 import eu.eyan.util.swing.JPanelWithFrameLayout
 import javax.swing.BorderFactory
 import java.awt.MouseInfo
+import rx.lang.scala.subjects.BehaviorSubject
 
 object ComponentPlus {
 
@@ -113,6 +114,11 @@ object ComponentPlus {
     def enabled(enabled: Boolean) = { component.setEnabled(enabled); component }
     def enabled: TYPE = enabled(true)
     def disabled = enabled(false)
+    def enabledObservable ={
+      val subject = BehaviorSubject(component.isEnabled)
+      onPropertyChange { subject.onNext(component.isEnabled) }
+      subject.distinctUntilChanged
+    }
 
     def focusable(focusable: Boolean) = { component.setFocusable(focusable); component }
     def focusable: TYPE = focusable(true)
