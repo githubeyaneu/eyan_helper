@@ -16,10 +16,10 @@ object CloseablePlus {
         closeable =>
           try {
             if (closeable != null) closeable.close
-            else Log.error("closeable null")
+            else Log.error("closeable null") //TODO is it quiet?
           } catch {
             case t: Throwable => Log.error(s"Cannot close closeable.closeable", t)
           }
       }
-    } else Log.error("closeables null")
+    } else Log.error("closeable_S_ null")//TODO is it quiet?
 }

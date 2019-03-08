@@ -27,6 +27,6 @@ object HttpServerTest extends App {
     
     val interval = Observable.interval(Duration.apply(5, TimeUnit.SECONDS)).share.subscribeOn(IOScheduler())
     val intervalSubscription = interval.map(s"ws$ct: msg" + _) subscribe ws.sendMessageObserver
-    ws.socketClosed.subscribe(s=> intervalSubscription unsubscribe)
+    ws.socketClosed.subscribe(s=> intervalSubscription.unsubscribe)
   }
 }

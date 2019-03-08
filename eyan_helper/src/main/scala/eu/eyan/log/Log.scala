@@ -10,8 +10,10 @@ import rx.lang.scala.subjects.ReplaySubject
 import rx.lang.scala.Observable
 import org.apache.log4j.Appender
 import org.apache.log4j.Level
+import java.text.SimpleDateFormat
+import java.util.Date
 
-case class Log(level: LogLevel, text: String)
+case class Log(level: LogLevel, text: String, timestamp: Long)
 
 object Log {
   private lazy val LOG_CLASS_NAME = Log.getClass.getName
@@ -46,7 +48,7 @@ object Log {
     def stackElementWhereLogWasCalled = Thread.currentThread.getStackTrace.filter(stackElementsNotToLog)(1) // TODO use lift //FIXME: this is very slow if dbg level on and lot of logs come (convert files)
     def stackClassAndMethod = stackElementWhereLogWasCalled.getClassName.substring(stackElementWhereLogWasCalled.getClassName.lastIndexOf(".") + 1) + "." + stackElementWhereLogWasCalled.getMethodName
     def logText = stackClassAndMethod + (if (messageText != "") { ": " + messageText } else "")
-    if (actualLevel.shouldLog(level)) logger.onNext(new Log(level, logText))
+    if (actualLevel.shouldLog(level)) logger.onNext(Log(level, logText, System.currentTimeMillis))
     this
   }
 
@@ -109,9 +111,16 @@ object Log {
   def trace = log(Trace)
   def trace(o: => Any) = log(Trace, String.valueOf(o))
 
-  def logToConsoleText(log: Log) = f"${log.level}%-5s ${log.text}"
-  logsObservable.filter(_.level > Error).subscribe(log => { logToConsoleText(log).println })
-  logsObservable.filter(_.level <= Error).subscribe(log => { logToConsoleText(log).printlnErr })
+  val dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+  def logToConsoleText(log: Log) = {
+    val time = dateTimeFormat.format(new Date(log.timestamp))
+    f"$time ${log.level}%-5s ${log.text}"
+  }
+  
+  logsObservable.subscribe(log => {
+    if (log.level > Error) logToConsoleText(log).println
+    else logToConsoleText(log).printlnErr
+  })
 
   implicit class LogImplicitString(val s: String) {
     def logFatal = Log.fatal(s)
@@ -133,33 +142,33 @@ object Log {
     logs.toString
   }
 
-  def log4jAppender:Appender = new Appender{
-    def addFilter(x$1: org.apache.log4j.spi.Filter): Unit = ??? 
-    def clearFilters(): Unit = ??? 
-    def close(): Unit = ??? 
+  def log4jAppender: Appender = new Appender {
+    def addFilter(x$1: org.apache.log4j.spi.Filter): Unit = ???
+    def clearFilters(): Unit = ???
+    def close(): Unit = ???
     def doAppend(event: org.apache.log4j.spi.LoggingEvent): Unit = {
-      val level = 
-      event.getLevel match {
-        case  Level.OFF    => None
-        case  Level.FATAL  => Fatal
-        case  Level.ERROR  => Error
-        case  Level.WARN   => Warn
-        case  Level.INFO   => Info
-        case  Level.DEBUG  => Debug
-        case  Level.TRACE  => Trace
-        case  Level.ALL    => Trace
-        case _ => Trace
-      }
+      val level =
+        event.getLevel match {
+          case Level.OFF   => None
+          case Level.FATAL => Fatal
+          case Level.ERROR => Error
+          case Level.WARN  => Warn
+          case Level.INFO  => Info
+          case Level.DEBUG => Debug
+          case Level.TRACE => Trace
+          case Level.ALL   => Trace
+          case _           => Trace
+        }
       log(level, event.getMessage.toString)
     }
     def getErrorHandler(): org.apache.log4j.spi.ErrorHandler = ???
-    def getFilter(): org.apache.log4j.spi.Filter = ??? 
+    def getFilter(): org.apache.log4j.spi.Filter = ???
     def getLayout(): org.apache.log4j.Layout = ???
-    def getName(): String = ??? 
-    def requiresLayout(): Boolean = ??? 
-    def setErrorHandler(x$1: org.apache.log4j.spi.ErrorHandler): Unit = ??? 
-    def setLayout(x$1: org.apache.log4j.Layout): Unit = ??? 
-    def setName(x$1: String): Unit = ??? 
+    def getName(): String = ???
+    def requiresLayout(): Boolean = ???
+    def setErrorHandler(x$1: org.apache.log4j.spi.ErrorHandler): Unit = ???
+    def setLayout(x$1: org.apache.log4j.Layout): Unit = ???
+    def setName(x$1: String): Unit = ???
   }
 }
 

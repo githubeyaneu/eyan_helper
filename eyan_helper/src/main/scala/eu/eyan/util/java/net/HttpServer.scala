@@ -1,30 +1,48 @@
 package eu.eyan.util.java.net
 
 import java.io.Closeable
-import eu.eyan.util.java.lang.ThreadPlus
 import java.net.ServerSocket
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import eu.eyan.log.Log
-import scala.collection.mutable.ListBuffer
-import java.nio.file.Paths
 import java.nio.file.Files
-import java.io.InputStream
-import eu.eyan.util.string.StringPlus.StringPlusImplicit
-import eu.eyan.util.io.InputStreamPlus.InputStreamPlusImplicit
-import java.io.PrintWriter
-import java.security.MessageDigest
-import java.io.BufferedOutputStream
-import java.io.OutputStream
-import eu.eyan.util.scala.Try
-import sun.misc.BASE64Encoder
+import java.nio.file.Paths
+
+import eu.eyan.log.Log
 import eu.eyan.util.io.CloseablePlus
-import java.net.Socket
+import eu.eyan.util.io.InputStreamPlus.InputStreamPlusImplicit
+import eu.eyan.util.java.lang.ThreadPlus
+import eu.eyan.util.string.StringPlus.StringPlusImplicit
 
 case class Get(url: String, param: String, value: String)
 
+object HttpServer {
+  private def noGetHandler(get: Get): String = {
+    Log.debug(get)
+
+    defaultGetResponse(get, "No get handler found for this GET")
+  }
+
+  private def noWebsocketHandler(websocket: WebSocket): Unit = {
+    websocket.sendMessageObserver.onNext(defaultGetResponse(websocket.get, "No websocket handler found."))
+    websocket.close
+  }
+
+  private def defaultGetResponse(get: Get, message: String) = {
+    val defaultResponses = Map(
+      "url" -> get.url,
+      "param" -> get.param,
+      "value" -> get.value,
+      "result" -> message)
+
+    val responses = defaultResponses
+    val responsesJson = responses map { case (key, value) => s""" "$key" : "$value" """ }
+    val response = s"{\r\n${responsesJson.mkString(", ")}\r\n}"
+    response
+  }
+
+}
+
+//TODO: make it possible to give more handlers.
 class HttpServer(
-  port: Int, getHandler: Get => String, websocketHandler: WebSocket => Unit) extends Closeable {
+  port: Int, var getHandler: Get => String = HttpServer.noGetHandler, var websocketHandler: WebSocket => Unit = HttpServer.noWebsocketHandler) extends Closeable {
 
   def start = { if (!active) { active = true; ThreadPlus run listenTheSocket }; this }
   def close = { active = false; serverSocket.close }
@@ -50,9 +68,9 @@ class HttpServer(
         val requestMap = requestLinesSplitted.toMap
         val get = findGet(requestLines)
 
-        // WEBSOCKET TODO
         if (requestMap.contains("Sec-WebSocket-Key") && WebSocket.handshake(socketOut, requestMap("Sec-WebSocket-Key"))) {
-          websocketHandler(new WebSocket(get.getOrElse(Get("", "", "")), requestMap, socket)) //FIXME: does it have always a get param?
+          // WEBSOCKET
+          websocketHandler(new WebSocket(get.getOrElse(Get("", "", "")), requestMap, socket)) //TODO: does it have always a get param?
         } else {
 
           val selectedResource = get.map(_.url).getOrElse("").toResourceFile
