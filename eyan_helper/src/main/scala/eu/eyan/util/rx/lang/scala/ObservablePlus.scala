@@ -4,6 +4,7 @@ import rx.lang.scala.subjects.BehaviorSubject
 import rx.lang.scala.Observable
 import rx.lang.scala.Subscription
 import eu.eyan.util.scala.BooleanPlus.BooleanImplicit
+import scala.reflect.ClassTag
 
 object ObservablePlus {
   // FIXME: why cannot implicits have more types???
@@ -30,7 +31,17 @@ object ObservablePlus {
   }
 
   def toList[T](observables: Observable[T]*): Observable[List[T]] = Observable.combineLatest(observables.toArray.toIterable)(_.toList)
-  
+
+  def toArray[T](observables: Seq[Observable[T]])(implicit ev: ClassTag[T]): Observable[Array[T]] = {
+    val array$ = toSeq(observables).map(_.toArray)
+    array$
+  }
+
+  def toSeq[T](observables: Seq[Observable[T]])(implicit ev: ClassTag[T]): Observable[Seq[T]] = {
+    val list$ = Observable.combineLatest(observables.toIterable)(x => x)
+    list$
+  }
+
   implicit class ObservableImplicitBoolean[O <: Observable[Boolean]](observableBoolean: O) {
     def ifElse[T](trueObs: Observable[T], falseObs: Observable[T]): Observable[T] = {
       val textsCombined = ObservablePlus.toList(trueObs, falseObs)
