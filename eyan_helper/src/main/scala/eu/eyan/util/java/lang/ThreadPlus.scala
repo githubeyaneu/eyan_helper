@@ -28,4 +28,14 @@ object ThreadPlus {
   def runObservable[T](action: => T) = Observable[T](emitter => {
     new Thread(RunnablePlus.runnable(TryCatch({ emitter.onNext(action); emitter.onCompleted }, emitter.onError _))).start
   })
+
+  def runBlockingWithTimeout[T](ms: Int, action: => T, cancel: => Unit) = {
+    def now = System.currentTimeMillis
+		val threadAction = ThreadPlus.run(action)
+    def waitForDone(plusCond: => Boolean = true) = while (!threadAction.done && plusCond) Thread.sleep(1)
+    val start = now
+    waitForDone(now < start + ms)
+    if (threadAction.done) threadAction.result 
+    else { cancel; waitForDone(); None }
+  }
 }

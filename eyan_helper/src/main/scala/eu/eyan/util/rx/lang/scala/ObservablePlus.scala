@@ -30,7 +30,7 @@ object ObservablePlus {
   }
 
   def toList[T](observables: Observable[T]*): Observable[List[T]] = Observable.combineLatest(observables.toArray.toIterable)(_.toList)
-
+  
   implicit class ObservableImplicitBoolean[O <: Observable[Boolean]](observableBoolean: O) {
     def ifElse[T](trueObs: Observable[T], falseObs: Observable[T]): Observable[T] = {
       val textsCombined = ObservablePlus.toList(trueObs, falseObs)
