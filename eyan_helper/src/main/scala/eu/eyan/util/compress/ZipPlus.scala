@@ -22,6 +22,7 @@ import scala.io.BufferedSource
 import scala.util.Failure
 import scala.util.Try
 import scala.util.Success
+import scala.util.control.Breaks
 
 object ZipPlus {
   def listFiles(file: File) = {
@@ -37,10 +38,10 @@ object ZipPlus {
   }
 
   def unzipToString(file: File) = {
-	  TryCatchFinallyClose(
-    Source.fromInputStream(new GZIPInputStream(new FileInputStream(file))),
-    (source: BufferedSource) => Success(source.getLines.mkString),
-    t => { Log.error("Error unzipping input array", t); Failure(t) })
+    TryCatchFinallyClose(
+      Source.fromInputStream(new GZIPInputStream(new FileInputStream(file))),
+      (source: BufferedSource) => Success(source.getLines.mkString),
+      t => { Log.error("Error unzipping input array", t); Failure(t) })
   }
 
   def unzipToString(input: Array[Byte]) = {
@@ -74,22 +75,30 @@ class ZipPlus(compressedInputStream: InputStream) extends CompressPlus {
   val _8KB = 8192
 
   def extractOneFileTo(filePathToExtract: String, targetFile: File) = {
+    Log.debug(filePathToExtract, targetFile)
     val zip = new ZipInputStream(compressedInputStream)
     var ze = zip.getNextEntry
-    while (ze != null) {
-      if (filePathToExtract.equals(ze.getName)) {
-        val out = new FileOutputStream(targetFile, false)
-        val buffer = new Array[Byte](_8KB)
-        var len = zip.read(buffer)
-        while (len != -1) {
-          out.write(buffer, 0, len);
-          len = zip.read(buffer)
+    var result: Option[File] = None
+    Breaks.breakable {
+      while (ze != null) {
+        if (filePathToExtract.equals(ze.getName)) {
+          Log.debug("found " + ze.getName)
+          val out = new FileOutputStream(targetFile, false)
+          val buffer = new Array[Byte](_8KB)
+          var len = zip.read(buffer)
+          while (len != -1) {
+            out.write(buffer, 0, len)
+            len = zip.read(buffer)
+          }
+          out.close
+          Log.debug("extracted to " + targetFile)
+          result = Option(targetFile)
+          Breaks.break
         }
-        out.close
+        ze = zip.getNextEntry
       }
-      ze = zip.getNextEntry
     }
     zip.close
-    targetFile
+    targetFile // FIXME: result
   }
 }

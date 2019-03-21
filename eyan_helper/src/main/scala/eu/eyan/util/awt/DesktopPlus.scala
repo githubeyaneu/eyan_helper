@@ -1,28 +1,31 @@
 package eu.eyan.util.awt
 
 import java.io.FileWriter
+import eu.eyan.log.Log
 
 object DesktopPlus {
   def getWindowsCurrentUserDesktopPath = System.getenv("userprofile") + "/Desktop"
 
   def createInternetShortcutOnDesktop(name: String, target: String) = {
-    val path = getWindowsCurrentUserDesktopPath + "/" + name + ".URL"
+    Log.info((name, target))
+    val path = getWindowsCurrentUserDesktopPath + "\\" + name + ".URL"
     createInternetShortcut(name, path, target, "")
   }
 
   def createInternetShortcutOnDesktop(name: String, target: String, icon: String) = {
-    val path = getWindowsCurrentUserDesktopPath + "/" + name + ".URL"
+    Log.info((name, target, icon))
+    val path = getWindowsCurrentUserDesktopPath + "\\" + name + ".URL"
     createInternetShortcut(name, path, target, icon)
   }
 
   def createInternetShortcut(name: String, dir: String, url: String): Unit = {
-    println(("createInternetShortcut", name, dir, url))
-    val path = dir + "/" + name + ".url"
+    Log.info((name, dir, url))
+    val path = dir.trim + "\\" + name.trim + ".url"
     createInternetShortcut(name, path, url, "")
   }
 
   private def createInternetShortcut(name: String, where: String, target: String, icon: String) = {
-    println(("createInternetShortcut", name, where, target, icon))
+    Log.info((name, where, target, icon))
     val fw = new FileWriter(where, false)
     fw.write("[InternetShortcut]\r\n")
     fw.write("URL=" + target + "\r\n")
