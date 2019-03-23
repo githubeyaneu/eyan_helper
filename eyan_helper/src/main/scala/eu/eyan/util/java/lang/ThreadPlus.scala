@@ -5,19 +5,11 @@ import eu.eyan.util.scala.TryCatch
 import rx.lang.scala.subjects.PublishSubject
 import rx.lang.scala.Observable
 import rx.lang.scala.subjects.BehaviorSubject
+import java.util.concurrent.Executors
 
 object ThreadPlus {
 
   def run[T](action: => T) = new ThreadRunner(action)
-  class ThreadRunner[T](action: => T) {
-    var done = false
-    private var ret: Option[T] = None
-    new Thread(RunnablePlus.runnable({
-      ret = try { Option(action) } catch { case e: Throwable => { Log.error(e); None } }
-      done = true
-    })).start
-    def result: Option[T] = ret
-  }
 
   //  def runSafe[T](action: => T) = new ThreadRunnerSafe(action).result.distinctUntilChanged
   //  class ThreadRunnerSafe[T](action: => T) {
@@ -31,11 +23,24 @@ object ThreadPlus {
 
   def runBlockingWithTimeout[T](ms: Int, action: => T, cancel: => Unit) = {
     def now = System.currentTimeMillis
-		val threadAction = ThreadPlus.run(action)
+    val threadAction = ThreadPlus.run(action)
     def waitForDone(plusCond: => Boolean = true) = while (!threadAction.done && plusCond) Thread.sleep(1)
     val start = now
     waitForDone(now < start + ms)
-    if (threadAction.done) threadAction.result 
+    if (threadAction.done) threadAction.result
     else { cancel; waitForDone(); None }
   }
+
+  lazy val executor = Executors.newFixedThreadPool(Math.max(1, Runtime.getRuntime.availableProcessors - 2))
+}
+
+class ThreadRunner[T](action: => T) {
+  var done = false
+  private var ret: Option[T] = None
+
+  ThreadPlus.executor.execute(RunnablePlus.runnable({
+    ret = try { Option(action) } catch { case e: Throwable => { Log.error(e); None } }
+    done = true
+  }))
+  def result: Option[T] = ret
 }
