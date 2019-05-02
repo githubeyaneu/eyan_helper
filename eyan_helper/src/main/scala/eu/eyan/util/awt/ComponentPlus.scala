@@ -187,6 +187,8 @@ object ComponentPlus {
     def onMousePressedEvent(action: MouseEvent => Unit) = { component.addMouseListener(AwtHelper.onMousePressed(action)); component }
     def onMouseReleased(action: => Unit) = onMouseReleasedEvent { e => action }
     def onMouseLeftReleased(action: => Unit) = onMouseReleasedEvent { e => if(e.getButton==MouseEvent.BUTTON1) action }
+    def onMouseMiddleReleased(action: => Unit) = onMouseReleasedEvent { e => if(e.getButton==MouseEvent.BUTTON2) action }
+    def onMouseRightReleased(action: => Unit) = onMouseReleasedEvent { e => if(e.getButton==MouseEvent.BUTTON3) action }
     def onMouseReleasedEvent(action: MouseEvent => Unit) = { component.addMouseListener(AwtHelper.onMouseReleased(action)); component }
     def onMouseEntered(action: => Unit) = onMouseEnteredEvent { e => action }
     def onMouseEnteredEvent(action: MouseEvent => Unit) = { component.addMouseListener(AwtHelper.onMouseEntered(action)); component }
