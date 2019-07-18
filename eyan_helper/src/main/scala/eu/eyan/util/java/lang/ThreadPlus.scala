@@ -21,7 +21,7 @@ object ThreadPlus {
     new Thread(RunnablePlus.runnable(TryCatch({ emitter.onNext(action); emitter.onCompleted }, emitter.onError _))).start
   })
 
-  def runBlockingWithTimeout[T](ms: Int, action: => T, cancel: => Unit) = {
+  def runBlockingWithTimeout[T](ms: Long, action: => T, cancel: => Unit) = {
     def now = System.currentTimeMillis
     val threadAction = ThreadPlus.run(action)
     def waitForDone(plusCond: => Boolean = true) = while (!threadAction.done && plusCond) Thread.sleep(1)

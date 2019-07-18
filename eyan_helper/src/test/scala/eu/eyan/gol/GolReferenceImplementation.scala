@@ -21,7 +21,7 @@ case class Gol(aliveCells: Set[Cell]) {
 
   private def aliveNeighboursCount(expectedCount: Int)(cell: Cell) = cell.neighboursIntersection(aliveCells).size == expectedCount
 
-  private def cellsWithAllNeighbours = aliveCells.map(_.neighbours).flatten
+  private def cellsWithAllNeighbours = aliveCells.flatMap(_.neighbours)
 }
 
 case class Cell(x: Int, y: Int) {
@@ -48,7 +48,7 @@ class GolTest extends TestPlus {
 }
 
 class GolPanel(var gol: Gol = Gol(Set())) extends JPanel {
-  def next = { this.gol = gol.nextGeneration; repaint() }
+  def next() = { this.gol = gol.nextGeneration; repaint() }
   def toggle(p: Point) = { this.gol = gol.toggle(Cell((p.x - getWidth / 2) / 10 + (if (p.x - getWidth / 2 < 0) -1 else 0), (p.y - getHeight / 2) / 10 + (if (p.y - getHeight / 2 < 0) -1 else 0))); repaint() }
 
   override def paint(g: Graphics) = {
@@ -65,6 +65,6 @@ object GolReferenceImplementation extends App {
   val startingGoL = Gol(oscillator ++ glider ++ glider.map(mirror(1, -1)) ++ glider.map(mirror(-1, 1)) ++ glider.map(mirror(-1, -1)))
   val golPanel = new GolPanel(startingGoL)
   golPanel.onMouseReleasedEvent(e => if (e.getButton == MouseEvent.BUTTON1) golPanel.toggle(e.getPoint))
-  golPanel.onMouseRightReleased(golPanel.next)
+  golPanel.onMouseRightReleased(golPanel.next())
   new JFrame().withComponent(golPanel).onCloseExit.packAndSetVisible.maximize
 }

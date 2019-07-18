@@ -69,14 +69,14 @@ object FilePlus {
 
     def mkDirs = { if (file.notExists) file.mkdirs; file }
 
-    def hash = {
+    def hashSimple: String = {
       if (file.isFile()) {
         if (file.length > 50 * 1000 * 1000) {
           val messageDigest = MessageDigest.getInstance("SHA")
           TryCatchFinallyClose(
             new FileInputStream(file),
             (is: FileInputStream) => {
-              val buffer = new Array[Byte](8192)
+              val buffer = Array.ofDim[Byte](8192)
               is.skip(file.length / 2)
               val bytesRead = is.read(buffer)
               if (bytesRead > 0) messageDigest.update(buffer, 0, bytesRead)
@@ -84,9 +84,31 @@ object FilePlus {
 
               sha.map("%02x".format(_)).mkString
             },
-            t => t.printStackTrace)
+            t => { Log.error(t); throw t })
         } else "small"
       } else "d" //throw new IllegalArgumentException("Create hash not possible to directory! "+file.getAbsolutePath)
+    }
+
+    def hashFull(bytesReadCallback: Int=>Unit = f=>{}): String = {
+      if (!file.isFile()) throw new IllegalArgumentException("Create hash not possible to directory! " + file.getAbsolutePath)
+      else {
+        val messageDigest = MessageDigest.getInstance("SHA")
+        TryCatchFinallyClose(
+          new FileInputStream(file),
+          (is: FileInputStream) => {
+            var bytesRead = 0
+            val buffer = Array.ofDim[Byte](8192)
+
+            while (bytesRead != -1) {
+              bytesRead = is.read(buffer)
+              if (bytesRead > 0) messageDigest.update(buffer, 0, bytesRead)
+              bytesReadCallback(bytesRead)
+            }
+
+            messageDigest.digest.map("%02x".format(_)).mkString
+          },
+          t => { Log.error(t); throw t })
+      }
     }
 
     def listFilesIfExists = if (file.isDirectory) file.listFiles else Array[File]()
@@ -123,7 +145,7 @@ object FilePlus {
       if (plus.notExists) plus
       else generateNewNameIfExists(ct + 1)
     }
-    
+
     def lift = if (file.exists) Some(file) else None
     def asResource = file.toString.toResourceFile.toOption
     def orElseResource = lift orElse asResource
@@ -137,5 +159,5 @@ object FilePlus {
   private def emptyArrayIfNull(list: Array[File]) = if (list == null) Array[File]() else list
 
   private def fileTreesWithItselfs(paths: String*): Stream[File] = (paths map { _.asFile } map treeWithItself).toStream.flatten
-  
+
 }

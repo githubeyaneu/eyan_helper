@@ -13,6 +13,7 @@ import javax.swing.JButton
 import javax.swing.JPanel
 import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
 import eu.eyan.util.awt.remember.RememberInRegistry
+import scala.collection.mutable.MutableList
 
 abstract class MultiField[INPUT, EDITOR <: Component](name: String) extends JPanel with RememberInRegistry[MultiField[INPUT, EDITOR]] {
 
@@ -26,6 +27,10 @@ abstract class MultiField[INPUT, EDITOR <: Component](name: String) extends JPan
     values foreach addEditorWithValue
     addEditorEmpty
   }
+  
+  val changedListeners = MutableList[() => Unit]()
+  def onChanged(action: () => Unit) = changedListeners += action
+  private def onChange = changedListeners.foreach(_())
 
   protected def createEditor(fieldEdited: EDITOR => Unit): EDITOR
   protected def getValue(editor: EDITOR): Option[INPUT]
@@ -91,6 +96,7 @@ abstract class MultiField[INPUT, EDITOR <: Component](name: String) extends JPan
   private def removeEditor(editor: EDITOR) = {
     editors.find(_.editor == editor).foreach(field => editors -= field)
     remove(editor.getParent)
+    onChange
   }
 
   private def addEditorIfLastAndRemember(editor: EDITOR) = {
@@ -99,5 +105,6 @@ abstract class MultiField[INPUT, EDITOR <: Component](name: String) extends JPan
       addEditorEmpty
     }
     rememberEventListenerAction()
+    onChange
   }
 }

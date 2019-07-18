@@ -93,6 +93,14 @@
 			<name>Artima Maven Repository</name>
 			<url>http://repo.artima.com/releases</url>
 		</repository>
+
+		<!-- UPNP -->
+		<repository>
+			<id>4thline</id>
+			<name>4th line</name>
+			<url>http://4thline.org/m2</url>
+		</repository>
+		
 	</repositories>
 
 	<pluginRepositories>
@@ -104,6 +112,13 @@
 	</pluginRepositories>
 
 	<dependencies>
+		<!-- UPNP -->
+		<dependency>
+			<groupId>org.fourthline.cling</groupId>
+			<artifactId>cling-core</artifactId>
+			<version>2.1.2</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.scala-lang</groupId>
 			<artifactId>scala-library</artifactId>
@@ -135,7 +150,7 @@
 			<artifactId>jgoodies-binding</artifactId>
 			<version>2.10.0</version>
 		</dependency>
-		
+
 		<!-- For JTableX -->
 		<dependency>
 			<groupId>org.swinglabs</groupId>

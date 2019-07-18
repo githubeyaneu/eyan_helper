@@ -233,6 +233,12 @@ class JPanelWithFrameLayout() extends JPanel {
     textArea
   }
 
+  def addTextAreaWoScrollPane(text: String = "") = {
+    val textArea = new JTextArea().appendText(text)
+    add(textArea)
+    textArea
+  }
+
   def addLabel(text: String) = {
     val label = new JLabel(text)
     add(label)
