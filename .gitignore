@@ -1,2 +1,10 @@
+/target/
 /.idea/
-eyan_helper/.classpath
+/.settings/
+.cache-main
+.cache-tests
+.project
+eyan_helper.iml
+/FailedTestVideos/
+/.scalastyle
+.classpath
