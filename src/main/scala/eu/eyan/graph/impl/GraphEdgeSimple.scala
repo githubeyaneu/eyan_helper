@@ -18,7 +18,7 @@ class GraphEdgeSimple[VERTEX](val direction: GraphEdgeDirection, val vertices: L
 
   def canEqual(that: Any): Boolean = that.getClass == classOf[GraphEdgeSimple[VERTEX]] 
 
-  override def toString = vertices.mkString(if(undirected)"-"else"->")
+  override def toString = vertices.mkString( if(undirected) "-" else "->")
 
   override def equals(that: Any): Boolean =
     that match {
