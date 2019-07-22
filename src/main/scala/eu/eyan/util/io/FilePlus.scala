@@ -1,19 +1,15 @@
 package eu.eyan.util.io
 
-import java.io.File
-import eu.eyan.util.string.StringPlus.StringPlusImplicit
-import java.security.MessageDigest
-import java.io.FileInputStream
-import scala.io.Source
+import java.io.{File, FileInputStream, FileOutputStream}
 import java.nio.file.Files
 import java.nio.file.attribute.BasicFileAttributes
-import java.nio.file.Path
-import eu.eyan.util.scala.TryCatchFinally
+import java.security.MessageDigest
+
 import eu.eyan.log.Log
-import java.io.FileOutputStream
-import eu.eyan.util.scala.TryCatchFinallyClose
-import scala.io.BufferedSource
-import scala.io.Codec
+import eu.eyan.util.scala.{TryCatchFinally, TryCatchFinallyClose}
+import eu.eyan.util.string.StringPlus.StringPlusImplicit
+
+import scala.io.{BufferedSource, Codec, Source}
 
 object FilePlus {
 
@@ -24,7 +20,9 @@ object FilePlus {
     }
 
     def notExists = !file.exists
+
     def existsAndFile = file != null && file.exists && file.isFile
+
     def existsAndDir = file != null && file.exists && file.isDirectory
 
     def extension = if (file.getName.lastIndexOf(".") > 0) file.getName.substring(file.getName.lastIndexOf(".")) else ""
@@ -34,48 +32,61 @@ object FilePlus {
     def dirs = if (file.exists) file.listFiles.filter(_.isDirectory).toStream else Stream()
 
     def dirsRecursively: Stream[File] =
-      if (file.exists && file.isDirectory) Stream(file) ++ file.dirs.map(_.dirsRecursively).flatten
+      if (file.exists && file.isDirectory) Stream(file) ++ file.dirs.flatMap(_.dirsRecursively)
       else Stream()
 
     def filesWithExtension(extension: String) = file.listFiles.filter(_.getName.endsWith("." + extension))
 
     def fileTreeWithItself = FilePlus.treeWithItself(file)
+
     def subTree = fileTreeWithItself.tail
+
     def treeSub = subTree
+
     def subFiles = subTree.filter(_.isFile)
+
     def subDirs = subTree.filter(_.isDirectory)
 
     def getFile(subFilename: String): File = new File(file.getAbsolutePath + File.separator + subFilename)
 
-    def linesList = TryCatchFinallyClose(Source.fromFile(file), (bs: BufferedSource) => bs.getLines.toList, e => { Log.error(s"cannot read file", e); List() })
+    def linesList = TryCatchFinallyClose(Source.fromFile(file), (bs: BufferedSource) => bs.getLines.toList, e => {
+      Log.error(s"cannot read file", e); List()
+    })
 
     //    def lines = Source.fromFile(file).getLines
     //TODO test it
     def lines(codec: Codec = Codec.UTF8) = new Iterator[String] {
       val bs = Source.fromFile(file)
       val lines = bs.getLines
-      def hasNext: Boolean = { val hn = lines.hasNext; if (!hn) CloseablePlus.closeQuietly(bs); hn }
+
+      def hasNext: Boolean = {
+        val hn = lines.hasNext; if (!hn) CloseablePlus.closeQuietly(bs); hn
+      }
+
       def next(): String = lines.next
     }
 
     def files = file.listFiles.toList
 
-    def endsWith(extensions: String*) = extensions.map(ext => file.getName.toLowerCase.endsWith(ext.toLowerCase)).contains(true)
-    def notEndsWith(extensions: String*) = !(extensions.map(ext => file.getName.toLowerCase.endsWith(ext.toLowerCase)).contains(true))
+    def endsWith(extensions: String*) = extensions.exists(ext => file.getName.toLowerCase.endsWith(ext.toLowerCase))
+
+    def notEndsWith(extensions: String*) = !extensions.exists(ext => file.getName.toLowerCase.endsWith(ext.toLowerCase))
 
     def contains(fileToContain: String) = file.exists && file.isDirectory && file.list.contains(fileToContain)
 
     def containsFileWithExtension(extension: String) = file.exists && file.isDirectory && file.listFiles.exists(_.endsWith(extension))
 
-    def mkDirs = { if (file.notExists) file.mkdirs; file }
+    def mkDirs = {
+      if (file.notExists) file.mkdirs; file
+    }
 
     def hashSimple: String = {
-      if (file.isFile()) {
+      if (file.isFile) {
         if (file.length > 50 * 1000 * 1000) {
-          val messageDigest = MessageDigest.getInstance("SHA")
           TryCatchFinallyClose(
             new FileInputStream(file),
             (is: FileInputStream) => {
+              val messageDigest = MessageDigest.getInstance("SHA")
               val buffer = Array.ofDim[Byte](8192)
               is.skip(file.length / 2)
               val bytesRead = is.read(buffer)
@@ -84,58 +95,115 @@ object FilePlus {
 
               sha.map("%02x".format(_)).mkString
             },
-            t => { Log.error(t); throw t })
+            t => {
+              Log.error(t); throw t
+            })
         } else "small"
       } else "d" //throw new IllegalArgumentException("Create hash not possible to directory! "+file.getAbsolutePath)
     }
 
-    def hashFull(bytesReadCallback: Int=>Unit = f=>{}): String = {
-      if (!file.isFile()) throw new IllegalArgumentException("Create hash not possible to directory! " + file.getAbsolutePath)
-      else {
-        val messageDigest = MessageDigest.getInstance("SHA")
-        TryCatchFinallyClose(
-          new FileInputStream(file),
-          (is: FileInputStream) => {
-            var bytesRead = 0
-            val buffer = Array.ofDim[Byte](8192)
+    def hashFull(bytesReadCallback: Long => Unit = _ => {}): String = {
+      if (!file.isFile) throw new IllegalArgumentException("Create hash not possible to directory! " + file.getAbsolutePath)
 
-            while (bytesRead != -1) {
-              bytesRead = is.read(buffer)
-              if (bytesRead > 0) messageDigest.update(buffer, 0, bytesRead)
-              bytesReadCallback(bytesRead)
-            }
+      TryCatchFinallyClose(
+        new FileInputStream(file),
+        (is: FileInputStream) => {
+          val messageDigest = MessageDigest.getInstance("SHA")
+          var bytesRead = 0
+          val buffer = Array.ofDim[Byte](8192)
 
-            messageDigest.digest.map("%02x".format(_)).mkString
-          },
-          t => { Log.error(t); throw t })
-      }
+          while (bytesRead != -1) {
+            bytesRead = is.read(buffer)
+            if (bytesRead > 0) messageDigest.update(buffer, 0, bytesRead)
+            bytesReadCallback(bytesRead)
+          }
+
+          messageDigest.digest.map("%02x".format(_)).mkString
+        },
+        t => {
+          Log.error(t); throw t
+        })
+    }
+
+    def hashFast(bytesReadCallback: Long => Unit = _ => {}): String = {
+      if (!file.isFile) throw new IllegalArgumentException("Create hash not possible to directory! " + file.getAbsolutePath)
+
+
+      val b = 4096L
+      val n = 16L
+      val minLength = (2*n-1) * b
+      val l = file.length
+
+      if(l<=minLength) hashFull(bytesReadCallback)
+      else TryCatchFinallyClose(
+        new FileInputStream(file),
+        (is: FileInputStream) => {
+          val s = (l - n*b)/n/b
+
+          val messageDigest = MessageDigest.getInstance("SHA")
+          val buffer = Array.ofDim[Byte](b.toInt)
+
+          var bytesRead = 0L
+          var step = 0
+          var pos = 0L
+          while (bytesRead != -1 && step < n-1) {
+            bytesRead = is.read(buffer)
+            if (bytesRead > 0) messageDigest.update(buffer, 0, bytesRead.toInt)
+            val bytesSkipped = is.skip(s*b)
+            bytesReadCallback(bytesRead+bytesSkipped)
+            pos += bytesRead + bytesSkipped
+            step += 1
+          }
+
+          val r = l - n*b - (n-1)*s*b
+          val r2 = l -pos -b
+          assert(r==r2)
+
+          val bytesSkipped = is.skip(r)
+          bytesRead = is.read(buffer)
+          if (bytesRead > 0) messageDigest.update(buffer, 0, bytesRead.toInt)
+          bytesReadCallback(bytesRead+bytesSkipped)
+
+          messageDigest.digest.map("%02x".format(_)).mkString
+        },
+        t => {
+          Log.error(t); throw t
+        })
     }
 
     def listFilesIfExists = if (file.isDirectory) file.listFiles else Array[File]()
 
     def empty = !file.isDirectory || file.list.isEmpty
+
     def notEmpty = !empty
 
     def attr = Files.readAttributes[BasicFileAttributes](file.toPath, classOf[BasicFileAttributes])
+
     def creationTime = attr.creationTime.toInstant
+
     def lastAccessTime = attr.lastAccessTime.toInstant
+
     def lastModifiedTime = attr.lastModifiedTime.toInstant
 
-    def copyToDir(destination: File, progressCallback: Int => Unit = dontcare => {}) = {
+    def copyToDir(destination: File, progressCallback: Int => Unit = _ => {}) = {
       val destFile = (destination.getAbsolutePath + "\\" + file.getName).asFile
       val result = copyTo(destFile, progressCallback)
       if (result) Option(destFile) else None
     }
 
-    def copyTo(destination: File, progressCallback: Int => Unit = dontcare => {}) = {
+    def copyTo(destination: File, progressCallback: Int => Unit = _ => {}) = {
       val dest = new FileOutputStream(destination)
       val src = new FileInputStream(file)
       Log.debug(s"Copy $file to $destination")
       // TODO progress implementieren
       TryCatchFinally(
-        { dest.getChannel().transferFrom(src.getChannel, 0, Long.MaxValue); true },
+        {
+          dest.getChannel.transferFrom(src.getChannel, 0, Long.MaxValue); true
+        },
         { e => Log.error(e); false },
-        { dest.close; src.close })
+        {
+          dest.close(); src.close()
+        })
     }
 
     def extendFileNameWith(plus: String) = file.getAbsolutePath.extendFileNameWith(plus).asFile
@@ -147,7 +215,9 @@ object FilePlus {
     }
 
     def lift = if (file.exists) Some(file) else None
+
     def asResource = file.toString.toResourceFile.toOption
+
     def orElseResource = lift orElse asResource
   }
 
@@ -157,7 +227,4 @@ object FilePlus {
       else Stream.empty)
 
   private def emptyArrayIfNull(list: Array[File]) = if (list == null) Array[File]() else list
-
-  private def fileTreesWithItselfs(paths: String*): Stream[File] = (paths map { _.asFile } map treeWithItself).toStream.flatten
-
 }
