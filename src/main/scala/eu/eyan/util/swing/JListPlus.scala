@@ -61,9 +61,9 @@ class JListPlus[TYPE] extends JList[TYPE] {
   def getValues = values
 
   def withValues(values: List[TYPE]): JListPlus[TYPE] = {
-    this.values = values.toList
+    this.values = values
     setModel(new AbstractListModel[TYPE]() {
-      def getSize() = values.length
+      def getSize = values.length
       def getElementAt(i: Int) = values(i)
     })
     this

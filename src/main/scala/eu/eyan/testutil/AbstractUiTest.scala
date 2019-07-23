@@ -35,9 +35,9 @@ class AbstractUiTest {
   val _globalTimeout = new Timeout(TIMEOUT, TimeUnit.SECONDS)
   @Rule def globalTimeout: Timeout = _globalTimeout
 
-  var frame: FrameFixture = null
-  var componentBefore: JTextComponentFixture = null
-  var componentAfter: JTextComponentFixture = null
+  var frame: FrameFixture = _
+  var componentBefore: JTextComponentFixture = _
+  var componentAfter: JTextComponentFixture = _
 
   def pause(ms: Long): Unit = Pause.pause(ms)
 

@@ -12,7 +12,7 @@ class AutocompleteHints {
   private val normalizedautocompleteValues = new java.util.HashMap[String, String]()
 
   private var autocompleteValues = List[String]()
-  def getAutocompleteValues = autocompleteValues.toList
+  def getAutocompleteValues = autocompleteValues
   def setAutocompleteValues(values: List[String]) = {
     autocompleteValues = values.filter { _ != null }
     new Thread(newRunnable { () => values.foreach { _.normalized } }).start()
@@ -40,7 +40,7 @@ class AutocompleteHints {
     else if (s2_startsWithSearch_s1_doesNot(s1_lc, s2_lc, search_lc)) false
     else if (s1_startsWithSearch_s2_doesNot(s1_lc.normalized, s2_lc.normalized, search_lc.normalized)) true
     else if (s2_startsWithSearch_s1_doesNot(s1_lc.normalized, s2_lc.normalized, search_lc.normalized)) false
-    else (s1_containsSearch_s2_doesNot(s1_lc, s2_lc, search_lc))
+    else s1_containsSearch_s2_doesNot(s1_lc, s2_lc, search_lc)
   }
 
   def findElementsToShow(searchString: String) = {

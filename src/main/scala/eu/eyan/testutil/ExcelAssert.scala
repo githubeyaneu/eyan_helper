@@ -20,7 +20,7 @@ object ExcelAssert {
     var workbook: Workbook = null
     try {
       workbook = Workbook.getWorkbook(sourceFile, getWorkbookSettings)
-      assertThat(workbook.getSheet(sheetName).getCell(column - 1, row - 1).getContents()).isEqualTo(expected)
+      assertThat(workbook.getSheet(sheetName).getCell(column - 1, row - 1).getContents).isEqualTo(expected)
     }
     catch {
       case e: BiffException => e.printStackTrace

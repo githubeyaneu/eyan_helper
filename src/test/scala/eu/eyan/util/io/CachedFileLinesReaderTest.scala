@@ -25,14 +25,13 @@ class CachedFileLinesReaderTest() extends TestPlus {
   val _folder = new TemporaryFolder
   @Rule def folder = _folder
 
-  private var file: File = null
+  private var file: File = _
 
   val cachedFileLineReader = CachedFileLineReader()
 
   @Before
   @throws(classOf[IOException])
-  def setUp = {
-  }
+  def setUp = {}
 
   @After
   @throws(classOf[IOException])
@@ -77,7 +76,7 @@ class CachedFileLinesReaderTest() extends TestPlus {
   @Test
   def test_load_IOException = {
     writeFileLines(10)
-    val channel = new RandomAccessFile(file, "rw").getChannel()
+    val channel = new RandomAccessFile(file, "rw").getChannel
     channel.lock()
     cachedFileLineReader.load(file, null)
     channel.close()
@@ -86,7 +85,7 @@ class CachedFileLinesReaderTest() extends TestPlus {
 
   @Test
   def test_getLongestLine = {
-    writeFileLines(11, false)
+    writeFileLines(11, sameLineLength = false)
     cachedFileLineReader.load(file, null)
     cachedFileLineReader.getLongestLine ==> Some("line10\r\n")
     cachedFileLineReader.close
@@ -110,7 +109,7 @@ class CachedFileLinesReaderTest() extends TestPlus {
 
   @Test
   def test_Size_1Line_load_twice = {
-    writeFileLines(1, false)
+    writeFileLines(1, sameLineLength = false)
     cachedFileLineReader.load(file, null)
     cachedFileLineReader.load(file, null)
     assertThat(cachedFileLineReader.size).isEqualTo(1)
@@ -121,7 +120,7 @@ class CachedFileLinesReaderTest() extends TestPlus {
   @Test
   def test_Size_1M_Lines = {
     val SIZE = 10 * 1000 * 1000
-    writeFileLines(SIZE, false)
+    writeFileLines(SIZE, sameLineLength = false)
     println(file)
     def fileMB = (file.length / 1000 / 1000).toInt
     def MBperSec(mbps: Int) = 1000 * fileMB / mbps
@@ -148,7 +147,7 @@ class CachedFileLinesReaderTest() extends TestPlus {
 
   @Test
   def test_Get = {
-    writeFileLines(10000, false)
+    writeFileLines(10000, sameLineLength = false)
     cachedFileLineReader.load(file, null)
     assertThat(cachedFileLineReader.get(0).get).isEqualTo("line1\r\n")
     assertThat(cachedFileLineReader.get(1).get).isEqualTo("line2\r\n")
@@ -159,8 +158,8 @@ class CachedFileLinesReaderTest() extends TestPlus {
 
   @Test
   def test_Get_reaIoException = {
-    writeFileLines(10000, false)
-    val channel = new RandomAccessFile(file, "rw").getChannel()
+    writeFileLines(10000, sameLineLength = false)
+    val channel = new RandomAccessFile(file, "rw").getChannel
     cachedFileLineReader.load(file, null)
     cachedFileLineReader.get(0) ==> Some("line1\r\n")
 
@@ -181,7 +180,7 @@ class CachedFileLinesReaderTest() extends TestPlus {
 
   @Test
   def test_iterator = {
-    writeFileLines(2, false)
+    writeFileLines(2, sameLineLength = false)
     cachedFileLineReader.load(file, null)
     val iterator = cachedFileLineReader.lines
     assertThat(iterator.hasNext).isTrue
@@ -194,7 +193,7 @@ class CachedFileLinesReaderTest() extends TestPlus {
 
   @Test
   def test_findFirst = {
-    writeFileLines(100, false)
+    writeFileLines(100, sameLineLength = false)
     cachedFileLineReader.load(file, null)
     val firstMatcher = cachedFileLineReader.findFirst(".*(n.*\\d2)")
     assertThat(firstMatcher.group(1)).isEqualTo("ne12")

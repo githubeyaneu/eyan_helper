@@ -14,12 +14,12 @@ import eu.eyan.util.swing.JLabelPlus.JLabelImplicit
 import javax.sound.sampled.SourceDataLine
 
 object AudioMixer extends App {
-  val sampleRate = 8000.0f
+  val SAMPLE_RATE = 8000.0f
   val sampleSizeInBits = 8
   val channels = 1
   val signed = true
   val bigEndian = true
-  val AUDIO_FORMAT = new AudioFormat(sampleRate, sampleSizeInBits, channels, signed, bigEndian)
+  val AUDIO_FORMAT = new AudioFormat(SAMPLE_RATE, sampleSizeInBits, channels, signed, bigEndian)
 
   val panel = new JPanelWithFrameLayout
   panel.newColumn.addLabel("Name")
@@ -83,7 +83,7 @@ object AudioMixer extends App {
               val speakers = AudioSystem.getLine(dataLineInfo).asInstanceOf[SourceDataLine]
               recording = false
               recordLabel.text("Record")
-              val data = record.toByteArray()
+              val data = record.toByteArray
               println("playing " + data.size)
 
               speakers.open(AUDIO_FORMAT)
@@ -103,7 +103,7 @@ object AudioMixer extends App {
                 ct += readBytes
                 val time = System.currentTimeMillis - start
                 SwingPlus.invokeLater {
-                  if (time != 0) progressBar.setFormat((ct * 8 / (time)) + "kbps ")
+                  if (time != 0) progressBar.setFormat((ct * 8 / time) + "kbps ")
                   progressBar.setValue(data.map(_.toInt).map(_.abs).max)
                 }
               }

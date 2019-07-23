@@ -26,12 +26,12 @@ class KarnaughTest extends TestPlus {
   @Test def varsNotEqual = Var("A") !== VarNot("A")
   
 	@Test def createKarnaugh = A
-	@Test def noCells =  A.solve ==> new KarnaughCellsMissing()
+	@Test def noCells =  A.solve ==> KarnaughCellsMissing()
 	@Test def addCells = karnaugh_Atrue
-	@Test def notEnoughCells =  karnaugh_Atrue.solve ==> new KarnaughCellsMissing()
+	@Test def notEnoughCells =  karnaugh_Atrue.solve ==> KarnaughCellsMissing()
 	@Test def enoughCells = karnaugh_Atrue_nAtrue.solve
   
-  @Test def notEnoughCells_ab =  karnaughAB.addCell(a_b, true).solve ==> new KarnaughCellsMissing()
+  @Test def notEnoughCells_ab =  karnaughAB.addCell(a_b, true).solve ==> KarnaughCellsMissing()
   @Test def enoughCells_ab = karnaughAB.addCell(a_b, true).addCell(a_nb, true).addCell(na_b, true).addCell(na_nb, true).solve
 	  
   @Test def a_true = A.addCell(a, true).addCell(na, true).solve ==> "true"

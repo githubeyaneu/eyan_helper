@@ -161,10 +161,10 @@ object Log {
         }
       log(level, event.getMessage.toString)
     }
-    def getErrorHandler(): org.apache.log4j.spi.ErrorHandler = ???
-    def getFilter(): org.apache.log4j.spi.Filter = ???
-    def getLayout(): org.apache.log4j.Layout = ???
-    def getName(): String = ???
+    def getErrorHandler: org.apache.log4j.spi.ErrorHandler = ???
+    def getFilter: org.apache.log4j.spi.Filter = ???
+    def getLayout: org.apache.log4j.Layout = ???
+    def getName: String = ???
     def requiresLayout(): Boolean = ???
     def setErrorHandler(x$1: org.apache.log4j.spi.ErrorHandler): Unit = ???
     def setLayout(x$1: org.apache.log4j.Layout): Unit = ???

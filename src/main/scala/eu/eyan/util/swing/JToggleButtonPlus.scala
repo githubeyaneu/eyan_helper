@@ -11,7 +11,7 @@ object JToggleButtonPlus {
 
     protected def rememberComponent = jToggleButton
     protected def rememberEventListener(action: => Unit) = onItemStateChange(action)
-    protected def rememberValueGet = jToggleButton.isSelected().toString
+    protected def rememberValueGet = jToggleButton.isSelected.toString
     protected def rememberValueSet(value: String) = jToggleButton.setSelected(value.toLowerCase == "true")
   }
 }

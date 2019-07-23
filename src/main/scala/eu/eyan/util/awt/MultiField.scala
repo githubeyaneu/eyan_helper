@@ -3,7 +3,6 @@ package eu.eyan.util.awt;
 import java.awt.Component
 
 import scala.collection.mutable.ListBuffer
-
 import eu.eyan.log.Log
 import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
 import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
@@ -13,6 +12,8 @@ import javax.swing.JButton
 import javax.swing.JPanel
 import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
 import eu.eyan.util.awt.remember.RememberInRegistry
+
+import scala.collection.mutable
 import scala.collection.mutable.MutableList
 
 abstract class MultiField[INPUT, EDITOR <: Component](name: String) extends JPanel with RememberInRegistry[MultiField[INPUT, EDITOR]] {
@@ -28,7 +29,7 @@ abstract class MultiField[INPUT, EDITOR <: Component](name: String) extends JPan
     addEditorEmpty
   }
   
-  val changedListeners = MutableList[() => Unit]()
+  val changedListeners = mutable.MutableList[() => Unit]()
   def onChanged(action: () => Unit) = changedListeners += action
   private def onChange = changedListeners.foreach(_())
 
@@ -46,7 +47,7 @@ abstract class MultiField[INPUT, EDITOR <: Component](name: String) extends JPan
   }
   
   protected def rememberValueGet: String = {
-    val values = editors.toList.map(_.editor).map(getValue).flatten.map(valueToString).mkString(" + ")
+    val values = editors.toList.map(_.editor).flatMap(getValue).map(valueToString).mkString(" + ")
     Log.debug(values)
     values
   }
@@ -63,7 +64,7 @@ abstract class MultiField[INPUT, EDITOR <: Component](name: String) extends JPan
   private var counter = 0
   private var rememberEventListenerAction: () => Unit = () => {}
 
-  private case class Editor[EDITOR](val editor: EDITOR, val deleteButton: JButton)
+  private case class Editor[E](editor: E, deleteButton: JButton)
 
   private def addEditorEmpty = addEditor(None)
   private def addEditorWithValue(input: INPUT) = addEditor(Some(input))

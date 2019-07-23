@@ -1,11 +1,8 @@
 package eu.eyan.testutil.assertt
 
-import org.hamcrest.BaseMatcher
-import org.hamcrest.Description
-import org.hamcrest.Matcher
-import org.hamcrest.MatcherAssert._
 import org.hamcrest.CoreMatchers._
-import org.hamcrest.CoreMatchers
+import org.hamcrest.MatcherAssert._
+import org.hamcrest.{BaseMatcher, Description, Matcher}
 import org.junit.Assert
 
 object AssertPlus {
@@ -21,7 +18,7 @@ object AssertPlus {
 
     def shouldBeEmpty = {
       assertThat(obj, new BaseMatcher[Iterable[_]] {
-        def matches(set: Any): Boolean = set.asInstanceOf[Iterable[_]].size == 0
+        def matches(set: Any): Boolean = set.asInstanceOf[Iterable[_]].isEmpty
         def describeTo(d: Description): Unit = d.appendText("empty")
       })
     }
@@ -58,10 +55,9 @@ object AssertPlus {
       exp
       true
     } catch {
-      case e: Throwable => {
+      case e: Throwable =>
         if (e.getClass != klazz) Assert.fail(s"Exception type $e.getClass wrong. Expected: $klazz")
         false
-      }
     }
 
     if (success) Assert.fail(s"Expected exception $klazz was not thrown.")

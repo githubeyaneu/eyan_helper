@@ -8,7 +8,6 @@ import java.awt.event.MouseEvent
 import java.util.EventObject
 
 import org.jdesktop.swingx.JXTable
-
 import eu.eyan.util.swing.JComponentPlus.JComponentImplicit
 import javax.swing.DropMode
 import javax.swing.JTable
@@ -33,14 +32,18 @@ import eu.eyan.util.registry.RegistryValue
 import eu.eyan.log.Log
 import java.awt.Graphics2D
 import java.awt.Graphics
+
 import rx.lang.scala.Observable
 import eu.eyan.util.rx.lang.scala.ObservablePlus.ObservableImplicit
 import eu.eyan.util.awt.Graphics2DPlus.Graphics2DImplicit
 import javax.swing.ListModel
 import com.jgoodies.binding.adapter.AbstractTableAdapter
+
 import scala.collection.mutable.MutableList
 import javax.swing.table.DefaultTableModel
 import rx.lang.scala.subjects.BehaviorSubject
+
+import scala.collection.mutable
 
 object JTablePlus {
   implicit class JTableImplicit[TYPE <: JTable](jTable: TYPE) extends JComponentImplicit(jTable) {
@@ -157,7 +160,7 @@ object JTablePlus {
         if (getWidth > 0 && getColumnCount > 0) lastWidths = getColumns.map(_.getWidth).map(_ * 100 / getWidth).mkString(",")
       }
       def resetColumnWidths = if (getWidth > 0 && getColumnCount > 0) columnWidhtsInRegistry.read.map(_.split(",").map(_.toInt * getWidth / 100)).foreach(setColumnWidths)
-      def setColumnWidths(columnWidths: Array[Int]) = if (columnWidths.size == getColumnCount) for (i <- 0 until getColumnCount) getColumn(i).setPreferredWidth(columnWidths(i))
+      def setColumnWidths(columnWidths: Array[Int]) = if (columnWidths.length == getColumnCount) for (i <- 0 until getColumnCount) getColumn(i).setPreferredWidth(columnWidths(i))
       jTable
     }
   }
@@ -172,7 +175,7 @@ class JTableModelPlus[T](listModel: ListModel[T], columns: List[String], cellVal
 
 class JXTableWithEmptyText(emptyTextObs: Observable[String]) extends JXTable {
   override protected def paintComponent(g: Graphics) = paintOrTextIfEmpty(g.asInstanceOf[Graphics2D])
-  private def paintOrTextIfEmpty(g2d: Graphics2D) = { super.paintComponent(g2d); if (getRowCount() == 0) g2d.drawString(emptyTextObs.get[String], Color.BLACK, 10, 20) }
+  private def paintOrTextIfEmpty(g2d: Graphics2D) = { super.paintComponent(g2d); if (getRowCount == 0) g2d.drawString(emptyTextObs.get[String], Color.BLACK, 10, 20) }
   emptyTextObs.foreach(x => repaint())
 }
 
@@ -192,10 +195,10 @@ class JTablePlus[TYPE] extends JXTable {
   }
 
   def withValues(values: List[TYPE]) = {
-    this.values = values.toList
+    this.values = values
     setModel(new AbstractTableModel {
-      def getColumnCount(): Int = columns.size
-      def getRowCount(): Int = values.size
+      def getColumnCount: Int = columns.size
+      def getRowCount: Int = values.size
       def getValueAt(rowIndex: Int, columnIndex: Int): Object = valueGetter(values(rowIndex), columns(columnIndex))
       override def getColumnName(index: Int) = columns(index)
     })
@@ -222,10 +225,10 @@ class JTablePlus3[COLUMN_TYPE, ROW_TYPE](getters: Tuple2[COLUMN_TYPE, ROW_TYPE =
 
   private val selectionObservable = BehaviorSubject[Option[ROW_TYPE]](None)
 
-  private val rows = MutableList[ROW_TYPE]()
+  private val rows = mutable.MutableList[ROW_TYPE]()
   private val model = new AbstractTableModel {
-    def getColumnCount(): Int = getters.size
-    def getRowCount(): Int = rows.size
+    def getColumnCount: Int = getters.size
+    def getRowCount: Int = rows.size
     def getValueAt(rowIndex: Int, columnIndex: Int): Object = getters(columnIndex)._2(rows(rowIndex))
     override def getColumnName(columnIndex: Int) = getters(columnIndex)._1.toString
   }

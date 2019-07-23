@@ -220,24 +220,24 @@ class GraphTest {
     AB.edges("C") shouldBeEmpty
 
     AB.edges("B") shouldHaveSize 1
-    AB.edges("B") shouldContain (GraphEdgeUndirected("A", "B"))
+    AB.edges("B") shouldContain GraphEdgeUndirected("A", "B")
 
     val graph = GraphImplSimple[String](GraphDirectionMixed).addUndirectedEdge("A", "B").addUndirectedEdge("C", "D").addDirectedEdge("A", "C").addDirectedEdge("C", "A")
     graph.edges("A") shouldHaveSize 3
-    graph.edges("A") shouldContain (GraphEdgeUndirected("A", "B"))
-    graph.edges("A") shouldContain (GraphEdgeDirected("A", "C"))
-    graph.edges("A") shouldContain (GraphEdgeDirected("C", "A"))
+    graph.edges("A") shouldContain GraphEdgeUndirected("A", "B")
+    graph.edges("A") shouldContain GraphEdgeDirected("A", "C")
+    graph.edges("A") shouldContain GraphEdgeDirected("C", "A")
 
     graph.edges("B") shouldHaveSize 1
-    graph.edges("B") shouldContain (GraphEdgeUndirected("A", "B"))
+    graph.edges("B") shouldContain GraphEdgeUndirected("A", "B")
 
     graph.edges("C") shouldHaveSize 3
-    graph.edges("C") shouldContain (GraphEdgeUndirected("C", "D"))
-    graph.edges("C") shouldContain (GraphEdgeDirected("A", "C"))
-    graph.edges("C") shouldContain (GraphEdgeDirected("C", "A"))
+    graph.edges("C") shouldContain GraphEdgeUndirected("C", "D")
+    graph.edges("C") shouldContain GraphEdgeDirected("A", "C")
+    graph.edges("C") shouldContain GraphEdgeDirected("C", "A")
 
     graph.edges("D") shouldHaveSize 1
-    graph.edges("D") shouldContain (GraphEdgeUndirected("C", "D"))
+    graph.edges("D") shouldContain GraphEdgeUndirected("C", "D")
   }
 
   @Test def testEdgesOfVertices() = {
@@ -248,41 +248,41 @@ class GraphTest {
     AB.edges(List("C", "D")) shouldBeEmpty
 
     AB.edges(List("A", "B")) shouldHaveSize 1
-    AB.edges(List("A", "B")) shouldContain (GraphEdgeUndirected("A", "B"))
+    AB.edges(List("A", "B")) shouldContain GraphEdgeUndirected("A", "B")
 
     val graph = GraphImplSimple[String](GraphDirectionMixed).addUndirectedEdge("A", "B").addUndirectedEdge("C", "D").addDirectedEdge("A", "C").addDirectedEdge("C", "A")
     graph.edges(List("A", "B")) shouldHaveSize 3
-    graph.edges(List("A", "B")) shouldContain (GraphEdgeUndirected("A", "B"))
-    graph.edges(List("A", "B")) shouldContain (GraphEdgeDirected("A", "C"))
-    graph.edges(List("A", "B")) shouldContain (GraphEdgeDirected("C", "A"))
+    graph.edges(List("A", "B")) shouldContain GraphEdgeUndirected("A", "B")
+    graph.edges(List("A", "B")) shouldContain GraphEdgeDirected("A", "C")
+    graph.edges(List("A", "B")) shouldContain GraphEdgeDirected("C", "A")
     graph.edges(List("A", "B")) shouldBeEqualTo graph.edges(List("B", "A"))
 
     graph.edges(List("A", "C")) shouldHaveSize 4
-    graph.edges(List("A", "C")) shouldContain (GraphEdgeUndirected("A", "B"))
-    graph.edges(List("A", "C")) shouldContain (GraphEdgeUndirected("C", "D"))
-    graph.edges(List("A", "C")) shouldContain (GraphEdgeDirected("A", "C"))
-    graph.edges(List("A", "C")) shouldContain (GraphEdgeDirected("C", "A"))
+    graph.edges(List("A", "C")) shouldContain GraphEdgeUndirected("A", "B")
+    graph.edges(List("A", "C")) shouldContain GraphEdgeUndirected("C", "D")
+    graph.edges(List("A", "C")) shouldContain GraphEdgeDirected("A", "C")
+    graph.edges(List("A", "C")) shouldContain GraphEdgeDirected("C", "A")
 
     graph.edges(List("A", "D")) shouldHaveSize 4
-    graph.edges(List("A", "D")) shouldContain (GraphEdgeUndirected("A", "B"))
-    graph.edges(List("A", "D")) shouldContain (GraphEdgeUndirected("C", "D"))
-    graph.edges(List("A", "D")) shouldContain (GraphEdgeDirected("A", "C"))
-    graph.edges(List("A", "D")) shouldContain (GraphEdgeDirected("C", "A"))
+    graph.edges(List("A", "D")) shouldContain GraphEdgeUndirected("A", "B")
+    graph.edges(List("A", "D")) shouldContain GraphEdgeUndirected("C", "D")
+    graph.edges(List("A", "D")) shouldContain GraphEdgeDirected("A", "C")
+    graph.edges(List("A", "D")) shouldContain GraphEdgeDirected("C", "A")
 
     graph.edges(List("B", "C")) shouldHaveSize 4
-    graph.edges(List("B", "C")) shouldContain (GraphEdgeUndirected("A", "B"))
-    graph.edges(List("B", "C")) shouldContain (GraphEdgeUndirected("C", "D"))
-    graph.edges(List("B", "C")) shouldContain (GraphEdgeDirected("A", "C"))
-    graph.edges(List("B", "C")) shouldContain (GraphEdgeDirected("C", "A"))
+    graph.edges(List("B", "C")) shouldContain GraphEdgeUndirected("A", "B")
+    graph.edges(List("B", "C")) shouldContain GraphEdgeUndirected("C", "D")
+    graph.edges(List("B", "C")) shouldContain GraphEdgeDirected("A", "C")
+    graph.edges(List("B", "C")) shouldContain GraphEdgeDirected("C", "A")
 
     graph.edges(List("B", "D")) shouldHaveSize 2
-    graph.edges(List("B", "D")) shouldContain (GraphEdgeUndirected("A", "B"))
-    graph.edges(List("B", "D")) shouldContain (GraphEdgeUndirected("C", "D"))
+    graph.edges(List("B", "D")) shouldContain GraphEdgeUndirected("A", "B")
+    graph.edges(List("B", "D")) shouldContain GraphEdgeUndirected("C", "D")
 
     graph.edges(List("C", "D")) shouldHaveSize 3
-    graph.edges(List("C", "D")) shouldContain (GraphEdgeUndirected("C", "D"))
-    graph.edges(List("C", "D")) shouldContain (GraphEdgeDirected("A", "C"))
-    graph.edges(List("C", "D")) shouldContain (GraphEdgeDirected("C", "A"))
+    graph.edges(List("C", "D")) shouldContain GraphEdgeUndirected("C", "D")
+    graph.edges(List("C", "D")) shouldContain GraphEdgeDirected("A", "C")
+    graph.edges(List("C", "D")) shouldContain GraphEdgeDirected("C", "A")
 
   }
   

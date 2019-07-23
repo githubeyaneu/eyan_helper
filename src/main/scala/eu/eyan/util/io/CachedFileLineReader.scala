@@ -1,8 +1,6 @@
 package eu.eyan.util.io
 
-import java.io.File
-import java.io.FileInputStream
-import java.io.IOException
+import java.io.{Closeable, File, FileInputStream}
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 import java.nio.charset.Charset
@@ -10,12 +8,9 @@ import java.util.regex.Pattern
 
 import eu.eyan.log.Log
 import eu.eyan.util.collection.MapsPlus._
-import java.io.Closeable
-import eu.eyan.util.string.StringPlus.StringPlusImplicit
-import scala.collection.mutable.ListBuffer
-import eu.eyan.util.scala.Try
-import eu.eyan.util.scala.TryFinallyClose
 import eu.eyan.util.java.lang.RuntimePlus._
+import eu.eyan.util.scala.{Try, TryFinallyClose}
+import eu.eyan.util.string.StringPlus.StringPlusImplicit
 
 object CachedFileLineReader {
   def apply(file: String) = new CachedFileLineReader().load(file.asFile)
@@ -36,8 +31,8 @@ class CachedFileLineReader extends Closeable with Iterable[String] {
   // FIXME: speed up: idea: new dataconstruct: availableProcessors number of LINE_COUNT_EARLY_READ(or bigbuffer) arrays for lines
   val NL = "\r\n"
 
-  private var fileChannel: FileChannel = null
-  private var fileInputStream: FileInputStream = null
+  private var fileChannel: FileChannel = _
+  private var fileInputStream: FileInputStream = _
 
   private def readFromFile(index: Int) = {
     val startEnd = getLineStartEnd(index)
@@ -77,7 +72,7 @@ class CachedFileLineReader extends Closeable with Iterable[String] {
   def get(index: Int) = {
     val line = lineCache.get(index)
     def linesFromFile = readFromFile(index, index + 1 + LINE_COUNT_EARLY_READ)
-    def extendCache = lineCache ++= linesFromFile 
+    def extendCache = lineCache ++= linesFromFile
     if (line.isEmpty) Try(extendCache)
 
     lineCache.get(index)
@@ -122,7 +117,7 @@ class CachedFileLineReader extends Closeable with Iterable[String] {
     TryFinallyClose(FileLineStartOffsetReader(file), { lnr: FileLineStartOffsetReader => { lineOffsets = lnr.iterator(readerCallback).toVector } })
 
     fileInputStream = new FileInputStream(file)
-    fileChannel = fileInputStream.getChannel()
+    fileChannel = fileInputStream.getChannel
     if (fileLength != endIndex) {
       // special characters brake the offsets
       Log.error("special characters brake the offsets: " + file.getAbsolutePath)
@@ -149,7 +144,7 @@ class CachedFileLineReader extends Closeable with Iterable[String] {
     private var index = 0
     def hasNext = index < CachedFileLineReader.this.size
     def next = {
-      if (lineOffsets.size != 0) Log.debug("Line " + (index + 1) + " " + (100 * (index + 1) / lineOffsets.size) + "%")
+      if (lineOffsets.nonEmpty) Log.debug("Line " + (index + 1) + " " + (100 * (index + 1) / lineOffsets.size) + "%")
       val line = get(index)
       index += 1
       line.get

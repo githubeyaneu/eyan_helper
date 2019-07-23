@@ -39,7 +39,7 @@ class ThreadRunner[T](action: => T) {
   private var ret: Option[T] = None
 
   ThreadPlus.executor.execute(RunnablePlus.runnable({
-    ret = try { Option(action) } catch { case e: Throwable => { Log.error(e); None } }
+    ret = try { Option(action) } catch { case e: Throwable => Log.error(e); None}
     done = true
   }))
   def result: Option[T] = ret

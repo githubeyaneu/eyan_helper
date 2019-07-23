@@ -20,7 +20,7 @@ object HighlightRenderer /* extends DefaultTableCellRenderer */ {
 class HighlightRenderer extends DefaultTableCellRenderer {
 
   var textToHighlighWithoutSpecChars = ""
-  var matcher: Matcher = null
+  var matcher: Matcher = _
 
   override def getTableCellRendererComponent(table: JTable, value: Object, isSelected: Boolean, hasFocus: Boolean, row: Int, column: Int): Component = {
     super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column)

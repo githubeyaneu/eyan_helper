@@ -107,8 +107,8 @@ object JTextComponentPlus {
     def viewToModel(p: Point) = { jTextComponent.viewToModel(p); jTextComponent }
     def write(out: Writer) = { jTextComponent.write(out); jTextComponent }
 
-    def alwaysScrollDown() = { jTextComponent.getCaret().asInstanceOf[DefaultCaret].setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE); jTextComponent }
-    def dontScroll() = { jTextComponent.getCaret().asInstanceOf[DefaultCaret].setUpdatePolicy(DefaultCaret.NEVER_UPDATE); jTextComponent }
+    def alwaysScrollDown() = { jTextComponent.getCaret.asInstanceOf[DefaultCaret].setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE); jTextComponent }
+    def dontScroll() = { jTextComponent.getCaret.asInstanceOf[DefaultCaret].setUpdatePolicy(DefaultCaret.NEVER_UPDATE); jTextComponent }
     def clickSelectsAll = onClicked(jTextComponent.selectAll)
     def lines: Iterator[String] = jTextComponent.getText.lines
     def onClickedSelectAll = onClicked(jTextComponent.selectAll)

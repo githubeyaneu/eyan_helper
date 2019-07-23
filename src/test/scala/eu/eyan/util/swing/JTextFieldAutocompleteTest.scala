@@ -25,7 +25,7 @@ import javax.swing.WindowConstants
 
 class JTextFieldAutocompleteTest extends AbstractUiTest {
 
-  var autocomplete: AutocompleteFixture = null
+  var autocomplete: AutocompleteFixture = _
 
   @Before def setUp = {
     JTextFieldAutocompleteTest.main(Array())

@@ -1,62 +1,19 @@
 package eu.eyan.util.awt
 
-import javax.swing.JLabel
-import java.awt.Component
-import java.awt.AWTEvent
-import java.awt.event.MouseEvent
-import eu.eyan.util.swing.JFramePlus
-import java.awt.Toolkit
-import java.awt.event.HierarchyListener
-import java.awt.event.MouseWheelListener
-import java.awt.event.InputMethodEvent
-import java.awt.event.MouseWheelEvent
-import java.awt.event.MouseAdapter
-import java.awt.event.HierarchyEvent
-import java.awt.event.MouseMotionAdapter
-import java.awt.event.KeyEvent
-import java.awt.dnd.DropTargetEvent
-import java.awt.dnd.DropTargetDropEvent
-import java.awt.event.FocusEvent
-import java.awt.dnd.DropTargetDragEvent
-import java.awt.event.ComponentEvent
-import java.awt.event.HierarchyBoundsAdapter
-import java.awt.event.FocusAdapter
-import java.awt.event.ComponentAdapter
-import java.awt.event.KeyAdapter
-import eu.eyan.util.java.beans.BeansPlus
-import java.beans.PropertyChangeEvent
-import eu.eyan.util.awt.dnd.DndPlus
+import java.awt.{AWTKeyStroke, Color, Component, ComponentOrientation, Container, Cursor, Dimension, Font, Frame, Point, Rectangle}
 import java.awt.dnd.DropTarget
+import java.awt.event._
+import java.beans.PropertyChangeEvent
 import java.io.File
-import java.awt.dnd.DnDConstants
-import java.awt.datatransfer.DataFlavor
-import eu.eyan.log.Log
-import java.awt.Color
-import java.awt.Rectangle
-import java.awt.ComponentOrientation
-import java.awt.Cursor
-import java.awt.Font
 import java.util.Locale
-import java.awt.Point
-import java.awt.Dimension
-import java.awt.AWTKeyStroke
-import scala.collection.JavaConverters._
-import javax.swing.SwingUtilities
-import javax.swing.JFrame
-import javax.swing.SwingUtilities
-import java.awt.Container
-import java.io.StringReader
-import org.apache.commons.compress.utils.IOUtils
+
+import eu.eyan.util.awt.dnd.DndPlus
+import eu.eyan.util.java.beans.BeansPlus
 import eu.eyan.util.swing.SwingPlus
-import java.awt.Frame
-import java.awt.GraphicsEnvironment
-import javax.swing.JScrollPane
-import javax.swing.Scrollable
-import javax.swing.JPanel
-import eu.eyan.util.swing.JPanelWithFrameLayout
-import javax.swing.BorderFactory
-import java.awt.MouseInfo
+import javax.swing.{BorderFactory, JScrollPane, SwingUtilities}
 import rx.lang.scala.subjects.BehaviorSubject
+
+import scala.collection.JavaConverters._
 
 object ComponentPlus {
 
@@ -233,7 +190,7 @@ object ComponentPlus {
         else window.getName
       else null
 
-    def parentPath: String = if (component.getParent != null) component.getParent.componentPath + component.getParent.asInstanceOf[Container].getComponents.indexOf(component) else ""
+    def parentPath: String = if (component.getParent != null) component.getParent.componentPath + component.getParent.getComponents.indexOf(component) else ""
 
     def componentPath: String = parentPath + "/" + component.getClass.getSimpleName + "." + component.getName
 

@@ -97,7 +97,7 @@ object AbstractButtonPlus {
     def texts(texts: TextsButton) = text(texts.text).toolTip(texts.tooltip).icon(texts.icon)
     
     def text(text: Observable[String]) = {
-    		//FIXME make it safe!
+      //FIXME make it safe!
       text.subscribe(abstractButton.setText _)
       abstractButton
     }
@@ -108,7 +108,7 @@ object AbstractButtonPlus {
     }
     
     def toolTip(tip: Observable[String]) = {
-    		//FIXME make it safe!
+      //FIXME make it safe!
       tip.subscribe(abstractButton.setToolTipText _)
       abstractButton
     }

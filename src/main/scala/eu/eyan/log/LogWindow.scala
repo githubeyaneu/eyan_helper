@@ -22,8 +22,8 @@ import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
 // FIXME: too many lines in textarea -> goes bad. show only configurable amount!
 object LogWindow {
   private lazy val window = new LogWindow
-  private var logsObservableSubscription: Subscription = null
-  private var levelObservableSubscription: Subscription = null
+  private var logsObservableSubscription: Subscription = _
+  private var levelObservableSubscription: Subscription = _
 
   def show(origin: Component = null) = {
     window.frame.packAndSetVisible
@@ -96,9 +96,9 @@ class LogWindow {
   val errTextArea = content.newRow("f:1px:g").addTextArea().alwaysScrollDown
 
   val limitLines = new LimitLinesDocumentListener(maxRows)
-  textArea.getDocument().addDocumentListener(limitLines)
-  outTextArea.getDocument().addDocumentListener(limitLines)
-  errTextArea.getDocument().addDocumentListener(limitLines)
+  textArea.getDocument.addDocumentListener(limitLines)
+  outTextArea.getDocument.addDocumentListener(limitLines)
+  errTextArea.getDocument.addDocumentListener(limitLines)
 
   val frame = new JFrame("").withComponent(content).size(DEFAULT_WIDTH, DEFAULT_HEIGHT).onCloseDispose.modalExclusionType_ApplicationExclude.name(classOf[LogWindow].getName)
 }

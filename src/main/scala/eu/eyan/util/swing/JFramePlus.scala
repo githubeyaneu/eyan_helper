@@ -109,13 +109,13 @@ object JFramePlus {
     val NO_IMAGE: Image = null
     val NO_ICON: Icon = null
     def addToSystemTray(icon: Image = jFrame.getIconImage, toolTip: String = jFrame.getTitle, popupMenu: PopupMenu = createOpenExitPopup, minimizeMessageTitle: String = "", minimizeMessageText: String = "" ) = {
-      if (SystemTray.isSupported()) {
-        val iconToUse = if (icon != NO_IMAGE) icon else Toolkit.getDefaultToolkit().getImage("/dontexists.jpg")
+      if (SystemTray.isSupported) {
+        val iconToUse = if (icon != NO_IMAGE) icon else Toolkit.getDefaultToolkit.getImage("/dontexists.jpg")
 
         //TODO TrayIcon Implicit
         val trayIcon = new TrayIcon(iconToUse, toolTip, popupMenu)
         trayIcon.setImageAutoSize(true)
-        trayIcon.addMouseListener(AwtHelper.onClicked(e => if (e.getButton == MouseEvent.BUTTON1) (if (jFrame.isVisible) jFrame.invisible else { jFrame.visible; jFrame.setState(Frame.NORMAL); jFrame.toFront })))
+        trayIcon.addMouseListener(AwtHelper.onClicked(e => if (e.getButton == MouseEvent.BUTTON1) if (jFrame.isVisible) jFrame.invisible else { jFrame.visible; jFrame.setState(Frame.NORMAL); jFrame.toFront }))
         systemTray.add(trayIcon)
         
         var userNotifiedOfMinimize = false

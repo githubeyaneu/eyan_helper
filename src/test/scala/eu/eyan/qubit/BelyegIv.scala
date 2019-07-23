@@ -22,7 +22,7 @@ class BelyegIv {
         (6 to 14).sliding(2, 1) ++
         (15 to 24).sliding(2, 1)
 
-    val graph24 = vs.foldLeft(GraphImplSimple[Int]())((g, e) => g.addUndirectedEdge(e(0), e(1)))
+    val graph24 = vs.foldLeft(GraphImplSimple[Int]())((g, e) => g.addUndirectedEdge(e.head, e(1)))
 
     val points = graph24.vertices.toList
 

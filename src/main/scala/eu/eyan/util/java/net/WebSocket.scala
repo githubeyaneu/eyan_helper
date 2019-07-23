@@ -111,7 +111,7 @@ case class WebSocket(get: Get, parameters: Map[String, String], private val sock
       logBytes(s"Payload($payloadSize):", payloadBuffer)
       val mask = payloadBuffer.slice(0, 4)
       val data = payloadBuffer.slice(4, payloadBuffer.length)
-      for (i <- 0 until data.length) data(i) = (data(i) ^ mask(i % mask.length)).toByte
+      for (i <- data.indices) data(i) = (data(i) ^ mask(i % mask.length)).toByte
       Some(new String(data))
     }
   }

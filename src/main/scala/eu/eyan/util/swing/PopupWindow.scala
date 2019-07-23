@@ -18,9 +18,9 @@ object PopupWindow {
 
 class PopupWindow(content: Component, owner: Component) {
   var wasCreated = false
-  private var componentAdapter: ComponentEvent => Unit = null
+  private var componentAdapter: ComponentEvent => Unit = _
 
-  private var window: JWindow = null
+  private var window: JWindow = _
 
   def showPopup = {
     if (!wasCreated) {

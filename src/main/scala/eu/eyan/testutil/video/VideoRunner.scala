@@ -14,7 +14,7 @@ import VideoRunner.fullScreenToRecord
 
 object VideoRunner {
   private var testVideoCounter = 1
-  private var componentToRecord: Component = null
+  private var componentToRecord: Component = _
   private var fullScreenToRecord = false
   def setComponentToRecord(componentToRecord: Component) = VideoRunner.componentToRecord = componentToRecord
   def setFullScreenToRecord = fullScreenToRecord = true
@@ -23,7 +23,7 @@ object VideoRunner {
 class VideoRunner(klass: Class[_]) extends BlockJUnit4ClassRunner(klass) {
 
   override def methodInvoker(method: FrameworkMethod, test: Object) = {
-    val testName = test.getClass().getSimpleName() + '.' + method.getName()
+    val testName = test.getClass.getSimpleName + '.' + method.getName
 
     new InvokeMethod(method, test) {
       override def evaluate() = {
@@ -31,8 +31,8 @@ class VideoRunner(klass: Class[_]) extends BlockJUnit4ClassRunner(klass) {
           throw new Exception(
             "Component to record not found. Please set it in the @Before method for the test: "
               + testName
-              + "\r\nFor Example: " + classOf[VideoRunner].getSimpleName()
-              + ".setComponentToRecord(component);");
+              + "\r\nFor Example: " + classOf[VideoRunner].getSimpleName
+              + ".setComponentToRecord(component);")
         }
         val videoRecorder = new VideoRecorder
         try {
@@ -40,11 +40,10 @@ class VideoRunner(klass: Class[_]) extends BlockJUnit4ClassRunner(klass) {
           super.evaluate
           videoRecorder.stopAndDeleteVideo
         } catch {
-          case t: Throwable => {
+          case t: Throwable =>
             videoRecorder.stopAndSaveVideo
             testVideoCounter += 1
             throw t
-          }
         } finally {
           componentToRecord = null
           fullScreenToRecord = false

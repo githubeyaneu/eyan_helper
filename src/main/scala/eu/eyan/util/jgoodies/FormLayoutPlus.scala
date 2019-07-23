@@ -32,9 +32,9 @@ class FormLayoutPlus private (container: Container, colSpec: String) extends Lay
 
   override def equals(obj: Any): Boolean = formLayout.equals(obj)
 
-  override def toString() = formLayout.toString()
+  override def toString = formLayout.toString
 
-  def getComponent() = container
+  def getComponent = container
 
   def appendRow(rowSpecs: String*): Int = {
     for {rowSpec <- rowSpecs} { appendRow(RowSpec.decode(rowSpec)); rows += 1 }
@@ -48,10 +48,10 @@ class FormLayoutPlus private (container: Container, colSpec: String) extends Lay
     this
   }
 
-  def appendRow(rowSpec: String, formLayout: FormLayoutPlus): FormLayoutPlus = appendRow(rowSpec, formLayout.getComponent())
+  def appendRow(rowSpec: String, formLayout: FormLayoutPlus): FormLayoutPlus = appendRow(rowSpec, formLayout.getComponent)
 
   /* DELEGATES */
-  def getColumnCount() = formLayout.getColumnCount()
+  def getColumnCount = formLayout.getColumnCount
 
   def getColumnSpec(columnIndex: Int) = formLayout.getColumnSpec(columnIndex)
 
@@ -63,7 +63,7 @@ class FormLayoutPlus private (container: Container, colSpec: String) extends Lay
 
   def removeColumn(columnIndex: Int) = formLayout.removeColumn(columnIndex)
 
-  def getRowCount() = formLayout.getRowCount()
+  def getRowCount = formLayout.getRowCount
 
   def getRowSpec(rowIndex: Int) = formLayout.getRowSpec(rowIndex)
 
@@ -79,19 +79,19 @@ class FormLayoutPlus private (container: Container, colSpec: String) extends Lay
 
   def setConstraints(component: Component, constraints: CellConstraints) = formLayout.setConstraints(component, constraints)
 
-  def getColumnGroups() = formLayout.getColumnGroups()
+  def getColumnGroups = formLayout.getColumnGroups
 
   def setColumnGroups(colGroupIndices: Array[Array[Int]]) = formLayout.setColumnGroups(colGroupIndices)
 
   def addGroupedColumn(columnIndex: Int) = formLayout.addGroupedColumn(columnIndex)
 
-  def getRowGroups() = formLayout.getRowGroups()
+  def getRowGroups = formLayout.getRowGroups
 
   def setRowGroups(rowGroupIndices: Array[Array[Int]]) = formLayout.setRowGroups(rowGroupIndices)
 
   def addGroupedRow(rowIndex: Int) = formLayout.addGroupedRow(rowIndex)
 
-  def getHonorsVisibility() = formLayout.getHonorsVisibility()
+  def getHonorsVisibility = formLayout.getHonorsVisibility
 
   def setHonorsVisibility(b: Boolean) = formLayout.setHonorsVisibility(b)
 

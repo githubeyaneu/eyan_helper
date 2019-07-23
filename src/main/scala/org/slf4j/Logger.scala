@@ -1,8 +1,8 @@
 package org.slf4j
 trait Logger {
   val ROOT_LOGGER_NAME: String = "ROOT"
-  def getName(): String
-  def isTraceEnabled(): Boolean
+  def getName: String
+  def isTraceEnabled: Boolean
   def trace(msg: String): Unit
   def trace(format: String, arg: AnyRef): Unit
   def trace(format: String, arg1: AnyRef, arg2: AnyRef): Unit
@@ -14,7 +14,7 @@ trait Logger {
   def trace(marker: Marker, format: String, arg1: AnyRef, arg2: AnyRef): Unit
   def trace(marker: Marker, format: String, argArray: AnyRef*): Unit
   def trace(marker: Marker, msg: String, t: Throwable): Unit
-  def isDebugEnabled(): Boolean
+  def isDebugEnabled: Boolean
   def debug(msg: String): Unit
   def debug(format: String, arg: AnyRef): Unit
   def debug(format: String, arg1: AnyRef, arg2: AnyRef): Unit
@@ -26,7 +26,7 @@ trait Logger {
   def debug(marker: Marker, format: String, arg1: AnyRef, arg2: AnyRef): Unit
   def debug(marker: Marker, format: String, arguments: AnyRef*): Unit
   def debug(marker: Marker, msg: String, t: Throwable): Unit
-  def isInfoEnabled(): Boolean
+  def isInfoEnabled: Boolean
   def info(msg: String): Unit
   def info(format: String, arg: AnyRef): Unit
   def info(format: String, arg1: AnyRef, arg2: AnyRef): Unit
@@ -38,7 +38,7 @@ trait Logger {
   def info(marker: Marker, format: String, arg1: AnyRef, arg2: AnyRef): Unit
   def info(marker: Marker, format: String, arguments: AnyRef*): Unit
   def info(marker: Marker, msg: String, t: Throwable): Unit
-  def isWarnEnabled(): Boolean
+  def isWarnEnabled: Boolean
   def warn(msg: String): Unit
   def warn(format: String, arg: AnyRef): Unit
   def warn(format: String, arguments: AnyRef*): Unit
@@ -50,7 +50,7 @@ trait Logger {
   def warn(marker: Marker, format: String, arg1: AnyRef, arg2: AnyRef): Unit
   def warn(marker: Marker, format: String, arguments: AnyRef*): Unit
   def warn(marker: Marker, msg: String, t: Throwable): Unit
-  def isErrorEnabled(): Boolean
+  def isErrorEnabled: Boolean
   def error(msg: String): Unit
   def error(format: String, arg: AnyRef): Unit
   def error(format: String, arg1: AnyRef, arg2: AnyRef): Unit

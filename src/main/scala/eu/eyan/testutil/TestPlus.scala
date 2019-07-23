@@ -57,21 +57,19 @@ trait TestPlus {
   def expect(expectedThrowable: Throwable, test: => Unit, same: Boolean = false) =
     try { test; Assert.fail("Exception(Throwable) was expected but none came.") }
     catch {
-      case e: Throwable => {
+      case e: Throwable =>
         if (same) e ==> ("expectedThrowable", expectedThrowable)
         e.getClass ==> ("expectedThrowable class", expectedThrowable.getClass)
         e.getMessage ==> ("expectedThrowable message", expectedThrowable.getMessage)
-      }
     }
 
   /** Expect a Throwable type of the method */
   def expectThrowable(expectedThrowableClass: Class[_], test: => Unit) =
     try { test; Assert.fail("Exception(Throwable) was expected but none came.") }
     catch {
-      case e: Throwable =>{
+      case e: Throwable =>
         if(e.getClass != expectedThrowableClass) e.printStackTrace
-    	  e.getClass ==> ("expectedThrowable class", expectedThrowableClass)
-      }
+        e.getClass ==> ("expectedThrowable class", expectedThrowableClass)
     }
 
   /**
@@ -104,8 +102,8 @@ trait TestPlus {
       val description = descriptionAndExpected._1
       val expected= descriptionAndExpected._2
       expected match {
-        case t:Throwable => {expect(t, actual); null.asInstanceOf[A]} 
-        case _ => {val a = actual; assertThat(a).as(description).isEqualTo(expected); a}
+        case t:Throwable => expect(t, actual); null.asInstanceOf[A]
+        case _ => val a = actual; assertThat(a).as(description).isEqualTo(expected); a
       }
     }
   }

@@ -100,9 +100,11 @@ object AwtHelper {
   def onMouseEntered(action: MouseEvent => Unit) = new MouseAdapter { override def mouseEntered(e: MouseEvent) = action(e) }
   def onMouseExited(action: MouseEvent => Unit) = new MouseAdapter { override def mouseExited(e: MouseEvent) = action(e) }
 
-  def onClicked(action: MouseEvent => Unit) = onMouseClicked(action, 1)
-  def onDoubleClick(action: MouseEvent => Unit) = onMouseClicked(action, 2)
-  def onTripleClick(action: MouseEvent => Unit) = onMouseClicked(action, 3)
+  def onClicked(action: MouseEvent => Unit) = onMouseClicked(action)
+  val DOUBLE_CLICK_NR = 2
+  def onDoubleClick(action: MouseEvent => Unit) = onMouseClicked(action, DOUBLE_CLICK_NR)
+  val TRIPLE_CLICK_NR = 3
+  def onTripleClick(action: MouseEvent => Unit) = onMouseClicked(action, TRIPLE_CLICK_NR)
 
   //MouseMotionAdapter
   //MouseMotionListener
@@ -137,7 +139,7 @@ object AwtHelper {
 
   def tryToEnlargeWindow(window: Window) = {
     if (window != null) {
-      val screenSize = Toolkit.getDefaultToolkit().getScreenSize()
+      val screenSize = Toolkit.getDefaultToolkit.getScreenSize
       val origPos = window.getBounds
       Log.debug("orig: " + origPos)
       window.pack

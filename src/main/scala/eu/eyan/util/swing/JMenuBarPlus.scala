@@ -25,7 +25,7 @@ object JMenuBarPlus {
 
     def getOrCreateMenu(text: String) = {
       def menuText(menu: JMenu) = menu.getText == text
-      if (menus.exists(menuText)) menus.filter(menuText)(0)
+      if (menus.exists(menuText)) menus.filter(menuText).head
       else { val menu = new JMenu(text); jMenuBar.add(menu); menu }
     }
 
@@ -33,7 +33,7 @@ object JMenuBarPlus {
     def getOrCreateMenu(text: Text) = {
       val menuString = text.get
       def menuText(menu: JMenu) = menu.getText == menuString
-      if (menus.exists(menuText)) menus.filter(menuText)(0)
+      if (menus.exists(menuText)) menus.filter(menuText).head
       else {
         //TODO JMenuPlus
         val menu = new JMenu(menuString)

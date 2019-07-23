@@ -9,22 +9,22 @@ import java.nio.file.Files
 import java.io.PrintWriter
 
 object ClipboardPlus {
-  def getTextFromClipboard(): String = {
+  def getTextFromClipboard: String = {
     try {
-      Toolkit.getDefaultToolkit().getSystemClipboard().getData(DataFlavor.stringFlavor).asInstanceOf[String]
+      Toolkit.getDefaultToolkit.getSystemClipboard.getData(DataFlavor.stringFlavor).asInstanceOf[String]
     } catch {
       case e: Exception => e.printStackTrace()
       ""
     }
   }
 
-  def copyToClipboard(text: String): Unit = Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(text), null)
+  def copyToClipboard(text: String): Unit = Toolkit.getDefaultToolkit.getSystemClipboard.setContents(new StringSelection(text), null)
 
-  def toTempFile(): File = {
+  def toTempFile: File = {
     try {
       val tempFile = File.createTempFile("clipboard", ".txt")
       println("Write clipboard contents to temp file: " + tempFile)
-      new PrintWriter(tempFile) { write(getTextFromClipboard()); close }
+      new PrintWriter(tempFile) { write(getTextFromClipboard); close }
       //      FileUtils.writeStringToFile(tempFile, getTextFromClipboard())
       tempFile
     } catch {

@@ -35,7 +35,7 @@ object SevenZipPlus {
 def extractAllTo(source: File, targetDir: File) = {
     val channel = new RandomAccessFile(source, "rw").getChannel
     val sevenZFile = new SevenZFile(channel)
-    var entry = sevenZFile.getNextEntry()
+    var entry = sevenZFile.getNextEntry
     while (entry != null) {
       val content = new Array[Byte](entry.getSize.toInt)
       sevenZFile.read(content, 0, content.length)
@@ -49,7 +49,7 @@ def extractAllTo(source: File, targetDir: File) = {
         new FileOutputStream(targetFile, false),
         (out: FileOutputStream) => out.write(content),
         t => Log.error("Error extracting 7z " + entry.getName, t))
-      entry = sevenZFile.getNextEntry()
+      entry = sevenZFile.getNextEntry
     }
     sevenZFile.close
     targetDir
@@ -90,7 +90,7 @@ class SevenZipPlus(compressedInputStream: InputStream) extends CompressPlus {
 
   private def extractOneFileTo(channel: SeekableInMemoryByteChannel, filePathToExtract: String, targetFile: File) = {
     val sevenZFile = new SevenZFile(channel)
-    var entry = sevenZFile.getNextEntry()
+    var entry = sevenZFile.getNextEntry
     while (entry != null) {
       val content = new Array[Byte](entry.getSize.toInt)
       sevenZFile.read(content, 0, content.length)
@@ -99,7 +99,7 @@ class SevenZipPlus(compressedInputStream: InputStream) extends CompressPlus {
         out.write(content)
         out.close
       }
-      entry = sevenZFile.getNextEntry()
+      entry = sevenZFile.getNextEntry
     }
     sevenZFile.close
     targetFile

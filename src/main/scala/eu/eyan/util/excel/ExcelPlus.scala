@@ -12,7 +12,7 @@ case class ExcelColumn(index: Int)
 case class ExcelRow(index: Int)
 case class ExcelCell(column: ExcelColumn, row: ExcelRow, content: Option[String])
 
-case class ExcelSheet(val columns: IndexedSeq[ExcelColumn], val rows: IndexedSeq[ExcelRow], private val cells: Map[(ExcelColumn, ExcelRow), String]) {
+case class ExcelSheet(columns: IndexedSeq[ExcelColumn], rows: IndexedSeq[ExcelRow], private val cells: Map[(ExcelColumn, ExcelRow), String]) {
   private val EMPTY_STRING = ""
 
   def firstRowCells = rowCells(ExcelRow(0))
@@ -61,7 +61,7 @@ object ExcelPlus {
   }
 
   private def getSheet(ws: WorkbookSettings, workbook: Workbook, string: String) = {
-    val sheet = workbook.getSheet(new String(string.getBytes(Charset.forName(ws.getEncoding()))))
+    val sheet = workbook.getSheet(new String(string.getBytes(Charset.forName(ws.getEncoding))))
     if (sheet == null) workbook.getSheet(string)
     else sheet
   }

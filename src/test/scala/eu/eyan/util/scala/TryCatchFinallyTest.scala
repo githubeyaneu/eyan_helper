@@ -30,6 +30,7 @@ class TryCatchFinallyTest extends TestPlus {
   var actionDone = false
   val Exeption_Action = new Exception("actionError")
   def action = { println("actionDone"); actionDone = true; ActionResult }
+  //noinspection ScalaStyle
   def actionError = { println("actionError"); throw Exeption_Action; actionDone = true; ActionResult }
 
   // Test test :)
@@ -45,6 +46,7 @@ class TryCatchFinallyTest extends TestPlus {
   var finallyDone = false
   val Exception_Finally = new Exception("finallyError")
   def finaly = { println("finallyDone"); finallyDone = true; }
+  //noinspection ScalaUnreachableCode
   def finallyError = { println("finallyError"); throw Exception_Finally; finallyDone = true }
 
   def actionCatchFinally(a: Boolean, c: Boolean, f: Boolean) = {
@@ -85,6 +87,7 @@ class TryCatchFinallyTest extends TestPlus {
   var closeable1Done = false
   val Exeption_Closeable1 = new Exception("closeable1Error")
   def closeable1 = { println("closeable1Done"); closeable1Done = true; Closeable1Result }
+  //noinspection ScalaUnreachableCode
   def closeable1Error = { println("closeable1Error"); throw Exeption_Closeable1; closeable1Done = true; Closeable1Result }
 
   var closeable1ActionDone = false
@@ -96,6 +99,7 @@ class TryCatchFinallyTest extends TestPlus {
   var close1Done = false
   val Exeption_Close1 = new Exception("close1Error")
   def close1Action = { println("close1Done"); close1Done = true; }
+  //noinspection ScalaUnreachableCode
   def close1Error = { println("close1Error"); throw Exeption_Close1; close1Done = true; }
 
   def closeableActionCatchClose(closeableExecuted: Boolean, closeableActionExecuted: Boolean, catchExecuted: Boolean, closeExecuted: Boolean) = {
@@ -143,6 +147,7 @@ class TryCatchFinallyTest extends TestPlus {
   var closeable2Done = false
   val Exeption_Closeable2 = new Exception("closeable2Error")
   def closeable2 = { println("closeable2Done"); closeable2Done = true; Closeable2Result }
+  //noinspection ScalaUnreachableCode
   def closeable2Error = { println("closeable2Error"); throw Exeption_Closeable2; closeable2Done = true; Closeable2Result }
 
   var closeable2ActionDone = false
@@ -154,6 +159,7 @@ class TryCatchFinallyTest extends TestPlus {
   var close2Done = false
   val Exeption_Close2 = new Exception("close2Error")
   def close2Action = { println("close2Done"); close2Done = true; }
+  //noinspection ScalaUnreachableCode
   def close2Error = { println("close2Error"); throw Exeption_Close2; close2Done = true; }
 
   def checkClose2(closeable1Executed: Boolean, closeable2Executed: Boolean, closeable2ActionExecuted: Boolean, catchExecuted: Boolean, close1Executed: Boolean, close2Executed: Boolean) = {

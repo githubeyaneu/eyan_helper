@@ -4,7 +4,7 @@ import java.text.NumberFormat
 
 object Memory {
   def printmem = {
-    val runtime = Runtime.getRuntime()
+    val runtime = Runtime.getRuntime
     val format = NumberFormat.getInstance()
     val maxMemory = runtime.maxMemory()
     val allocatedMemory = runtime.totalMemory()

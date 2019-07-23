@@ -10,7 +10,7 @@ object Progress {
   def counter() = new Progress(0, None)
 }
 
-case class ProgressUpdate(val state: ProgressState, val counter: Long, val max: Option[Long]) {
+case class ProgressUpdate(state: ProgressState, counter: Long, max: Option[Long]) {
   def notStarted = state == NotStarted
   def ended = state == Ended
 }

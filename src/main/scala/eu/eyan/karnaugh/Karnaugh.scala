@@ -1,8 +1,11 @@
 package eu.eyan.karnaugh
 
 import eu.eyan.testutil.assertt.AssertPlus
+
 import scala.collection.mutable.HashMap
 import eu.eyan.karnaugh.Karnaugh.crossJoin
+
+import scala.collection.mutable
 
 object Karnaugh extends App {
   /*
@@ -60,12 +63,12 @@ case class AND() extends Operator2("and", (a, b) => a && b)
 case class OR() extends Operator2("or", (a, b) => a || b)
 
 class Karnaugh(variables: Set[String]) {
-  private val cells = HashMap[Set[_ <: KarVar], Boolean]()
+  private val cells = mutable.HashMap[Set[_ <: KarVar], Boolean]()
   def addCell(variables: Set[_ <: KarVar], value: Boolean) = { cells += (variables -> value); this }
 
   private def variableDoubles = variables.map(variable => Set[KarVar](Var(variable), VarNot(variable)))
   def solve: String = {
-    if (crossJoin(variableDoubles) != cells.keySet) throw new KarnaughCellsMissing()
+    if (crossJoin(variableDoubles) != cells.keySet) throw KarnaughCellsMissing()
     ""
   }
 

@@ -14,7 +14,7 @@ class StringsSearchTree[TYPE] private (
     nodes: Map[Char, StringsSearchTree[TYPE]] = Map[Char, StringsSearchTree[TYPE]]()) {
   def get(key: String): Set[TYPE] =
     if (key.isEmpty) values
-    else if (nodes.contains(key.head)) nodes.get(key.head).get.get(key.tail)
+    else if (nodes.contains(key.head)) nodes(key.head).get(key.tail)
     else Set()
 
   def add(key: String, value: TYPE): StringsSearchTree[TYPE] =
@@ -23,7 +23,7 @@ class StringsSearchTree[TYPE] private (
       def valuesContainsValue = values.contains(value)
       def addToValues = new StringsSearchTree(char, values + value, nodes)
       def nodesContainKey = nodes.contains(key.head)
-      def addToNode = new StringsSearchTree(char, values, nodes.updated(key.head, nodes.get(key.head).get.add(key.tail, value)))
+      def addToNode = new StringsSearchTree(char, values, nodes.updated(key.head, nodes(key.head).add(key.tail, value)))
       def newNode = new StringsSearchTree(char, values, nodes + (key.head -> new StringsSearchTree(Option(key.head)).add(key.tail, value)))
 
       if (keyEmpty)

@@ -38,6 +38,7 @@ object ObservablePlus {
   }
 
   def toSeq[T](observables: Seq[Observable[T]])(implicit ev: ClassTag[T]): Observable[Seq[T]] = {
+    //noinspection ScalaStyle
     val list$ = Observable.combineLatest(observables.toIterable)(x => x)
     list$
   }
@@ -66,7 +67,7 @@ object ObservablePlus {
       def selectTitleText(nrAndTexts: (Int, List[T])) = {
         val nr = nrAndTexts._1
         val texts = nrAndTexts._2
-        val idx = if (nr < 1) 0 else ((nr == 1) ? 1 | 2)
+        val idx = if (nr < 1) 0 else (nr == 1) ? 1 | 2
         texts(idx)
       }
       nrAndTexts map selectTitleText

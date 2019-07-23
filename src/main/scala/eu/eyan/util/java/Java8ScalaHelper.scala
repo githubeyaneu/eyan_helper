@@ -3,5 +3,5 @@ package eu.eyan.util.java
 import java.util.function.Consumer
 
 object Java8ScalaHelper {
-  def newConsumer[TYPE](mthod: TYPE => Unit):Consumer[TYPE] = new Consumer[TYPE]() { override def accept(v1: TYPE): Unit = mthod.apply(v1) }
+  def newConsumer[TYPE](mthod: TYPE => Unit):Consumer[TYPE] = (v1: TYPE) => mthod.apply(v1)
 }

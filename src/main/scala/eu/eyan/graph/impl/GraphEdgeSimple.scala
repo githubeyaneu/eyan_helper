@@ -28,7 +28,7 @@ class GraphEdgeSimple[VERTEX](val direction: GraphEdgeDirection, val vertices: L
   
   override def hashCode: Int = vertices.map(_.hashCode*31).sum // FIXME this can be much better
   
-  def predecessor = if(direction==GraphEdgeDirectionDirected) vertices(0) else throw new GraphUndirectedEdgeNotSupported
+  def predecessor = if(direction==GraphEdgeDirectionDirected) vertices.head else throw new GraphUndirectedEdgeNotSupported
 
   def successor = if(direction==GraphEdgeDirectionDirected) vertices(1) else throw new GraphUndirectedEdgeNotSupported
 }

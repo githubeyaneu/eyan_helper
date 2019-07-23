@@ -152,7 +152,7 @@ object StringPlus {
 
     def asUrlGet = Source.fromInputStream(asUrlGet_responseAsStream()).mkString
 
-    def linesFromFile = Source.fromFile(s).getLines
+    def linesFromFile = Source.fromFile(s).getLines // FIXME
 
     def toSafeFileName = s.replaceAll(":", "").replaceAll("\\\\", "_")
 
@@ -194,7 +194,7 @@ object StringPlus {
     def containsAnyIgnoreCase(strings: Seq[String]) = s.toLowerCase.containsAny(strings.map(_.toLowerCase))
 
     def toHexEncode = s.getBytes.map(_.toHexString).mkString(",")
-    def toHexDecode = new String(s.split(",").map(Integer.parseUnsignedInt(_, 16).toByte).toArray)
+    def toHexDecode = new String(s.split(",").map(Integer.parseUnsignedInt(_, 16).toByte))
 
     private def encryptDecryptIvParameterSpec = new IvParameterSpec(new Array[Byte](16))
     private def encryptDecryptKey(salt:String) = new SecretKeySpec(Base64.getDecoder.decode(salt), "AES")
@@ -227,7 +227,7 @@ object StringPlus {
       Log.debug("matchData: "+matchData)
       val matchDataList = matchData.toList
       Log.debug("matchDataList: "+matchDataList)
-      val lift = matchDataList.lift(0)
+      val lift = matchDataList.headOption
       Log.debug("lift: "+lift)
       val groupFilter = lift.filter(mach => mach.groupCount >0)
       Log.debug("groupFilter: "+groupFilter)
@@ -241,7 +241,7 @@ object StringPlus {
     def splitLinesFromFile(splitCondition: String => Boolean): Stream[String] = s.linesFromFile.toStream.splitToStreams(splitCondition).map(_.mkString("\r\n"))
 
     def toResourceFile = Try {
-      val url = this.getClass.getClassLoader().getResource(s)
+      val url = this.getClass.getClassLoader.getResource(s)
       if (url == null) throw new IllegalArgumentException(s"resource $s not found.")
       url.getFile.asFile
     }
@@ -263,10 +263,10 @@ object StringPlus {
         else {
           val underScore = s.head == '_'
           val plus = if (underScore) "" else if (lastUnderScore) s.head.toUpper else if (first) s.head else s.head.toLower
-          underScoreToCamel(s.tail, output + plus, false, underScore)
+          underScoreToCamel(s.tail, output + plus, first = false, lastUnderScore = underScore)
         }
 
-      underScoreToCamel(s, "", true, false)
+      underScoreToCamel(s, "", first = true, lastUnderScore = false)
     }
 
     def toUnderScoreCase = {
@@ -274,10 +274,10 @@ object StringPlus {
         if (s.isEmpty) output
         else {
           val plus = if (s.head.isUpper && !first) "_" else ""
-          camel2Underscore(s.tail, output + plus + s.head, false)
+          camel2Underscore(s.tail, output + plus + s.head, first = false)
         }
 
-      camel2Underscore(s, "", true)
+      camel2Underscore(s, "", first = true)
     }
 
     def copyToClipboard = ClipboardPlus.copyToClipboard(s)

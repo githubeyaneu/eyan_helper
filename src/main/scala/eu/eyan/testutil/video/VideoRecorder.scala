@@ -27,11 +27,11 @@ import java.awt.Point
 
 class VideoRecorder {
 
-  private var screenRecorder: ScreenRecorderToFile = null
+  private var screenRecorder: ScreenRecorderToFile = _
 
   def start(fullScreen: Boolean, component: Component, fileLocation: String, videoName: String) = {
     try {
-      val gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration()
+      val gc = GraphicsEnvironment.getLocalGraphicsEnvironment.getDefaultScreenDevice.getDefaultConfiguration
 
       val fileFormat = new Format(MediaTypeKey, MediaType.FILE, MimeTypeKey, MIME_AVI)
 
@@ -56,7 +56,7 @@ class VideoRecorder {
 
       val capture =
         if (fullScreen) new Rectangle(new Point(0, 0), Toolkit.getDefaultToolkit.getScreenSize)
-        else new Rectangle(component.getLocationOnScreen(), component.getSize())
+        else new Rectangle(component.getLocationOnScreen, component.getSize())
 
       screenRecorder = new ScreenRecorderToFile(gc, capture, fileFormat, screenFormat, mouseFormat, null, new File(fileLocation), videoName)
       screenRecorder.start()
@@ -79,7 +79,7 @@ class VideoRecorder {
     val videoFile = screenRecorder.getVideoFile // must be the first line, because screenRecorder set to null
     try stop
     catch { case e: IOException => Log.error(e) }
-    finally if (videoFile != null && videoFile.exists() && videoFile.isFile()) videoFile.delete()
+    finally if (videoFile != null && videoFile.exists() && videoFile.isFile) videoFile.delete()
   }
 
   private def stop = if (screenRecorder != null) { screenRecorder.stop; screenRecorder = null }

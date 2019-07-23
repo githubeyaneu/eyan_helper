@@ -5,19 +5,25 @@ import java.util.zip.ZipInputStream
 import java.io.InputStream
 import java.io.File
 import java.io.FileInputStream
+
 import eu.eyan.util.scala.TryCatchFinally
 import eu.eyan.log.Log
+
 import scala.collection.mutable.MutableList
 import scala.collection.mutable.ListBuffer
 import java.util.zip.ZipEntry
+
 import eu.eyan.util.scala.TryCatchFinallyClose
 import java.util.zip.GZIPInputStream
+
 import scala.io.Source
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
 import org.apache.commons.compress.archivers.ArchiveStreamFactory
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry
 import org.apache.commons.compress.utils.IOUtils
 import java.io.ByteArrayInputStream
+
+import scala.collection.mutable
 import scala.io.BufferedSource
 import scala.util.Failure
 import scala.util.Try
@@ -56,11 +62,11 @@ object ZipPlus {
   def unTarAllFilesToMemory(tarPath: File) = {
     val debInputStream = new ArchiveStreamFactory().createArchiveInputStream("tar", new FileInputStream(tarPath)).asInstanceOf[TarArchiveInputStream]
 
-    val files = new MutableList[NameAndContent]
+    val files = new mutable.MutableList[NameAndContent]
     var entry: TarArchiveEntry = debInputStream.getNextEntry.asInstanceOf[TarArchiveEntry]
     while (entry != null) {
       if (entry.isFile) {
-        val name = (entry.getName)
+        val name = entry.getName
         val bytes = IOUtils.toByteArray(debInputStream)
         files += NameAndContent(name, bytes)
       }

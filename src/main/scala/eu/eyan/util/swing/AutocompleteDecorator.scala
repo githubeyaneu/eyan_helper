@@ -62,7 +62,7 @@ class AutocompleteDecorator(component: JTextComponent) {
     event.getKeyCode match {
       case KeyEvent.VK_DOWN => event.consume
       case KeyEvent.VK_UP   => event.consume
-      case _                => { /* do nothing */ }
+      case _                => /* do nothing */
     }
   })
 

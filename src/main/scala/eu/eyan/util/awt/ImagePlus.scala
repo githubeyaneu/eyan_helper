@@ -8,7 +8,7 @@ import java.awt.Color
 object ImagePlus {
   def imageFromChar(c: Char, color: Color = Color.red, width: Int = 256, height: Int = 256) = {
     val image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
-    val g2 = image.createGraphics.asInstanceOf[Graphics2D]
+    val g2 = image.createGraphics
     g2.setFont(new Font(null, Font.BOLD, height))
     g2.setColor(color)
     g2.drawString(c + "", width / 6, height - height / 6)
@@ -18,7 +18,7 @@ object ImagePlus {
 
   def imageFromString(text: String, color: Color = Color.red, width: Int = 256, height: Int = 256) = {
     val image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
-    val g2 = image.createGraphics.asInstanceOf[Graphics2D]
+    val g2 = image.createGraphics
     g2.setFont(new Font(null, Font.BOLD, height))
     g2.setColor(color)
     g2.drawString(text, width / 6, height - height / 6)

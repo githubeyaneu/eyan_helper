@@ -4,13 +4,18 @@ import java.io.OutputStream
 import java.io.PrintStream
 import java.util.Timer
 import java.util.TimerTask
+
 import eu.eyan.util.awt.AwtHelper
+
 import scala.collection.mutable.MutableList
 import eu.eyan.util.scala.Try
 import eu.eyan.log.Log
 import java.io.FileWriter
 import java.io.Writer
+
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
+
+import scala.collection.mutable
 
 object OutputStreamPlus {
   def apply(onWrite: Int => Unit, onFlush: => Unit, onClose: => Unit) = new OutputStream {
@@ -30,7 +35,7 @@ object OutputStreamPlus {
 
   def timebuffered(callback: String => Unit, time: Int = 100) = {
     val lock = new Object
-    var chars = MutableList[Char]()
+    var chars = mutable.MutableList[Char]()
     def newChar(i: Int) = lock.synchronized { chars += i.toChar }
     def flushCars = {
       

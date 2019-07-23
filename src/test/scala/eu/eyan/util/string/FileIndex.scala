@@ -29,7 +29,7 @@ object FileIndex {
     println("lines done " + timerElapsed)
     printmem
 
-    val itemsOfLines = linesWithIndices.map(p => (StringsSearchTree.allSubStrings(p._1, INDEXING_DEPTH).map((_, p._2)))).flatten
+    val itemsOfLines = linesWithIndices.flatMap(p => StringsSearchTree.allSubStrings(p._1, INDEXING_DEPTH).map((_, p._2)))
     println("itemsOfLines done " + timerElapsed)
     printmem
 

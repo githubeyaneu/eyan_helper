@@ -67,8 +67,8 @@ object RegistryPlus extends App {
           else
             try { Option(valueHex.toHexDecode) }
             catch {
-              case nfe: NumberFormatException => { Log.error(s"error converting from hex valueHex=$valueHex"); Option(valueHex) }
-              case t: Throwable               => { Log.error(s"error converting from hex valueHex=$valueHex", t); Option(valueHex) }
+              case nfe: NumberFormatException => Log.error(s"error converting from hex valueHex=$valueHex"); Option(valueHex)
+              case t: Throwable               => Log.error(s"error converting from hex valueHex=$valueHex", t); Option(valueHex)
             }
         Log.debug(s"value=$value")
         value
@@ -93,8 +93,8 @@ object RegistryPlus extends App {
           else
             try { Option(valuesHex.split("_").map(_.toHexDecode).toList) }
             catch {
-              case nfe: NumberFormatException => { Log.error(s"error converting from hex valueHex=$valuesHex"); Option(List(valuesHex)) }
-              case t: Throwable               => { Log.error(s"error converting from hex valueHex=$valuesHex", t); Option(List(valuesHex)) }
+              case nfe: NumberFormatException => Log.error(s"error converting from hex valueHex=$valuesHex"); Option(List(valuesHex))
+              case t: Throwable               => Log.error(s"error converting from hex valueHex=$valuesHex", t); Option(List(valuesHex))
             }
         Log.debug(s"values=${values.map(_.mkString)}")
         values

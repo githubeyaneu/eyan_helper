@@ -10,7 +10,7 @@ object BooleanPlus {
   }
 
   def main(args: Array[String]): Unit = {
-    (1 < 2) ? ("a")
+    (1 < 2) ? "a"
     (1 > 2) ? "b"
 
     println((1 > 2) ? "b")

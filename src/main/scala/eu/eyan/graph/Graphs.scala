@@ -48,8 +48,8 @@ object Graphs {
 
   //TODO make it performant
   def isConnected[VERTEX, EDGE](graph: Graph[VERTEX, EDGE], alreadySelectedVertices: Set[VERTEX] = Set[VERTEX]()): Boolean = {
-    if (graph.vertices.size == 0 || graph.vertices.size == 1) true
-    else if (alreadySelectedVertices.size == 0) isConnected(graph, Set(graph.vertices.head))
+    if (graph.vertices.isEmpty || graph.vertices.size == 1) true
+    else if (alreadySelectedVertices.isEmpty) isConnected(graph, Set(graph.vertices.head))
     else if(graph.vertices.size ==  alreadySelectedVertices.size) true
     else {
       val remainingVertices = graph.vertices.toSet -- alreadySelectedVertices
@@ -58,7 +58,7 @@ object Graphs {
 	    val edgesBetween = edgesFromAlready.intersect(edgesToRemaining)
       if(edgesBetween.isEmpty) false
       else {
-        val nextVertices =edgesBetween.map(_.vertices.toSet).flatten
+        val nextVertices =edgesBetween.flatMap(_.vertices.toSet)
         isConnected(graph, alreadySelectedVertices++nextVertices)
       }
     }

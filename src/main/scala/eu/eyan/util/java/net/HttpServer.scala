@@ -85,13 +85,13 @@ class HttpServer(
             val bytes = Files.readAllBytes(Paths.get(selectedResource.get.toURI))
             Log.debug(bytes.size)
             socketOut.write(("Content-Length: " + bytes.length + "\r\n").getBytes("ASCII"))
-            socketOut.write(("Content-Type: text/javascript\r\n").getBytes("ASCII"))
+            socketOut.write("Content-Type: text/javascript\r\n".getBytes("ASCII"))
             socketOut.write("\r\n".getBytes("ASCII"))
             socketOut.write(bytes)
           } else {
             // GET
             val response = get.map(getHandler).getOrElse("Not get found")
-            socketOut.write(("Content-Type: application/json\r\n").getBytes("ASCII"))
+            socketOut.write("Content-Type: application/json\r\n".getBytes("ASCII"))
             socketOut.write(("Content-Length: " + response.length + "\r\n").getBytes("ASCII"))
             socketOut.write("\r\n".getBytes("ASCII"))
             socketOut.write(response.getBytes("ASCII"))
@@ -107,7 +107,7 @@ class HttpServer(
   }
 
   def findGet(lines: List[String]) = {
-    val getLine = lines.filter(_.startsWith("GET ")).lift(0)
+    val getLine = lines.find(_.startsWith("GET "))
 
     getLine.map(line => {
       Log.debug("Get line:" + line)

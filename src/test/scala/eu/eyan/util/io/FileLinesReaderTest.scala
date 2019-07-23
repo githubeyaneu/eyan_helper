@@ -21,7 +21,7 @@ class FileLinesReaderTest() {
 
   // @Rule var folder: TemporaryFolder = new TemporaryFolder
 
-  private var filepath: String = null
+  private var filepath: String = _
 
   @Before
   @throws(classOf[IOException])

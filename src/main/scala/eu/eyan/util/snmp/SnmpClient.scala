@@ -56,7 +56,7 @@ class SnmpClient(host: String, port: Int, community: String) extends Closeable {
   }
 
   private def getAsString(response: scala.util.Try[ResponseEvent], index: Int = 0) =
-    response.map(r => r.getResponse().get(index).getVariable().toString())
+    response.map(r => r.getResponse.get(index).getVariable.toString)
 
   private def getSnmpResponse(oids: List[OID]) = {
     Try {

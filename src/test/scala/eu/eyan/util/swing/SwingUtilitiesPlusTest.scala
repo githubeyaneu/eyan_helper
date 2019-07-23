@@ -61,7 +61,7 @@ class SwingUtilitiesPlusTest() {
   @Test
   def test_jCheckBox = {
     var runned = false
-    val cb = SwingPlus.checkBox("a", (cb) => runned = true)
+    val cb = SwingPlus.checkBox("a", cb => runned = true)
     assertThat(cb.getText).isEqualTo("a")
     cb.getActionListeners()(0).actionPerformed(null)
     assertThat(runned).isTrue
