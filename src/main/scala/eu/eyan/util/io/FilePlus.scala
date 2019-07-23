@@ -50,7 +50,8 @@ object FilePlus {
     def getFile(subFilename: String): File = new File(file.getAbsolutePath + File.separator + subFilename)
 
     def linesList = TryCatchFinallyClose(Source.fromFile(file), (bs: BufferedSource) => bs.getLines.toList, e => {
-      Log.error(s"cannot read file", e); List()
+      Log.error(s"cannot read file", e)
+      List()
     })
 
     //    def lines = Source.fromFile(file).getLines
@@ -60,7 +61,9 @@ object FilePlus {
       val lines = bs.getLines
 
       def hasNext: Boolean = {
-        val hn = lines.hasNext; if (!hn) CloseablePlus.closeQuietly(bs); hn
+        val hn = lines.hasNext
+        if (!hn) CloseablePlus.closeQuietly(bs)
+        hn
       }
 
       def next(): String = lines.next
@@ -77,7 +80,8 @@ object FilePlus {
     def containsFileWithExtension(extension: String) = file.exists && file.isDirectory && file.listFiles.exists(_.endsWith(extension))
 
     def mkDirs = {
-      if (file.notExists) file.mkdirs; file
+      if (file.notExists) file.mkdirs
+      file
     }
 
     def hashSimple: String = {
@@ -96,7 +100,8 @@ object FilePlus {
               sha.map("%02x".format(_)).mkString
             },
             t => {
-              Log.error(t); throw t
+              Log.error(t)
+              throw t
             })
         } else "small"
       } else "d" //throw new IllegalArgumentException("Create hash not possible to directory! "+file.getAbsolutePath)
@@ -121,53 +126,55 @@ object FilePlus {
           messageDigest.digest.map("%02x".format(_)).mkString
         },
         t => {
-          Log.error(t); throw t
+          Log.error(t)
+          throw t
         })
     }
 
-    def hashFast(bytesReadCallback: Long => Unit = _ => {}): String = {
+    def hashFast(bytesReadCallback: Long => Unit = _ => {}, bufferSize: Long = 4096, sampleNumber: Long= 16): String = {
       if (!file.isFile) throw new IllegalArgumentException("Create hash not possible to directory! " + file.getAbsolutePath)
 
+      val minLength = (2 * sampleNumber - 1) * bufferSize
+      val fileLength = file.length
 
-      val b = 4096L
-      val n = 16L
-      val minLength = (2*n-1) * b
-      val l = file.length
-
-      if(l<=minLength) hashFull(bytesReadCallback)
+      if (fileLength <= minLength) hashFull(bytesReadCallback)
       else TryCatchFinallyClose(
         new FileInputStream(file),
         (is: FileInputStream) => {
-          val s = (l - n*b)/n/b
+
+          val samplesSize = sampleNumber * bufferSize
+          val samplesNrWithoutLast = sampleNumber - 1
+          val skipSize = ((fileLength - samplesSize) / samplesSize) * bufferSize
 
           val messageDigest = MessageDigest.getInstance("SHA")
-          val buffer = Array.ofDim[Byte](b.toInt)
+          val buffer = Array.ofDim[Byte](bufferSize.toInt)
 
           var bytesRead = 0L
           var step = 0
-          var pos = 0L
-          while (bytesRead != -1 && step < n-1) {
+          var actualFilePosition = 0L
+          while (bytesRead != -1 && step < samplesNrWithoutLast) {
             bytesRead = is.read(buffer)
             if (bytesRead > 0) messageDigest.update(buffer, 0, bytesRead.toInt)
-            val bytesSkipped = is.skip(s*b)
-            bytesReadCallback(bytesRead+bytesSkipped)
-            pos += bytesRead + bytesSkipped
+            val bytesSkipped = is.skip(skipSize)
+            bytesReadCallback(bytesRead + bytesSkipped)
+            actualFilePosition += bytesRead + bytesSkipped
             step += 1
           }
 
-          val r = l - n*b - (n-1)*s*b
-          val r2 = l -pos -b
-          assert(r==r2)
+          val remainingCalculated = fileLength - samplesSize - samplesNrWithoutLast * skipSize
+          val remainingCounted = fileLength - actualFilePosition - bufferSize
+          assert(remainingCalculated == remainingCounted)
 
-          val bytesSkipped = is.skip(r)
+          val bytesSkipped = is.skip(remainingCalculated)
           bytesRead = is.read(buffer)
           if (bytesRead > 0) messageDigest.update(buffer, 0, bytesRead.toInt)
-          bytesReadCallback(bytesRead+bytesSkipped)
+          bytesReadCallback(bytesRead + bytesSkipped)
 
           messageDigest.digest.map("%02x".format(_)).mkString
         },
         t => {
-          Log.error(t); throw t
+          Log.error(t)
+          throw t
         })
     }
 
@@ -198,11 +205,13 @@ object FilePlus {
       // TODO progress implementieren
       TryCatchFinally(
         {
-          dest.getChannel.transferFrom(src.getChannel, 0, Long.MaxValue); true
+          dest.getChannel.transferFrom(src.getChannel, 0, Long.MaxValue)
+          true
         },
         { e => Log.error(e); false },
         {
-          dest.close(); src.close()
+          dest.close()
+          src.close()
         })
     }
 

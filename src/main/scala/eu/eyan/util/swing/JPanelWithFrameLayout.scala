@@ -1,42 +1,23 @@
 package eu.eyan.util.swing
 
-import java.awt.Component
-import java.awt.event.ActionEvent
-import com.jgoodies.forms.factories.CC
-import com.jgoodies.forms.layout.ColumnSpec
-import com.jgoodies.forms.layout.FormLayout
-import com.jgoodies.forms.layout.RowSpec
-import JPanelWithFrameLayout._
-import eu.eyan.util.awt.AwtHelper
-import eu.eyan.util.awt.AwtHelper.onActionPerformed
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.JScrollPane
-import javax.swing.JTextField
-import com.jgoodies.forms.internal.AbstractBuilder
-import com.jgoodies.forms.FormsSetup
-import javax.swing.SwingConstants
-import javax.swing.JTable
-import eu.eyan.log.Log
-import eu.eyan.util.swing.JComponentPlus.JComponentImplicit
-import javax.swing.plaf.PanelUI
-import eu.eyan.util.swing.JTextAreaPlus.JTextAreaImplicit
-import javax.swing.JTextArea
-import javax.swing.text.JTextComponent
-import javax.swing.JPasswordField
-import java.awt.Desktop
-import java.net.URI
-import javax.swing.JCheckBox
+import java.awt.{Color, Component, Desktop}
 import java.io.File
-import javax.swing.JOptionPane
-import eu.eyan.util.swing.JLabelPlus.JLabelImplicit
-import java.awt.Color
-import javax.swing.JComponent
-import javax.swing.JButton
-import eu.eyan.util.text.Text
-import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
+import java.net.URI
+
+import com.jgoodies.forms.FormsSetup
+import com.jgoodies.forms.factories.CC
+import com.jgoodies.forms.layout.{ColumnSpec, FormLayout, RowSpec}
+import eu.eyan.log.Log
 import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
-import eu.eyan.util.awt.MultiField
+import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
+import eu.eyan.util.swing.JComponentPlus.JComponentImplicit
+import eu.eyan.util.swing.JLabelPlus.JLabelImplicit
+import eu.eyan.util.swing.JPanelWithFrameLayout._
+import eu.eyan.util.swing.JTextAreaPlus.JTextAreaImplicit
+import eu.eyan.util.text.Text
+import javax.swing.{JButton, JCheckBox, JLabel, JOptionPane, JPanel, JPasswordField, JScrollPane, JTextArea, JTextField, SwingConstants}
+import javax.swing.plaf.PanelUI
+import javax.swing.text.JTextComponent
 
 object JPanelPlus {
   implicit class JPanelImplicit[TYPE <: JPanel](jPanel: JPanel) extends JComponentImplicit(jPanel) {
@@ -71,7 +52,7 @@ class JPanelWithFrameLayout() extends JPanel {
   reset
 
   def reset = {
-    removeAll
+    removeAll()
     separatorSizeBetweenColumns = DEFAULT_SEPARATOR_SIZE
     separatorSizeBetweenRows = DEFAULT_SEPARATOR_SIZE
     borderSize = DEFAULT_BORDER_SIZE
@@ -193,7 +174,7 @@ class JPanelWithFrameLayout() extends JPanel {
   }
 
   def debug(comp: Component) = {
-    val text = if (comp.isInstanceOf[JTextComponent]) "\"" + comp.asInstanceOf[JTextComponent].getText.lines.toList.lift(0).getOrElse("") + "\""
+    val text = if (comp.isInstanceOf[JTextComponent]) "\"" + comp.asInstanceOf[JTextComponent].getText.lines.toList.headOption.getOrElse("") + "\""
     else if (comp.isInstanceOf[JLabel]) "\"" + comp.asInstanceOf[JLabel].getText + "\""
     else ""
     val name = if (comp.getName == null) "" else comp.getName
@@ -253,7 +234,7 @@ class JPanelWithFrameLayout() extends JPanel {
 
   def addLabelAsURL(text: String) = {
     val label = addLabel(text).cursor_HAND_CURSOR
-    label.onMouseClicked(Desktop.getDesktop.browse((new URI(label.getText))))
+    label.onMouseClicked(Desktop.getDesktop.browse(new URI(label.getText)))
     label
   }
 
