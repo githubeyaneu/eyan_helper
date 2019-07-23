@@ -1,13 +1,10 @@
 package eu.eyan.graph
 
-import org.junit.Test
-import org.junit.runner.RunWith
-
+import eu.eyan.graph.impl.{GraphEdgeSimple, GraphEdgeUndirected}
 import eu.eyan.testutil.assertt.AssertPlus._
-import eu.eyan.graph.impl.GraphEdgeUndirected
-import eu.eyan.graph.impl.GraphImplSimple
-import eu.eyan.graph.impl.GraphEdgeDirected
-import eu.eyan.graph.impl.GraphEdgeSimple
+import org.junit.Test
+
+import scala.language.postfixOps
 
 class GraphEdgeTest {
 
@@ -55,6 +52,7 @@ class GraphEdgeTest {
     GraphEdgeSimple(GraphEdgeDirectionUndirected, "A", "B").toString shouldBeEqualTo "A-B"
     GraphEdgeSimple(GraphEdgeDirectionDirected, "A", "B").toString shouldBeEqualTo "A->B"
   }
+
 
   @Test def testUndirected = {
     // direction - undirected

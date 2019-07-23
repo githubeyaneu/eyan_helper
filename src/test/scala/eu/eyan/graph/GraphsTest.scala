@@ -7,6 +7,7 @@ import eu.eyan.testutil.assertt.AssertPlus._
 import eu.eyan.graph.impl.GraphEdgeUndirected
 import eu.eyan.graph.impl.GraphImplSimple
 import eu.eyan.graph.impl.GraphEdgeDirected
+import scala.language.postfixOps
 
 class GraphsTest {
 

@@ -15,6 +15,7 @@ import eu.eyan.testutil.ScalaEclipseJunitRunner
 import eu.eyan.testutil.TestPlus
 import java.io.Closeable
 import eu.eyan.util.io.CloseablePlus.CloseablePlusImplicit
+import scala.language.reflectiveCalls
 
 @RunWith(classOf[ScalaEclipseJunitRunner])
 class CloseablePlusTest extends TestPlus {

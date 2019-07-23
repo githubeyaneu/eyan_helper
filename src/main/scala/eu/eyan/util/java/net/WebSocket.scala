@@ -48,17 +48,17 @@ object WebSocket {
     hash.isSuccess
   }
 }
-case class WebSocket(val get: Get, val parameters: Map[String, String], private val socket: Socket) extends Closeable {
+case class WebSocket(get: Get, parameters: Map[String, String], private val socket: Socket) extends Closeable {
   def receivedMessages = receivedMessages_.distinctUntilChanged.subscribeOn(IOScheduler())
   def socketClosed = socketClosed_.distinctUntilChanged.subscribeOn(IOScheduler())
-  def sendMessageObserver = Observer[String](onSendMessageNext: String => Unit, onSendMessageError: Throwable => Unit, onSendMessageCompleted: () => Unit)
+  def sendMessageObserver = Observer[String](onSendMessageNext: String => Unit, onSendMessageError: Throwable => Unit, () => onSendMessageCompleted())
   def close = closeWebSocket
 
   private val socketOut = new BufferedOutputStream(socket.getOutputStream)
   private val socketClosed_ = BehaviorSubject[String]()
   private val receivedMessages_ = BehaviorSubject[String]()
 
-  private val socketId = parameters.get("Sec-WebSocket-Key").getOrElse(UUID.randomUUID.toString)
+  private val socketId = parameters.getOrElse("Sec-WebSocket-Key", UUID.randomUUID.toString)
 
   //FIXME do somehow better threading.
   val receiving = ThreadPlus.runObservable(

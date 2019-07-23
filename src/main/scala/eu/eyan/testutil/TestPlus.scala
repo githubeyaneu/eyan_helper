@@ -147,12 +147,8 @@ trait TestPlus {
     val newConsoleOut = originalConsoleOut.copyToStream(newOutputStream)
 
     System.setOut(newSystemOut)
-    Console.setOut(newConsoleOut)
-
-    action
-
+    Console.withOut(newConsoleOut)(action)
     System.setOut(originalSystemOut)
-    Console.setOut(originalConsoleOut)
 
     output
   }
@@ -175,12 +171,8 @@ trait TestPlus {
     val newConsoleErr = originalConsoleErr.copyToStream(newOutputStream)
 
     System.setErr(newSystemErr)
-    Console.setErr(newConsoleErr)
-
-    action
-
+    Console.withErr(newConsoleErr)(action)
     System.setErr(originalSystemErr)
-    Console.setErr(originalConsoleErr)
 
     output
   }
@@ -205,6 +197,7 @@ trait TestPlus {
   def reflectionSetFieldValue(objekt: Object, fieldName: String, value: Object, klazz: Class[_] = null): Boolean = {
     if (objekt == null) false
     else {
+      import scala.language.existentials
       val klass = if (klazz == null) objekt.getClass else klazz
       val field = klass.getDeclaredField(fieldName)
       if (field == null) {
@@ -239,8 +232,8 @@ trait TestPlus {
   class ArgumentCaptorPlus[T](val clazz: Class[_ <: T], actionOnArgument: T => Unit = (x: T) => {}) {
     val capturingMatcher: CapturingMatcher[T] = new CapturingMatcherPlus(actionOnArgument)
     def capture: T = { ArgumentMatchers.argThat(capturingMatcher); Primitives.defaultValue(clazz) }
-    def getValue(): T = this.capturingMatcher.getLastValue
-    def getAllValues(): java.util.List[T] = this.capturingMatcher.getAllValues
+    def getValue: T = this.capturingMatcher.getLastValue
+    def getAllValues: java.util.List[T] = this.capturingMatcher.getAllValues
   }
 
 }

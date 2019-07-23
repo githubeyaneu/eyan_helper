@@ -9,19 +9,25 @@ import java.awt.dnd.DropTarget
 import java.io.StringReader
 import java.awt.datatransfer.DataFlavor
 import java.awt.dnd.DnDConstants
+
 import eu.eyan.log.Log
 import eu.eyan.util.scala.Try
+
 import scala.util.Failure
 import eu.eyan.util.awt.dnd.DropTargetDragEventPlus.DropTargetDragEventImplicit
 import eu.eyan.util.awt.dnd.DropTargetDropEventPlus.DropTargetDropEventImplicit
+
 import scala.io.Source
 import java.io.InputStream
+
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
 import java.nio.charset.Charset
+
 import scala.io.Codec
 import scala.util.Success
 import java.io.File
-import scala.collection.JavaConversions._
+
+import scala.collection.JavaConverters._
 
 object DndPlus {
   //DropTargetListener
@@ -46,13 +52,14 @@ object DndPlus {
     case Failure(t)      => Log.error("Getting String from drop data was not successful", t)
   })
 
+
   def onDropFile(component: Component, action: File => Unit) = onDropType(component, DataFlavor.javaFileListFlavor, _.map(_.asInstanceOf[java.util.List[File]]) match {
-    case Success(droppedFiles) => action(droppedFiles.toList.last)
+    case Success(droppedFiles) => action(droppedFiles.asScala.last)
     case Failure(t)            => Log.error("Getting one file from drop data was not successful", t)
   })
 
   def onDropFiles(component: Component, action: List[File] => Unit) = onDropType(component, DataFlavor.javaFileListFlavor, _.map(_.asInstanceOf[java.util.List[File]]) match {
-    case Success(droppedFiles) => action(droppedFiles.toList)
+    case Success(droppedFiles) => action(droppedFiles.asScala.toList)
     case Failure(t)            => Log.error("Getting files from drop data was not successful", t)
   })
 

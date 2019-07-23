@@ -8,6 +8,8 @@ import eu.eyan.graph.impl.GraphEdgeUndirected
 import eu.eyan.graph.impl.GraphImplSimple
 import eu.eyan.graph.impl.GraphEdgeDirected
 
+import scala.language.postfixOps
+
 class GraphTest {
 
   @Test def testVertices = {

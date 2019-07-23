@@ -13,6 +13,7 @@ import eu.eyan.util.jgoodies.FormLayoutPlus
 import javax.swing.JPanel
 import javax.swing.JTextPane
 import eu.eyan.util.swing.JTextComponentPlus.JTextComponentImplicit
+import scala.language.reflectiveCalls
 
 @RunWith(classOf[ScalaEclipseJunitRunner])
 class SwingUtilitiesPlusTest() {

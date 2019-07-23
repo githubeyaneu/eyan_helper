@@ -25,14 +25,14 @@ class JProgressBarPlus(min: Int = 0, max: Int = 100, var format: String = "%d%%"
 
   setNewValue(min)
 
-  def setNewValue(percent: Int) = { setString(String.format(format, percent: Integer)); setValue(percent); this }
+  private def setNewValue(newValue: Int) = { setString(String.format(format, newValue:Integer)); setValue(newValue); this }
 
-  def percentChanged(percent: Int) = { if (this.getValue() != percent) invokeLater { this.setVisible(true); setNewValue(percent) }; this }
+  def valueChanged(newValue: Int) = { if (this.getValue != newValue) invokeLater { this.setVisible(true); setNewValue(newValue) }; this }
 
   // refactor it.
   def doneThenInvisible = { finished; invokeLater(setVisible(false)); this }
 
-  def finished = { invokeLater({ this.setString(finishedText); this.setValue(this.getMaximum()) }); this }
+  def finished = { invokeLater({ this.setString(finishedText); this.setValue(this.getMaximum) }); this }
 
-  def setFormat(newFormat: String) = { format = newFormat; setNewValue(this.getValue()); this }
+  def setFormat(newFormat: String) = { format = newFormat; setNewValue(this.getValue); this }
 }

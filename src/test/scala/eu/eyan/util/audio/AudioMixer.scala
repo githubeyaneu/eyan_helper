@@ -59,7 +59,7 @@ object AudioMixer extends App {
             println("    Format: " + microphone.getFormat)
 
             panel.newRow.addLabel(mixer.getMixerInfo.toString)
-            val progressBar = panel.nextColumn.addProgressBar(0, 128, "").setNewValue(0)
+            val progressBar = panel.nextColumn.addProgressBar(0, 128, "").valueChanged(0)
             val recordLabel = panel.nextColumn.addLabel("Record")
             val playLabel = panel.nextColumn.addLabel("Play")
 
