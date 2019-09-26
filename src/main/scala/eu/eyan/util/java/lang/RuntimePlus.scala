@@ -19,6 +19,7 @@ object RuntimePlus {
     val outRunner = readStreamInThread(process.getInputStream)
     val errRunner = readStreamInThread(process.getErrorStream)
     process.waitFor
+    Log.info("Executing process finished: " + cmd)
     ProcessResult(process.exitValue, outRunner.result, errRunner.result)
   }
 

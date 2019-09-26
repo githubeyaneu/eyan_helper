@@ -175,7 +175,6 @@ object JFramePlus {
     }
     def menuItemSeparator(menuText: Text) = { getOrCreateMenu(menuText.get).addSeparator; jFrame }
     private def getOrCreateMenu(menuText: Text) = getOrCreateJMenuBar.getOrCreateMenu(menuText)
-
   }
 
   def close(frame: JFrame) = frame.close

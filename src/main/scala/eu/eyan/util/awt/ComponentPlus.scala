@@ -209,6 +209,14 @@ object ComponentPlus {
 
     def invalidateSafe = { if (component != null) component.invalidate(); component }
     
-    def windowForComponent = if (component == null) null else SwingUtilities.windowForComponent(component) 
+    def windowForComponent = if (component == null) null else SwingUtilities.windowForComponent(component)
+
+
+    def resizeAndBack = {
+      val w = component.getWidth
+      val h = component.getHeight
+      component.size(w + 1, h + 1)
+      component.size(w , h )
+    }
   }
 }

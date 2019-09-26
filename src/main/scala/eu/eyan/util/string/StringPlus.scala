@@ -287,5 +287,11 @@ object StringPlus {
     def toSmallIcon(color: Color = Color.gray, width: Int = s.length * 16, height: Int = 16) = new ImageIcon(ImagePlus.imageFromString(s, color, width, height))
     
     def asSingle = Observable[String](emitter => {emitter.onNext(s);emitter.onCompleted})
+
+    def findAll(regex:String) = {
+      val re = regex.r
+      val matches = for(m <- re.findAllIn(s)) yield(m)
+      matches.toList
+    }
   }
 }
