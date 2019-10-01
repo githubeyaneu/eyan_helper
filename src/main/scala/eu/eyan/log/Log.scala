@@ -1,7 +1,5 @@
 package eu.eyan.log
 
-import scala.collection.mutable.MutableList
-
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
 import org.slf4j.Logger
 import org.slf4j.Marker
@@ -39,6 +37,7 @@ object Log {
     log(level, s"$msg $tName: $tMsg\r\n  $tSt")
   }
 
+  var ct = 0
   def log(level: LogLevel, message: => String = ""): Log.type = {
     lazy val messageText = message
     def stackElementsNotToLog(stackTraceElement: StackTraceElement) =
@@ -48,7 +47,12 @@ object Log {
     def stackElementWhereLogWasCalled = Thread.currentThread.getStackTrace.filter(stackElementsNotToLog)(1) // TODO use lift //FIXME: this is very slow if dbg level on and lot of logs come (convert files)
     def stackClassAndMethod = stackElementWhereLogWasCalled.getClassName.substring(stackElementWhereLogWasCalled.getClassName.lastIndexOf(".") + 1) + "." + stackElementWhereLogWasCalled.getMethodName
     def logText = stackClassAndMethod + (if (messageText != "") { ": " + messageText } else "")
-    if (actualLevel.shouldLog(level)) logger.onNext(Log(level, logText, System.currentTimeMillis))
+    if (actualLevel.shouldLog(level)) logger.onNext({
+      ct += 1
+      val l = Log(level, logText, System.currentTimeMillis)
+      println("log"+ct+" "+l)
+      l
+    })
     this
   }
 
@@ -111,16 +115,23 @@ object Log {
   def trace = log(Trace)
   def trace(o: => Any) = log(Trace, String.valueOf(o))
 
-  val dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+  val dateTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
   def logToConsoleText(log: Log) = {
     val time = dateTimeFormat.format(new Date(log.timestamp))
     f"$time ${log.level}%-5s ${log.text}"
   }
-  
+
+  var ct2 = 0
   logsObservable.subscribe(log => {
-    if (log.level > Error) logToConsoleText(log).println
+    ct2+=1
+    if(log==null) s"log was null $ct2".printlnErr
+    else if(log.level==null) "log.level was null".printlnErr
+    else if (log.level > Error) logToConsoleText(log).println
     else logToConsoleText(log).printlnErr
-  })
+    },
+    throwable => {("ERROR HAPPENED IN LOGGING "+throwable).printlnErr; throwable.printStackTrace()},
+    () => {"LOGGING finished ".println}
+  )
 
   implicit class LogImplicitString(val s: String) {
     def logFatal = Log.fatal(s)
@@ -136,16 +147,20 @@ object Log {
 
   def formatLog(log: Log) = Log.logToConsoleText(log) + "\r\n"
   override def toString = {
-    var logs = new StringBuilder()
-    val s = Log.logsObservable.map(formatLog).subscribe(log => logs.append(log))
+    val logs = new StringBuilder()
+    val s = Log.logsObservable.map(formatLog).subscribe(
+      log => logs.append(log),
+      throwable => logs.append("ERROR HAPPENED IN LOGGING "+throwable+"\r\n"+throwable.getStackTrace.mkString("\r\n")),
+      () => logs.append("End of logs")
+    )
     s.unsubscribe
     logs.toString
   }
 
   def log4jAppender: Appender = new Appender {
-    def addFilter(x$1: org.apache.log4j.spi.Filter): Unit = ???
-    def clearFilters(): Unit = ???
-    def close(): Unit = ???
+    def addFilter(x$1: org.apache.log4j.spi.Filter): Unit = throw new Exception("not implemented")
+    def clearFilters(): Unit = throw new Exception("not implemented")
+    def close(): Unit = throw new Exception("not implemented")
     def doAppend(event: org.apache.log4j.spi.LoggingEvent): Unit = {
       val level =
         event.getLevel match {
@@ -161,14 +176,14 @@ object Log {
         }
       log(level, event.getMessage.toString)
     }
-    def getErrorHandler: org.apache.log4j.spi.ErrorHandler = ???
-    def getFilter: org.apache.log4j.spi.Filter = ???
-    def getLayout: org.apache.log4j.Layout = ???
-    def getName: String = ???
-    def requiresLayout(): Boolean = ???
-    def setErrorHandler(x$1: org.apache.log4j.spi.ErrorHandler): Unit = ???
-    def setLayout(x$1: org.apache.log4j.Layout): Unit = ???
-    def setName(x$1: String): Unit = ???
+    def getErrorHandler: org.apache.log4j.spi.ErrorHandler = throw new Exception("not implemented")
+    def getFilter: org.apache.log4j.spi.Filter = throw new Exception("not implemented")
+    def getLayout: org.apache.log4j.Layout = throw new Exception("not implemented")
+    def getName: String = throw new Exception("not implemented")
+    def requiresLayout(): Boolean = throw new Exception("not implemented")
+    def setErrorHandler(x$1: org.apache.log4j.spi.ErrorHandler): Unit = throw new Exception("not implemented")
+    def setLayout(x$1: org.apache.log4j.Layout): Unit = throw new Exception("not implemented")
+    def setName(x$1: String): Unit = throw new Exception("not implemented")
   }
 }
 
@@ -188,15 +203,15 @@ case object Debug extends LogLevel(600)
 case object Trace extends LogLevel(700)
 
 class LogImplSlf4j(name: String) extends Logger {
-  def getName(): String = name
+  def getName: String = name
   def nameLog = if (name == null || name == "") "" else s"Logger: $name, "
 
   implicit class MarkerToString(marker: Marker) {
     def getLog = if (marker == null || marker.getName == null || marker.getName == "") "" else s"Marker: ${marker.getName}, "
   }
 
-  def isTraceEnabled(): Boolean = Log.isEnabled(Trace)
-  def isTraceEnabled(marker: Marker): Boolean = isTraceEnabled()
+  def isTraceEnabled: Boolean = Log.isEnabled(Trace)
+  def isTraceEnabled(marker: Marker): Boolean = isTraceEnabled
   def trace(msg: String): Unit = Log.log(Trace, nameLog + msg)
   def trace(format: String, arg: AnyRef): Unit = Log.log(Trace, nameLog + String.format(format, arg))
   def trace(format: String, arg1: AnyRef, arg2: AnyRef): Unit = Log.log(Trace, nameLog + String.format(format, arg1, arg2))
@@ -208,8 +223,8 @@ class LogImplSlf4j(name: String) extends Logger {
   def trace(marker: Marker, format: String, arguments: AnyRef*): Unit = Log.log(Trace, nameLog + marker.getLog + String.format(format, arguments))
   def trace(marker: Marker, msg: String, t: Throwable): Unit = Log.log(Trace, nameLog + marker.getLog + msg, t)
 
-  def isDebugEnabled(): Boolean = Log.isEnabled(Debug)
-  def isDebugEnabled(marker: Marker): Boolean = isDebugEnabled()
+  def isDebugEnabled: Boolean = Log.isEnabled(Debug)
+  def isDebugEnabled(marker: Marker): Boolean = isDebugEnabled
   def debug(msg: String): Unit = Log.log(Debug, nameLog + msg)
   def debug(format: String, arg: AnyRef): Unit = Log.log(Debug, nameLog + String.format(format, arg))
   def debug(format: String, arg1: AnyRef, arg2: AnyRef): Unit = Log.log(Debug, nameLog + String.format(format, arg1, arg2))
@@ -221,8 +236,8 @@ class LogImplSlf4j(name: String) extends Logger {
   def debug(marker: Marker, format: String, arguments: AnyRef*): Unit = Log.log(Debug, nameLog + marker.getLog + String.format(format, arguments))
   def debug(marker: Marker, msg: String, t: Throwable): Unit = Log.log(Debug, nameLog + marker.getLog + msg, t)
 
-  def isInfoEnabled(): Boolean = Log.isEnabled(Info)
-  def isInfoEnabled(marker: Marker): Boolean = isInfoEnabled()
+  def isInfoEnabled: Boolean = Log.isEnabled(Info)
+  def isInfoEnabled(marker: Marker): Boolean = isInfoEnabled
   def info(msg: String): Unit = Log.log(Info, nameLog + msg)
   def info(format: String, arg: AnyRef): Unit = Log.log(Info, nameLog + String.format(format, arg))
   def info(format: String, arg1: AnyRef, arg2: AnyRef): Unit = Log.log(Info, nameLog + String.format(format, arg1, arg2))
@@ -234,8 +249,8 @@ class LogImplSlf4j(name: String) extends Logger {
   def info(marker: Marker, format: String, arguments: AnyRef*): Unit = Log.log(Info, nameLog + marker.getLog + String.format(format, arguments))
   def info(marker: Marker, msg: String, t: Throwable): Unit = Log.log(Info, nameLog + marker.getLog + msg, t)
 
-  def isWarnEnabled(): Boolean = Log.isEnabled(Warn)
-  def isWarnEnabled(marker: Marker): Boolean = isWarnEnabled()
+  def isWarnEnabled: Boolean = Log.isEnabled(Warn)
+  def isWarnEnabled(marker: Marker): Boolean = isWarnEnabled
   def warn(msg: String): Unit = Log.log(Warn, nameLog + msg)
   def warn(format: String, arg: AnyRef): Unit = Log.log(Warn, nameLog + String.format(format, arg))
   def warn(format: String, arg1: AnyRef, arg2: AnyRef): Unit = Log.log(Warn, nameLog + String.format(format, arg1, arg2))
@@ -247,8 +262,8 @@ class LogImplSlf4j(name: String) extends Logger {
   def warn(marker: Marker, format: String, arguments: AnyRef*): Unit = Log.log(Warn, nameLog + marker.getLog + String.format(format, arguments))
   def warn(marker: Marker, msg: String, t: Throwable): Unit = Log.log(Warn, nameLog + marker.getLog + msg, t)
 
-  def isErrorEnabled(): Boolean = Log.isEnabled(Error)
-  def isErrorEnabled(marker: Marker): Boolean = isErrorEnabled()
+  def isErrorEnabled: Boolean = Log.isEnabled(Error)
+  def isErrorEnabled(marker: Marker): Boolean = isErrorEnabled
   def error(msg: String): Unit = Log.log(Error, nameLog + msg)
   def error(format: String, arg: AnyRef): Unit = Log.log(Error, nameLog + String.format(format, arg))
   def error(format: String, arg1: AnyRef, arg2: AnyRef): Unit = Log.log(Error, nameLog + String.format(format, arg1, arg2))
