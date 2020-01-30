@@ -64,7 +64,7 @@ object JComponentPlus {
     def doubleBuffered: TYPE = doubleBuffered(true)
     def doubleBufferedDisabled = doubleBuffered(false)
     def enabled(enabled: Observable[Boolean]) = {
-      val setDeleteEnabled = (enabled: Boolean) => jComponent.setEnabled(enabled) // TODO why def does not work???
+      val setDeleteEnabled = (enabled: Boolean) => SwingPlus.invokeLater(jComponent.setEnabled(enabled)) // TODO why def does not work???
       enabled.subscribe(setDeleteEnabled)
       jComponent
     }

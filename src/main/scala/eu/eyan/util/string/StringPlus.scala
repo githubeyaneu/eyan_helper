@@ -120,7 +120,7 @@ object StringPlus {
 
     //    import scala.sys.process.stringToProcess
     def executeAsProcess = {
-      ("Executing a process:\r\n  " + s).println
+      Log.debug("Executing a process:\r\n  " + s)
       scala.sys.process.stringToProcess(s).!!
     }
 

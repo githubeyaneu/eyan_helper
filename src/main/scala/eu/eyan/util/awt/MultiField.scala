@@ -1,20 +1,16 @@
-package eu.eyan.util.awt;
+package eu.eyan.util.awt
 
 import java.awt.Component
 
-import scala.collection.mutable.ListBuffer
 import eu.eyan.log.Log
 import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
+import eu.eyan.util.awt.remember.RememberInRegistry
 import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
 import eu.eyan.util.swing.JPanelWithFrameLayout
-import javax.swing.BoxLayout
-import javax.swing.JButton
-import javax.swing.JPanel
-import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
-import eu.eyan.util.awt.remember.RememberInRegistry
+import javax.swing.{BoxLayout, JButton, JPanel}
 
 import scala.collection.mutable
-import scala.collection.mutable.MutableList
+import scala.collection.mutable.ListBuffer
 
 abstract class MultiField[INPUT, EDITOR <: Component](name: String) extends JPanel with RememberInRegistry[MultiField[INPUT, EDITOR]] {
 
@@ -60,11 +56,11 @@ abstract class MultiField[INPUT, EDITOR <: Component](name: String) extends JPan
   }
 
   setLayout(new BoxLayout(this, BoxLayout.Y_AXIS))
-  private val editors: ListBuffer[Editor[EDITOR]] = ListBuffer()
+  protected val editors: ListBuffer[Editor[EDITOR]] = ListBuffer()
   private var counter = 0
   private var rememberEventListenerAction: () => Unit = () => {}
 
-  private case class Editor[E](editor: E, deleteButton: JButton)
+  protected case class Editor[E](editor: E, deleteButton: JButton)
 
   private def addEditorEmpty = addEditor(None)
   private def addEditorWithValue(input: INPUT) = addEditor(Some(input))

@@ -299,7 +299,7 @@ object SwingPlus {
   }
 
   //TODO merge with other methods
-  def runInWorker(work: => Unit, doAtDone: => Unit) = {
+  def runInWorker(work: => Unit, doAtDone: => Unit = ()=>{} ) = {
     new SwingWorker[Void, Void]() {
       override def doInBackground() = {
         //try { work } catch { case t: Throwable => Log.error("Error in SwingWorker", t) }

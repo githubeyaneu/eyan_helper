@@ -1,30 +1,16 @@
 package eu.eyan.util.swing
 
-import java.awt.Color
-import java.awt.ComponentOrientation
-import java.awt.Insets
-import java.awt.Point
+import java.awt.{Color, ComponentOrientation, Insets, Point}
 import java.awt.event.InputMethodEvent
 import java.io.Writer
 
 import eu.eyan.util.awt.AwtHelper
+import eu.eyan.util.awt.remember.RememberInRegistry
 import eu.eyan.util.swing.JComponentPlus.JComponentImplicit
 import javax.swing.DropMode
-import javax.swing.event.CaretEvent
+import javax.swing.event.{CaretEvent, DocumentEvent}
 import javax.swing.plaf.TextUI
-import javax.swing.text.Caret
-import javax.swing.text.Document
-import javax.swing.text.Highlighter
-import javax.swing.text.JTextComponent
-import javax.swing.text.Keymap
-import javax.swing.text.NavigationFilter
-import javax.swing.text.DefaultCaret
-import javax.swing.event.DocumentEvent
-import eu.eyan.util.registry.RegistryPlus
-import eu.eyan.log.Log
-import javax.swing.SwingUtilities
-import javax.swing.JFrame
-import eu.eyan.util.awt.remember.RememberInRegistry
+import javax.swing.text._
 import rx.lang.scala.Observer
 
 object JTextComponentPlus {
@@ -109,9 +95,9 @@ object JTextComponentPlus {
 
     def alwaysScrollDown() = { jTextComponent.getCaret.asInstanceOf[DefaultCaret].setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE); jTextComponent }
     def dontScroll() = { jTextComponent.getCaret.asInstanceOf[DefaultCaret].setUpdatePolicy(DefaultCaret.NEVER_UPDATE); jTextComponent }
-    def clickSelectsAll = onClicked(jTextComponent.selectAll)
+    def clickSelectsAll = onClicked(jTextComponent.selectAll())
     def lines: Iterator[String] = jTextComponent.getText.lines
-    def onClickedSelectAll = onClicked(jTextComponent.selectAll)
+    def onClickedSelectAll = onClicked(jTextComponent.selectAll())
 
     protected def rememberComponent = jTextComponent
     protected def rememberEventListener(action: => Unit) = onTextChanged(action)

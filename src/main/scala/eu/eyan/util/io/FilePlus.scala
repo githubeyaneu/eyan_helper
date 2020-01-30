@@ -49,7 +49,7 @@ object FilePlus {
 
     def getFile(subFilename: String): File = new File(file.getAbsolutePath + File.separator + subFilename)
 
-    def linesList = TryCatchFinallyClose(Source.fromFile(file), (bs: BufferedSource) => bs.getLines.toList, e => {
+    def linesList = TryCatchFinallyClose(Source.fromFile(file)(Codec.ISO8859), (bs: BufferedSource) => bs.getLines.toList, e => {
       Log.error(s"cannot read file", e)
       List()
     })
@@ -215,7 +215,17 @@ object FilePlus {
         })
     }
 
-    def extendFileNameWith(plus: String) = file.getAbsolutePath.extendFileNameWith(plus).asFile
+    def extendFileNameWith(plus: String):File = file.getAbsolutePath.extendFileNameWith(plus).asFile
+		def prependFileNameWith(plus: String):File = {
+      val dir = file.getParentFile
+      if(dir==null) (plus+file.getAbsolutePath).asFile
+      else (dir.getAbsolutePath+File.separator+plus+file.getName).asFile
+    }
+    def addSubDir(subdir: String):File = {
+      val dir = file.getParentFile
+      if(dir!=null) (dir.getAbsolutePath+File.separator+subdir).asFile.mkdirs
+      prependFileNameWith(subdir+File.separator)
+    }
 
     def generateNewNameIfExists(ct: Int = 0): File = {
       val plus = if (ct == 0) file else file.extendFileNameWith("_" + ct)

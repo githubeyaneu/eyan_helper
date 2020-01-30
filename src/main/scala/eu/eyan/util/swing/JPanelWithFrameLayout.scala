@@ -226,6 +226,11 @@ class JPanelWithFrameLayout() extends JPanel {
     label
   }
 
+  def addLabelFluent(text: String) = {
+    addLabel(text)
+    this
+  }
+
   def addHelpLabel(text: String) = {
     val label = new JLabel("").cursor_HAND_CURSOR.onClicked(JOptionPane.showMessageDialog(null, text)).iconFromChar('?', Color.gray.brighter).tooltipText(text)
     add(label)
