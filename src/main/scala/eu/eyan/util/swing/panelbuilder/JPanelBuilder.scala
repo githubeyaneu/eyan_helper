@@ -30,17 +30,18 @@ import eu.eyan.util.swing.SwingPlus
 import javax.swing.JList
 import javax.swing.JTable
 import eu.eyan.util.string.StringPlus.StringPlusImplicit
+import rx.lang.scala.Observer
 
 object JPanelBuilder {
   val PREF = "p"
   private var counterForLogs = 0
   def counterForLog = { counterForLogs += 1; counterForLogs }
-  def apply(firstColumnSpec: String = PREF, firstRowSpec: String = PREF, name: String ="") = new JPanelBuilder(name).newColumn(firstColumnSpec).newRow(firstRowSpec)
+  def apply(name: String = "") = new JPanelBuilder(name)//.newColumn(firstColumnSpec).newRow(firstRowSpec)
 }
 
 class JPanelBuilder private (name: String) extends JPanel with IPanelBuilder {
   setName(name)
-  
+
   private val DEFAULT_SEPARATOR_SIZE = "3dlu"
   private val DEFAULT_BORDER_SIZE = "6dlu"
   private def DEFAULT_FORM_LAYOUT = new FormLayout("", "")
@@ -73,9 +74,29 @@ class JPanelBuilder private (name: String) extends JPanel with IPanelBuilder {
   private def noRowYet = actualRow == 0
   private def noColumnYet = actualColumn == 0
 
-  private def addComponent[C <: Component](c: C): C = { add(c); c }
+  private def debug(comp: Component) = {
+    val text = if (comp.isInstanceOf[JTextComponent]) "\"" + comp.asInstanceOf[JTextComponent].getText.lines.toList.headOption.getOrElse("") + "\""
+    else if (comp.isInstanceOf[JLabel]) "\"" + comp.asInstanceOf[JLabel].getText + "\""
+    else ""
+    val name = if (comp.getName == null) "" else comp.getName
+    f"${comp.getClass.getSimpleName}%-20s $text $name"
+  }
+  
+  private def addComponent[C <: Component](c: C): C = {
+    if (noRowYet) newRow
+    if (noColumnYet) newColumn
+
+    val width = if (useSeparators) actualSpanColumns * 2 - 1 else actualSpanColumns
+
+    val name = if (getName != null) getName else f"($counterForLog)"
+    val cc = f"x$actualColumn%-2s y$actualRow%-2s w$width%-2s"
+    Log.debug(f"$name%-4s $cc ${debug(c)}")
+    this.add(c, CC.xyw(actualColumn, actualRow, width))
+    actualSpanColumns = 1
+    c
+  }
   private def addComponentInScrollPane[C <: Component](c: C): C = { addInScrollPane(c); c }
-  private def addComponentInResizableScrollPane[C <: Component](c: C): C = { addComponent(JPanelBuilder("f:1px:g", "f:1px:g").addInScrollPane(c)); c }
+  private def addComponentInResizableScrollPane[C <: Component](c: C): C = { addComponent(JPanelBuilder().newColumnScrollable.newRowScrollable.addInScrollPane(c)); c }
 
   def reset = {
     removeAll()
@@ -142,9 +163,10 @@ class JPanelBuilder private (name: String) extends JPanel with IPanelBuilder {
     this
   }
 
-  def addFluent(comp: Component): IPanelBuilder = { add(comp); this }
-  def addInScrollPane[C <: Component](c: C): IPanelBuilder = { add(c.inScrollPane); this }
+  def addFluent(comp: Component): IPanelBuilder = { addComponent(comp); this }
+  def addInScrollPane[C <: Component](c: C): IPanelBuilder = { addComponent(c.inScrollPane); this }
 
+  //TODO check if add should be replaced with addComponent
   def addSeparatorWithTitle(title: String): IPanelBuilder = { add(FormsSetup.getComponentFactoryDefault.createSeparator(title, SwingConstants.LEFT)); this }
   def addSeparatorRow(title: String, span: Int): IPanelBuilder = newRow("5px").newRow.span(span).addSeparatorWithTitle(title)
 
@@ -165,7 +187,7 @@ class JPanelBuilder private (name: String) extends JPanel with IPanelBuilder {
     new JPanelBuilderLabel(this, addComponent(label))
   }
 
-  def addTextArea(text: String = "") = new JPanelBuilderTextArea(this, addComponentInResizableScrollPane(new JTextArea()))
+  def addTextArea = new JPanelBuilderTextArea(this, addComponentInResizableScrollPane(new JTextArea()))
 
   def addTextAreaWoScrollPane = new JPanelBuilderTextArea(this, addComponent(new JTextArea))
   def addTable[TYPE] = new JPanelBuilderTable[TYPE](this, addComponentInResizableScrollPane(new JTablePlus[TYPE])) // TODO maybe only addComponentInScrollPane?
@@ -176,7 +198,7 @@ class JPanelBuilder private (name: String) extends JPanel with IPanelBuilder {
 
   def addAutocompleteMulti(name: String, hint: String, noItemsFoundHint: String) = new JPanelBuilderMultiFieldAutocomplete(this, new MultiFieldAutocomplete(name, hint, noItemsFoundHint))
 
-  def addPanelWithFormLayout() = new JPanelBuilderPanelBuilder(this, addComponent(new JPanelBuilder("")))
+  def addPanelBuilder(panelBuild: JPanelBuilder => Unit) = {panelBuild(addComponent(new JPanelBuilder(""))); this}
 }
 
 trait IPanelBuilder extends JPanel /*TODO hmmm... is it good idea to extend from JPanel even it is itself a JPanel? But otherwise it is referenced like panel.panel*/ {
@@ -204,11 +226,15 @@ trait IPanelBuilder extends JPanel /*TODO hmmm... is it good idea to extend from
   def addSeparatorWithTitle(title: String): IPanelBuilder
   def addSeparatorRow(title: String, span: Int): IPanelBuilder
   def addInScrollPane[C <: Component](c: C): IPanelBuilder
+  def addPanelBuilder(panelBuild: JPanelBuilder => Unit): IPanelBuilder
 
   def addTextField: JPanelBuilderTextField
   def addLabel: JPanelBuilderLabel
   def addCheckBox: JPanelBuilderCheckBox
   def addButton: JPanelBuilderButton
+  def addTextFieldMulti(name: String, size: Int): JPanelBuilderMultiFieldJTextField
+  def addProgressBar(min: Int = 0, max: Int = 100, format: String = "%d%%"): JPanelBuilderProgressBar
+  def addTextArea: JPanelBuilderTextArea
 }
 
 abstract class JPanelBuilderDelegator(jPanelBuilder: JPanelBuilder) extends IPanelBuilder {
@@ -237,6 +263,10 @@ abstract class JPanelBuilderDelegator(jPanelBuilder: JPanelBuilder) extends IPan
   def addLabel = jPanelBuilder.addLabel
   def addCheckBox = jPanelBuilder.addCheckBox
   def addButton = jPanelBuilder.addButton
+  def addTextFieldMulti(name: String, size: Int) = jPanelBuilder.addTextFieldMulti(name, size)
+  def addProgressBar(min: Int, max: Int, format: String) = jPanelBuilder.addProgressBar(min, max, format)
+  def addPanelBuilder(panelBuild: JPanelBuilder => Unit) = jPanelBuilder.addPanelBuilder(panelBuild)
+  def addTextArea = jPanelBuilder.addTextArea
 }
 
 class JPanelBuilderTextField(jPanelBuilder: JPanelBuilder, jTextField: JTextField) extends JPanelBuilderDelegator(jPanelBuilder) {
@@ -244,26 +274,32 @@ class JPanelBuilderTextField(jPanelBuilder: JPanelBuilder, jTextField: JTextFiel
   def text(text: Observable[String]) = { text.subscribe(jTextField.setText(_)); this }
   def size(columns: Int) = { jTextField.setColumns(columns); this }
   def onTextChanged(textChanged: String => Unit) = { jTextField.onTextChanged(textChanged); textChanged(jTextField.getText); this }
-  def rememberInRegistry(rememberValueInRegistryName: String) = { jTextField.rememberValueInRegistry(rememberValueInRegistryName); this }
+  def onTextChanged(observer: Observer[String]) = { jTextField.onTextChanged(observer.onNext(jTextField.getText)); observer.onNext(jTextField.getText); this }
+  def remember(rememberValueInRegistryName: String) = { jTextField.rememberValueInRegistry(rememberValueInRegistryName); this }
 }
 class JPanelBuilderLabel(jPanelBuilder: JPanelBuilder, jLabel: JLabel) extends JPanelBuilderDelegator(jPanelBuilder) {
   def text(text: String) = { jLabel.setText(text); this }
   def text(text: Observable[String]) = { text.subscribe(jLabel.setText(_)); this }
   def cursor_HAND_CURSOR = { jLabel.cursor_HAND_CURSOR; this }
   def onMouseClicked(action: String => Unit) = { jLabel.onMouseClicked(action(jLabel.getText)); this }
+  def onMouseClicked(observer: Observer[String]) = { jLabel.onMouseClicked(observer.onNext(jLabel.getText)); this }
 }
 class JPanelBuilderCheckBox(jPanelBuilder: JPanelBuilder, jCheckBox: JCheckBox) extends JPanelBuilderDelegator(jPanelBuilder) {
   def text(text: String) = { jCheckBox.setText(text); this }
   def text(text: Observable[String]) = { text.subscribe(jCheckBox.setText(_)); this }
   def selected(isSelected: Boolean) = { jCheckBox.setSelected(isSelected); this }
   def onSelectionChanged(action: Boolean => Unit) = { jCheckBox.onSelectionChange(action); action(jCheckBox.isSelected); this }
-  def rememberInRegistry(rememberValueInRegistryName: String) = { jCheckBox.rememberValueInRegistry(rememberValueInRegistryName); this }
+  def onSelectionChanged(observer: Observer[Boolean]) = { jCheckBox.onSelectionChange(observer.onNext); observer.onNext(jCheckBox.isSelected); this }
+  def remember(rememberValueInRegistryName: String) = { jCheckBox.rememberValueInRegistry(rememberValueInRegistryName); this }
 }
 class JPanelBuilderButton(jPanelBuilder: JPanelBuilder, jButton: JButton) extends JPanelBuilderDelegator(jPanelBuilder) {
   def text(text: String) = { jButton.setText(text); this }
   def text(text: Observable[String]) = { text.subscribe(jButton.setText(_)); this }
   def onAction(action: String => Unit) = { jButton.onAction(action(jButton.getText)); this }
+  def onAction(observer: Observer[String]) = { jButton.onAction(observer.onNext(jButton.getText)); this }
   def enabled(enabled: Observable[Boolean]) = { enabled.subscribe(jButton.setEnabled(_)); this }
+  def disabled = { jButton.setEnabled(false); this }
+  def onDropFiles(observer: Observer[List[File]]) = { jButton.onDropFiles(observer.onNext); this }
 }
 class JPanelBuilderPasswordField(jPanelBuilder: JPanelBuilder, jPasswordField: JPasswordField) extends JPanelBuilderDelegator(jPanelBuilder) {
   def text(text: String) = { jPasswordField.setText(text); this }
@@ -288,18 +324,20 @@ class JPanelBuilderTable[TYPE](jPanelBuilder: JPanelBuilder, jTable: JTablePlus[
 }
 class JPanelBuilderProgressBar(jPanelBuilder: JPanelBuilder, jProgressBar: JProgressBarPlus) extends JPanelBuilderDelegator(jPanelBuilder) {
   @deprecated("Should extend the JPanelBuilderProgressBar instead setup", "per default") def setupprogressBAr(setup: JProgressBarPlus => Unit) = { setup(jProgressBar); this }
-    def setValue(value: Int) =  {jProgressBar.setValue(value); this}
-    def setStringPainted(painted: Boolean) =  {jProgressBar.setStringPainted(painted); this}
-    def setString(value: String) =  {jProgressBar.setString(value); this}
+  def setValue(value: Int) = { jProgressBar.setValue(value); this }
+  def setStringPainted(painted: Boolean) = { jProgressBar.setStringPainted(painted); this }
+  def setString(value: String) = { jProgressBar.setString(value); this }
 }
 class JPanelBuilderMultiFieldJTextField(jPanelBuilder: JPanelBuilder, multiText: MultiFieldJTextField) extends JPanelBuilderDelegator(jPanelBuilder) {
-  def setValues(values: List[String]) = {multiText.setValues(values); this}
+  def setValues(values: List[String]) = { multiText.setValues(values); this }
+  def remember(rememberValueInRegistryName: String) = { multiText.rememberValueInRegistry(rememberValueInRegistryName); this }
+  def onChanged(observer: Observer[List[String]]) = { multiText.onChanged(() => observer.onNext(multiText.getValues)); this }
 }
 class JPanelBuilderMultiFieldAutocomplete(jPanelBuilder: JPanelBuilder, multiAutocomplete: MultiFieldAutocomplete) extends JPanelBuilderDelegator(jPanelBuilder) {
 }
-class JPanelBuilderPanelBuilder(jPanelBuilderParent: JPanelBuilder, jPanelBuilder: JPanelBuilder) extends JPanelBuilderDelegator(jPanelBuilder) {
-  def done: IPanelBuilder = jPanelBuilderParent
-  def exit: IPanelBuilder = done
-}
+//class JPanelBuilderPanelBuilder(jPanelBuilderParent: JPanelBuilder, jPanelBuilder: JPanelBuilder) extends JPanelBuilderDelegator(jPanelBuilder) {
+//  def done: IPanelBuilder = jPanelBuilderParent
+//  def exit: IPanelBuilder = done
+//}
 
 
