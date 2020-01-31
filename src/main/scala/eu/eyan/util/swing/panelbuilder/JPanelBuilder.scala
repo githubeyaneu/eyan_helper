@@ -36,7 +36,7 @@ object JPanelBuilder {
   val PREF = "p"
   private var counterForLogs = 0
   def counterForLog = { counterForLogs += 1; counterForLogs }
-  def apply(name: String = "") = new JPanelBuilder(name) //.newColumn(firstColumnSpec).newRow(firstRowSpec)
+  def apply(name: String = "") = new JPanelBuilder(name)//.newColumn(firstColumnSpec).newRow(firstRowSpec)
 }
 
 class JPanelBuilder private (name: String) extends /*JPanel with*/ IPanelBuilder {
