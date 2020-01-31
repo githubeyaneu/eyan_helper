@@ -18,6 +18,10 @@ import eu.eyan.util.text.Text
 import javax.swing.{JButton, JCheckBox, JLabel, JOptionPane, JPanel, JPasswordField, JScrollPane, JTextArea, JTextField, SwingConstants}
 import javax.swing.plaf.PanelUI
 import javax.swing.text.JTextComponent
+import eu.eyan.util.swing.JTextFieldPlus.JTextFieldPlusImplicit
+import eu.eyan.util.swing.JTextComponentPlus.JTextComponentImplicit
+import eu.eyan.util.swing.JCheckBoxPlus.JCheckBoxImplicit
+import rx.lang.scala.Observable
 
 object JPanelPlus {
   implicit class JPanelImplicit[TYPE <: JPanel](jPanel: JPanel) extends JComponentImplicit(jPanel) {
@@ -186,6 +190,13 @@ class JPanelWithFrameLayout() extends JPanel {
     add(button)
     button
   }
+  def addButtonFluent(text: String, action: String => Unit, enabled: Observable[Boolean]) = {
+    val button = new JButton(text)
+    add(button)
+    button.onAction(action(text))
+    enabled.subscribe(button.setEnabled(_))
+    this
+  }
 
   def addButton(text: Text) = {
     val button = new JButton("").text(text)
@@ -198,6 +209,14 @@ class JPanelWithFrameLayout() extends JPanel {
     val tf = new JTextField(text, size)
     add(tf)
     tf
+  }
+  def addTextFieldFluent(text: String, size: Int, textChanged: String => Unit, rememberValueInRegistryName: String = null) = {
+    val tf = new JTextField(text, size)
+    add(tf)
+    tf.onTextChanged(textChanged)
+    if(rememberValueInRegistryName != null) tf.rememberValueInRegistry(rememberValueInRegistryName)
+    textChanged(tf.getText)
+    this
   }
 
   def addPasswordField(text: String, size: Int = TEXTFIELD_DEFAULT_SIZE) = {
@@ -224,6 +243,12 @@ class JPanelWithFrameLayout() extends JPanel {
     val label = new JLabel(text)
     add(label)
     label
+  }
+  def addLabelFluent(text: String, observable: Observable[String] = null) = {
+    val label = new JLabel(text)
+    add(label)
+    if(observable != null) observable.subscribe(text => SwingPlus.invokeLater(label.setText(text)))
+    this
   }
 
   def addLabelFluent(text: String) = {
@@ -281,6 +306,13 @@ class JPanelWithFrameLayout() extends JPanel {
     val cb = new JCheckBox(text, selected)
     add(cb)
     cb
+  }
+  def addCheckBoxFluent(text: String, selected: Boolean, selectionChanged: Boolean => Unit, rememberValueInRegistryName: String = null) = {
+    val cb = new JCheckBox(text, selected)
+    cb.onChange(selectionChanged(cb.isSelected))
+    if(rememberValueInRegistryName!=null) cb.rememberValueInRegistry(rememberValueInRegistryName)
+    add(cb)
+    this
   }
 
   def addProgressBar(min: Int = 0, max: Int = 100, format: String = "%d%%") = {
