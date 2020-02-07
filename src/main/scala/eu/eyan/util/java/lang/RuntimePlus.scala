@@ -52,7 +52,12 @@ object RuntimePlus {
   private def startProcess(cmd: String) = {
     //val process = Runtime.getRuntime.exec(cmd)
 
+<<<<<<< Upstream, based on branch 'JPanelBuilder' of https://github.com/githubeyaneu/eyan_helper.git
     val process = new ProcessBuilder("cmd", "/C start /B /LOW " + cmd).start();
     process
+=======
+    val pb = new ProcessBuilder("cmd", "/C start /B /LOW " + cmd);
+    pb.start()
+>>>>>>> 942e12c low prio execution jpanelbuilder obse+
   }
 }
