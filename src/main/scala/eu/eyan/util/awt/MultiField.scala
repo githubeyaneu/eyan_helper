@@ -29,7 +29,7 @@ abstract class MultiField[INPUT, EDITOR <: Component](name: String) extends JPan
   def onChanged(action: () => Unit) = changedListeners += action
 
   // MEMBERS
-  private val editors: ListBuffer[Editor[EDITOR]] = ListBuffer()
+  protected val editors: ListBuffer[Editor[EDITOR]] = ListBuffer()
   private val changedListeners = mutable.MutableList[() => Unit]()
   private var counter = 0
   private var rememberEventListenerAction: () => Unit = () => {}

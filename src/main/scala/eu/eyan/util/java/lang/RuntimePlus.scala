@@ -52,7 +52,7 @@ object RuntimePlus {
   private def startProcess(cmd: String) = {
     //val process = Runtime.getRuntime.exec(cmd)
 
-    val pb = new ProcessBuilder("cmd", "/C start /B /LOW " + cmd);
-    pb.start()
+    val process = new ProcessBuilder("cmd", "/C start /B /LOW " + cmd).start();
+    process
   }
 }
