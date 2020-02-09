@@ -30,11 +30,7 @@ abstract class MultiField[INPUT, EDITOR <: Component](name: String) extends JPan
   def onChanged(action: () => Unit) = changedListeners += action
 
   // MEMBERS
-<<<<<<< Upstream, based on branch 'JPanelBuilder' of https://github.com/githubeyaneu/eyan_helper.git
   protected val editors: ListBuffer[Editor[EDITOR]] = ListBuffer()
-=======
-  private val editors: ListBuffer[Editor[EDITOR]] = ListBuffer()
->>>>>>> 942e12c low prio execution jpanelbuilder obse+
   private val changedListeners = mutable.MutableList[() => Unit]()
   private var counter = 0
   private var rememberEventListenerAction: () => Unit = () => {}
