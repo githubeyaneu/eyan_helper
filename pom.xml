@@ -99,21 +99,21 @@
     <repository>
       <id>scala-tools.org</id>
       <name>Scala-tools Maven2 Repository</name>
-      <url>http://scala-tools.org/repo-releases</url>
+      <url>https://scala-tools.org/repo-releases</url>
     </repository>
 
     <!-- For scalatest -->
     <repository>
       <id>artima</id>
       <name>Artima Maven Repository</name>
-      <url>http://repo.artima.com/releases</url>
+      <url>https://repo.artima.com/releases</url>
     </repository>
 
     <!-- UPNP -->
     <repository>
       <id>4thline</id>
       <name>4th line</name>
-      <url>http://4thline.org/m2</url>
+      <url>https://4thline.org/m2</url>
     </repository>
 
   </repositories>
@@ -122,7 +122,7 @@
     <pluginRepository>
       <id>scala-tools.org</id>
       <name>Scala-tools Maven2 Repository</name>
-      <url>http://scala-tools.org/repo-releases</url>
+      <url>https://scala-tools.org/repo-releases</url>
     </pluginRepository>
   </pluginRepositories>
 
