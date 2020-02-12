@@ -24,6 +24,7 @@ abstract class MultiField[INPUT, EDITOR <: Component](name: String) extends JPan
 
     values foreach addEditorWithValue
     addEditorEmpty
+    onChange
   }
 
   def onChanged(action: () => Unit) = changedListeners += action

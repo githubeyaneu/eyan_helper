@@ -352,7 +352,7 @@ class JPanelBuilderProgressBar(jPanelBuilder: JPanelBuilder, jProgressBar: JProg
 class JPanelBuilderMultiFieldJTextField(jPanelBuilder: JPanelBuilder, multiText: MultiFieldJTextField) extends JPanelBuilderDelegator(jPanelBuilder, multiText) {
   def setValues(values: List[String]) = { multiText.setValues(values); this }
   def remember(rememberValueInRegistryName: String) = { multiText.rememberValueInRegistry(rememberValueInRegistryName); this }
-  def onChanged(observer: Observer[List[String]]) = { multiText.onChanged(() => observer.onNext(multiText.getValues));observer.onNext(multiText.getValues); this }
+  def onChanged(observer: Observer[List[String]]) = { multiText.onChanged(() => observer.onNext(multiText.getValues)); observer.onNext(multiText.getValues); this }
 }
 class JPanelBuilderMultiFieldAutocomplete(jPanelBuilder: JPanelBuilder, multiAutocomplete: MultiFieldAutocomplete) extends JPanelBuilderDelegator(jPanelBuilder, multiAutocomplete) {
 }
