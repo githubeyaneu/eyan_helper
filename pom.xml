@@ -97,6 +97,12 @@
 
   <repositories>
     <repository>
+      <id>maven.google.com</id>
+      <name>Google Maven Repository</name>
+      <url>https://maven.google.com/</url>
+    </repository>
+
+    <repository>
       <id>scala-tools.org</id>
       <name>Scala-tools Maven2 Repository</name>
       <url>https://scala-tools.org/repo-releases</url>
@@ -113,7 +119,7 @@
     <repository>
       <id>4thline</id>
       <name>4th line</name>
-      <url>https://4thline.org/m2</url>
+      <url>http://4thline.org/m2</url>
     </repository>
 
   </repositories>
@@ -127,7 +133,8 @@
   </pluginRepositories>
 
   <dependencies>
-    <!-- UPNP -->
+    <!-- UPNP 
+    -->
     <dependency>
       <groupId>org.fourthline.cling</groupId>
       <artifactId>cling-core</artifactId>

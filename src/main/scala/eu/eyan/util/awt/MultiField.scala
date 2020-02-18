@@ -7,13 +7,14 @@ import eu.eyan.util.awt.ComponentPlus.ComponentPlusImplicit
 import eu.eyan.util.awt.remember.RememberInRegistry
 import eu.eyan.util.swing.JButtonPlus.JButtonImplicit
 import eu.eyan.util.swing.JPanelWithFrameLayout
-import javax.swing.{BoxLayout, JButton, JPanel}
+import javax.swing.{ BoxLayout, JButton, JPanel }
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 abstract class MultiField[INPUT, EDITOR <: Component](name: String) extends JPanel with RememberInRegistry[MultiField[INPUT, EDITOR]] {
 
+  // PUBLIC METHODS
   def getValues: List[INPUT] = editors.map(_.editor).map(getValue).toList.filter(_.nonEmpty).map(_.get)
 
   def setValues(values: List[INPUT]) = {
@@ -23,44 +24,39 @@ abstract class MultiField[INPUT, EDITOR <: Component](name: String) extends JPan
 
     values foreach addEditorWithValue
     addEditorEmpty
+    onChange
   }
-  
-  val changedListeners = mutable.MutableList[() => Unit]()
+
   def onChanged(action: () => Unit) = changedListeners += action
-  private def onChange = changedListeners.foreach(_())
+
+  // MEMBERS
+  protected val editors: ListBuffer[Editor[EDITOR]] = ListBuffer()
+  private val changedListeners = mutable.MutableList[() => Unit]()
+  private var counter = 0
+  private var rememberEventListenerAction: () => Unit = () => {}
+
+  // INITIALISATION
+  setLayout(new BoxLayout(this, BoxLayout.Y_AXIS))
+  addEditorEmpty
+
+  // PROTECTED METHODS
+  protected case class Editor[E](editor: E, deleteButton: JButton)
 
   protected def createEditor(fieldEdited: EDITOR => Unit): EDITOR
   protected def getValue(editor: EDITOR): Option[INPUT]
   protected def setValueInEditor(editor: EDITOR)(value: INPUT): Unit
   protected def valueToString(value: INPUT): String
-  protected def stringToValue(string: String):INPUT
+  protected def stringToValue(string: String): INPUT
 
-  protected def rememberComponent: MultiField[INPUT, EDITOR] = this 
   
-  protected def rememberEventListener(action: => Unit): MultiField[INPUT, EDITOR] = {
-    rememberEventListenerAction = () => action
-    this
-  }
-  
-  protected def rememberValueGet: String = {
-    val values = editors.toList.map(_.editor).flatMap(getValue).map(valueToString).mkString(" + ")
-    Log.debug(values)
-    values
-  }
-  
-  protected def rememberValueSet(value: String) = {
-    Log.debug(value)
-    val values = value.split(" \\+ ").toList.map(stringToValue)
-    Log.debug(values)
-    setValues(values)
-  }
+  // PROTECTED METHODS for RememberInRegistry
+  protected def rememberComponent: MultiField[INPUT, EDITOR] = this
+  protected def rememberEventListener(action: => Unit): MultiField[INPUT, EDITOR] = {rememberEventListenerAction = () => action; this}
+  protected def rememberValueGet: String = editors.toList.map(_.editor).flatMap(getValue).map(valueToString).mkString(" + ")
+  protected def rememberValueSet(value: String) = setValues(value.split(" \\+ ").toList.map(stringToValue))
 
-  setLayout(new BoxLayout(this, BoxLayout.Y_AXIS))
-  protected val editors: ListBuffer[Editor[EDITOR]] = ListBuffer()
-  private var counter = 0
-  private var rememberEventListenerAction: () => Unit = () => {}
-
-  protected case class Editor[E](editor: E, deleteButton: JButton)
+  // PRIVATE METHODS
+  private def onChange = changedListeners.foreach(_())
 
   private def addEditorEmpty = addEditor(None)
   private def addEditorWithValue(input: INPUT) = addEditor(Some(input))

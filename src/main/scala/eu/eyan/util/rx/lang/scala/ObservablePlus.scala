@@ -11,11 +11,16 @@ object ObservablePlus {
   // https://stackoverflow.com/questions/41486024/scala-multiple-type-parameters-for-implicit-class
   // https://stackoverflow.com/questions/5598085/where-does-scala-look-for-implicits/5598107#5598107
   implicit class ObservableImplicit[O <: Observable[_]](observable: O) {
-    def get[T] = {
+    @deprecated("Using this is not reactive...", "2020.02.04")
+    def get[T]: T = {
       var result = null.asInstanceOf[T]
       observable.take(1).subscribe(s => result = s.asInstanceOf[T])
       result
     }
+  }
+  implicit class ObservableImplicitT[T, O <: Observable[T]](observable: O) {
+    def combineLatestFirst[T2](observable2: Observable[T2]): Observable[T] = observable.combineLatest(observable2).map(_._1)
+    def takeLatestOf[T2](observable2: Observable[T2]): Observable[T2] = observable.withLatestFrom(observable2)((t, t2) => t2)
   }
 
   implicit class ObservableVarargsImplicit[T](observables: Observable[T]*) {
@@ -73,4 +78,15 @@ object ObservablePlus {
       nrAndTexts map selectTitleText
     }
   }
+
+  def combineLatest[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11](o1: Observable[T1], o2: Observable[T2], o3: Observable[T3], o4: Observable[T4], o5: Observable[T5], o6: Observable[T6], o7: Observable[T7], o8: Observable[T8], o9: Observable[T9], o10: Observable[T10], o11: Observable[T11]) =
+    List(o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11)
+      .combineLatest
+      .map(list => (list(0).asInstanceOf[T1], list(1).asInstanceOf[T2], list(2).asInstanceOf[T3], list(3).asInstanceOf[T4], list(4).asInstanceOf[T5], list(5).asInstanceOf[T6], list(6).asInstanceOf[T7], list(7).asInstanceOf[T8], list(8).asInstanceOf[T9], list(9).asInstanceOf[T10], list(10).asInstanceOf[T11]))
+
+  def combineLatest[T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12](o1: Observable[T1], o2: Observable[T2], o3: Observable[T3], o4: Observable[T4], o5: Observable[T5], o6: Observable[T6], o7: Observable[T7], o8: Observable[T8], o9: Observable[T9], o10: Observable[T10], o11: Observable[T11], o12: Observable[T12]) =
+    List(o1, o2, o3, o4, o5, o6, o7, o8, o9, o10, o11, o12)
+      .combineLatest
+      .map(list => (list(0).asInstanceOf[T1], list(1).asInstanceOf[T2], list(2).asInstanceOf[T3], list(3).asInstanceOf[T4], list(4).asInstanceOf[T5], list(5).asInstanceOf[T6], list(6).asInstanceOf[T7], list(7).asInstanceOf[T8], list(8).asInstanceOf[T9], list(9).asInstanceOf[T10], list(10).asInstanceOf[T11], list(11).asInstanceOf[T12]))
+
 }
