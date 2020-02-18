@@ -332,7 +332,7 @@ class JPanelWithFrameLayout() extends JPanel {
   }
 
   def addAutocompleteMulti(name: String, hint: String, noItemsFoundHint: String) = {
-    val mfa = new MultiFieldAutocomplete(name, hint, noItemsFoundHint)
+    val mfa = new MultiFieldAutocomplete(name, hint, noItemsFoundHint, List())
     add(mfa)
     mfa
   }

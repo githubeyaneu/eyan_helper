@@ -21,7 +21,8 @@ abstract class MultiField[INPUT, EDITOR <: Component](name: String) extends JPan
     Log.debug(getName + ": " + values.mkString(", "))
     removeAll
     editors.clear
-
+    counter = 0
+    
     values foreach addEditorWithValue
     addEditorEmpty
     onChange

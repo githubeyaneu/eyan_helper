@@ -205,7 +205,7 @@ class JPanelBuilder private (name: String) extends /*JPanel with*/ IPanelBuilder
 
   def addTextFieldMulti(name: String, size: Int) = new JPanelBuilderMultiFieldJTextField(this, addComponent(new MultiFieldJTextField(name, size)))
 
-  def addAutocompleteMulti(name: String, hint: String, noItemsFoundHint: String) = new JPanelBuilderMultiFieldAutocomplete(this, addComponent(new MultiFieldAutocomplete(name, hint, noItemsFoundHint)))
+  def addAutocompleteMulti(name: String, hint: String, noItemsFoundHint: String) = new JPanelBuilderMultiFieldAutocomplete(this, addComponent(new MultiFieldAutocomplete(name, hint, noItemsFoundHint, List())))
 
   def addPanelBuilder(panelBuild: JPanelBuilder => Unit) = { val subPanelBuilder = new JPanelBuilder(""); panelBuild(subPanelBuilder); addComponent(subPanelBuilder.getPanel); this }
 }
