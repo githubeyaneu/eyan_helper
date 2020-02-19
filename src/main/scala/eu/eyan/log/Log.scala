@@ -47,12 +47,7 @@ object Log {
     def stackElementWhereLogWasCalled = Thread.currentThread.getStackTrace.filter(stackElementsNotToLog)(1) // TODO use lift //FIXME: this is very slow if dbg level on and lot of logs come (convert files)
     def stackClassAndMethod = stackElementWhereLogWasCalled.getClassName.substring(stackElementWhereLogWasCalled.getClassName.lastIndexOf(".") + 1) + "." + stackElementWhereLogWasCalled.getMethodName
     def logText = stackClassAndMethod + (if (messageText != "") { ": " + messageText } else "")
-    if (actualLevel.shouldLog(level)) logger.onNext({
-      ct += 1
-      val l = Log(level, logText, System.currentTimeMillis)
-      println("log"+ct+" "+l)
-      l
-    })
+    if (actualLevel.shouldLog(level)) logger.onNext(Log(level, logText, System.currentTimeMillis))
     this
   }
 

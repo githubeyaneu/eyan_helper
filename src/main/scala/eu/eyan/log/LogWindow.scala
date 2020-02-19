@@ -43,7 +43,10 @@ object LogWindow {
       levelObservableSubscription = Log.levelObservable.subscribe(onNextLogLevel, onErrorLogLevel("levelObservable"), () => onCompletedLogLevel("levelObservable"))
   }
 
-  def add(text: String) = if (window != null && window.frame != null) window.textArea.append(text + "\n")
+  def add(text: String) = {
+    if (window != null && window.frame != null) window.textArea.append(text + "\n")
+    if (window != null && window.frame != null) if(text.contains(window.filterTextField.getText)) window.filteredTextArea.append(text + "\n")
+  }
 
   def outStreamAppender = OutputStreamPlus.carriageReturnReplacer(OutputStreamPlus.timebuffered(s => window.outTextArea.append(s)))
   def errStream = OutputStreamPlus.carriageReturnReplacer(OutputStreamPlus.timebuffered(s => window.errTextArea.append(s)))
@@ -90,6 +93,12 @@ class LogWindow {
 
   content.newRow.addSeparatorWithTitle("Logs")
   val textArea = content.newRow("f:1px:g").addTextArea().alwaysScrollDown
+  
+  content.newRow.addSeparatorWithTitle("Filter")
+  val filterTextField = content.newRow.addTextField("", 15).onTextChanged(filterLogs).rememberValueInRegistry("logFilter")
+  val filteredTextArea = content.newRow("f:1px:g").addTextArea().alwaysScrollDown
+  def filterLogs:Unit = filteredTextArea.setText(textArea.getText.lines.filter(_.contains(filterTextField.getText)).mkString("\n"))
+  
   content.newRow.addSeparatorWithTitle("Console out")
   val outTextArea = content.newRow("f:1px:g").addTextArea().alwaysScrollDown
   content.newRow.addSeparatorWithTitle("Console err")

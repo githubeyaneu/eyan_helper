@@ -41,6 +41,7 @@ import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
 import java.util.Base64
 import rx.lang.scala.Observable
+import java.nio.charset.Charset
 
 object StringPlus {
   lazy val reg = "[\\p{InCombiningDiacriticalMarks}]".r
@@ -193,8 +194,9 @@ object StringPlus {
 
     def containsAnyIgnoreCase(strings: Seq[String]) = s.toLowerCase.containsAny(strings.map(_.toLowerCase))
 
-    def toHexEncode = s.getBytes.map(_.toHexString).mkString(",")
-    def toHexDecode = new String(s.split(",").map(Integer.parseUnsignedInt(_, 16).toByte))
+    private val UTF8=Charset.forName("utf-8")
+    def toHexEncode = s.getBytes(UTF8).map(_.toInt).map(Integer.toHexString).mkString(",")
+    def toHexDecode = new String(s.split(",").map(Integer.parseUnsignedInt(_, 16).toByte), UTF8)
 
     private def encryptDecryptIvParameterSpec = new IvParameterSpec(new Array[Byte](16))
     private def encryptDecryptKey(salt:String) = new SecretKeySpec(Base64.getDecoder.decode(salt), "AES")
