@@ -47,7 +47,13 @@ object Log {
     def stackElementWhereLogWasCalled = Thread.currentThread.getStackTrace.filter(stackElementsNotToLog)(1) // TODO use lift //FIXME: this is very slow if dbg level on and lot of logs come (convert files)
     def stackClassAndMethod = stackElementWhereLogWasCalled.getClassName.substring(stackElementWhereLogWasCalled.getClassName.lastIndexOf(".") + 1) + "." + stackElementWhereLogWasCalled.getMethodName
     def logText = stackClassAndMethod + (if (messageText != "") { ": " + messageText } else "")
-    if (actualLevel.shouldLog(level)) logger.onNext(Log(level, logText, System.currentTimeMillis))
+    if (actualLevel.shouldLog(level)) logger.onNext({
+    	//FIXME why is this needed? In PVTools the logging does not work if i remove this code....
+      ct += 1
+      val l = Log(level, logText, System.currentTimeMillis)
+      print("log" + ct + " ")// + l)
+      l
+    })
     this
   }
 
@@ -91,7 +97,7 @@ object Log {
     if (actualLevel.shouldLog(Error))
       message match {
         case t: Throwable => error(t)
-        case o: Any       => log(Error, String.valueOf(o))
+        case o: Any => log(Error, String.valueOf(o))
       }
     this
   }
@@ -117,16 +123,16 @@ object Log {
   }
 
   var ct2 = 0
-  logsObservable.subscribe(log => {
-    ct2+=1
-    if(log==null) s"log was null $ct2".printlnErr
-    else if(log.level==null) "log.level was null".printlnErr
+  logsObservable.subscribe(
+    log => {
+    ct2 += 1
+    if (log == null) s"log was null $ct2".printlnErr
+    else if (log.level == null) "log.level was null".printlnErr
     else if (log.level > Error) logToConsoleText(log).println
     else logToConsoleText(log).printlnErr
-    },
-    throwable => {("ERROR HAPPENED IN LOGGING "+throwable).printlnErr; throwable.printStackTrace()},
-    () => {"LOGGING finished ".println}
-  )
+  },
+    throwable => { ("ERROR HAPPENED IN LOGGING " + throwable).printlnErr; throwable.printStackTrace() },
+    () => { "LOGGING finished ".println })
 
   implicit class LogImplicitString(val s: String) {
     def logFatal = Log.fatal(s)
@@ -145,9 +151,8 @@ object Log {
     val logs = new StringBuilder()
     val s = Log.logsObservable.map(formatLog).subscribe(
       log => logs.append(log),
-      throwable => logs.append("ERROR HAPPENED IN LOGGING "+throwable+"\r\n"+throwable.getStackTrace.mkString("\r\n")),
-      () => logs.append("End of logs")
-    )
+      throwable => logs.append("ERROR HAPPENED IN LOGGING " + throwable + "\r\n" + throwable.getStackTrace.mkString("\r\n")),
+      () => logs.append("End of logs"))
     s.unsubscribe
     logs.toString
   }
@@ -159,15 +164,15 @@ object Log {
     def doAppend(event: org.apache.log4j.spi.LoggingEvent): Unit = {
       val level =
         event.getLevel match {
-          case Level.OFF   => None
+          case Level.OFF => None
           case Level.FATAL => Fatal
           case Level.ERROR => Error
-          case Level.WARN  => Warn
-          case Level.INFO  => Info
+          case Level.WARN => Warn
+          case Level.INFO => Info
           case Level.DEBUG => Debug
           case Level.TRACE => Trace
-          case Level.ALL   => Trace
-          case _           => Trace
+          case Level.ALL => Trace
+          case _ => Trace
         }
       log(level, event.getMessage.toString)
     }

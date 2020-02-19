@@ -78,6 +78,15 @@ object StringPlus {
       filename
     }
 
+    def writeToFileUtf8(filename: String): String = {
+      val writer = new OutputStreamWriter(new FileOutputStream(filename, true), "utf-8")
+      TryCatchFinally(
+        writer.append(s),
+        e => Log.error(e),
+        writer.close)
+      filename
+    }
+
     def appendToFile(file: File): Unit = {
       val bw = new BufferedWriter(new FileWriter(file, true))
       bw.write(s)
@@ -103,10 +112,10 @@ object StringPlus {
     def asUrl = new URL(s)
 
     def execInDir(
-      commandAndArgs:  Array[String],
-      codec:           Codec,
+      commandAndArgs: Array[String],
+      codec: Codec,
       outputProcessor: Stream[String] => Unit = s => {},
-      errorProcessor:  Stream[String] => Unit = s => {}) = {
+      errorProcessor: Stream[String] => Unit = s => {}) = {
 
       Log.info(s"Executing process in workDir $s cmd:${commandAndArgs.mkString(" ")}")
 
@@ -140,9 +149,9 @@ object StringPlus {
     def executeAsProcessWithResult(codec: Codec) = RuntimePlus.exec(s, codec)
 
     def executeAsProcessWithStreamProcessors(
-      codec:           Codec,
+      codec: Codec,
       outputProcessor: Stream[String] => Unit = s => {},
-      errorProcessor:  Stream[String] => Unit = s => {}) =
+      errorProcessor: Stream[String] => Unit = s => {}) =
       RuntimePlus.execWithStreamProcessors(s, codec, outputProcessor, errorProcessor)
 
     def executeAsProcessWithResultAndOutputLineCallback(callback: String => Unit) = RuntimePlus.execAndProcessOutputs(s, callback, callback)
@@ -194,14 +203,14 @@ object StringPlus {
 
     def containsAnyIgnoreCase(strings: Seq[String]) = s.toLowerCase.containsAny(strings.map(_.toLowerCase))
 
-    private val UTF8=Charset.forName("utf-8")
+    private val UTF8 = Charset.forName("utf-8")
     def toHexEncode = s.getBytes(UTF8).map(_.toInt).map(Integer.toHexString).mkString(",")
     def toHexDecode = new String(s.split(",").map(Integer.parseUnsignedInt(_, 16).toByte), UTF8)
 
     private def encryptDecryptIvParameterSpec = new IvParameterSpec(new Array[Byte](16))
-    private def encryptDecryptKey(salt:String) = new SecretKeySpec(Base64.getDecoder.decode(salt), "AES")
+    private def encryptDecryptKey(salt: String) = new SecretKeySpec(Base64.getDecoder.decode(salt), "AES")
     private def encryptDecryptCipher = Cipher.getInstance("AES/CBC/PKCS5Padding")
-    
+
     def encrypt(salt: String): String = {
       val cipher = encryptDecryptCipher
       cipher.init(Cipher.ENCRYPT_MODE, encryptDecryptKey(salt), encryptDecryptIvParameterSpec)
@@ -209,7 +218,7 @@ object StringPlus {
     }
 
     def decrypt(salt: String): String = {
-  		val cipher = encryptDecryptCipher
+      val cipher = encryptDecryptCipher
       cipher.init(Cipher.DECRYPT_MODE, encryptDecryptKey(salt), encryptDecryptIvParameterSpec)
       new String(cipher.doFinal(Base64.getDecoder.decode(s.getBytes("utf-8"))), "utf-8")
     }
@@ -219,22 +228,22 @@ object StringPlus {
 
     //    def findGroup(regex: String, group: Int = 1):Option[String] = findGroup(regex.r, group)
     def findGroup(regex: Regex, group: Int = 1) = {
-      Log.debug("string: "+s)
-      Log.debug("regex: "+regex)
-      Log.debug("group: "+group)
-      
+      Log.debug("string: " + s)
+      Log.debug("regex: " + regex)
+      Log.debug("group: " + group)
+
       val findAll = regex.findAllIn(s)
-      Log.debug("findAll: "+findAll)
+      Log.debug("findAll: " + findAll)
       val matchData = findAll.matchData
-      Log.debug("matchData: "+matchData)
+      Log.debug("matchData: " + matchData)
       val matchDataList = matchData.toList
-      Log.debug("matchDataList: "+matchDataList)
+      Log.debug("matchDataList: " + matchDataList)
       val lift = matchDataList.headOption
-      Log.debug("lift: "+lift)
-      val groupFilter = lift.filter(mach => mach.groupCount >0)
-      Log.debug("groupFilter: "+groupFilter)
+      Log.debug("lift: " + lift)
+      val groupFilter = lift.filter(mach => mach.groupCount > 0)
+      Log.debug("groupFilter: " + groupFilter)
       val res = groupFilter.map(mach => mach.group(group))
-      Log.debug("Res: "+res)
+      Log.debug("Res: " + res)
       res
     }
 
@@ -287,12 +296,12 @@ object StringPlus {
     def countOccurrences(tgt: String): Int = if (s != null) s.sliding(tgt.length).count(window => window == tgt) else 0
 
     def toSmallIcon(color: Color = Color.gray, width: Int = s.length * 16, height: Int = 16) = new ImageIcon(ImagePlus.imageFromString(s, color, width, height))
-    
-    def asSingle = Observable[String](emitter => {emitter.onNext(s);emitter.onCompleted})
 
-    def findAll(regex:String) = {
+    def asSingle = Observable[String](emitter => { emitter.onNext(s); emitter.onCompleted })
+
+    def findAll(regex: String) = {
       val re = regex.r
-      val matches = for(m <- re.findAllIn(s)) yield(m)
+      val matches = for (m <- re.findAllIn(s)) yield (m)
       matches.toList
     }
   }

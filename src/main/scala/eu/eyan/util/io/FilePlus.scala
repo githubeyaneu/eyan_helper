@@ -54,6 +54,11 @@ object FilePlus {
       List()
     })
 
+    def linesListUtf8 = TryCatchFinallyClose(Source.fromFile(file)(Codec.UTF8), (bs: BufferedSource) => bs.getLines.toList, e => {
+    	Log.error(s"cannot read file", e)
+    	List()
+    })
+
     //    def lines = Source.fromFile(file).getLines
     //TODO test it
     def lines(codec: Codec = Codec.UTF8) = new Iterator[String] {

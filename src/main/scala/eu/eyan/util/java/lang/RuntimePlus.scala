@@ -11,7 +11,7 @@ import java.io.File
 object RuntimePlus {
   case class ProcessResult(exitValue: Int, output: Option[String], errorOutput: Option[String])
 
-  def exec(cmd: String, codec: Codec = Codec.UTF8) = {
+  def exec(cmd: String, codec: Codec = Codec.ISO8859) = {
     //TODO params: copy out end arr to console and as a result...
     Log.info("Executing process: " + cmd)
     val process = startProcess(cmd)
@@ -36,7 +36,7 @@ object RuntimePlus {
     process.exitValue
   }
 
-  def execWithStreamProcessors(cmd: String, codec: Codec = Codec.UTF8, outputProcessor: Stream[String] => Unit, errorProcessor: Stream[String] => Unit) = {
+  def execWithStreamProcessors(cmd: String, codec: Codec = Codec.ISO8859, outputProcessor: Stream[String] => Unit, errorProcessor: Stream[String] => Unit) = {
     //TODO params: copy out end arr to console and as a result...
     Log.info("Executing process: " + cmd)
     val process = startProcess(cmd)
@@ -49,10 +49,32 @@ object RuntimePlus {
 
   def availableProcessors = Runtime.getRuntime.availableProcessors
 
+  def execAndProcessOutputs(cmd: List[String], callbackOut: String => Unit, callbackErr: String => Unit) = {
+    //TODO params: copy out end arr to console and as a result...
+    val process = startProcess(cmd)
+
+    def readStreamInThread(stream: InputStream, callback: String => Unit) = ThreadPlus.run(Source.fromInputStream(stream).getLines.foreach(callback))
+    val outRunner = readStreamInThread(process.getInputStream, callbackOut)
+    val errRunner = readStreamInThread(process.getErrorStream, callbackErr)
+    process.waitFor
+    process.exitValue
+  }
+
+  private def startProcess(cmds: List[String]) = {
+    val cmd = List("cmd", "/C",  "start",  "/B",  "/LOW")++cmds
+    Log.info(cmd.mkString(" "))
+    val processBuilder = new ProcessBuilder(cmd:_*)
+    val process = processBuilder.start();
+
+    process
+  }
+
   private def startProcess(cmd: String) = {
     //val process = Runtime.getRuntime.exec(cmd)
 
-    val process = new ProcessBuilder("cmd", "/C start /B /LOW " + cmd).start();
+    val processBuilder = new ProcessBuilder("cmd", "/C start /B /LOW " + cmd)
+    val process = processBuilder.start();
+
     process
   }
 }
