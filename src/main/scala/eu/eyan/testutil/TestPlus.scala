@@ -21,6 +21,9 @@ import org.mockito.ArgumentMatchers
 import org.fest.assertions.ObjectAssert
 import eu.eyan.log.Log
 import org.fest.swing.timing.Pause
+import rx.lang.scala.Observable
+import rx.observers.AssertableSubscriber
+import rx.internal.observers.AssertableSubscriberObservable
 
 object TestPlus {
 
@@ -38,9 +41,8 @@ object TestPlus {
       try {
         Log.debug("try")
         res = assertion
-        ok = true 
-        }
-      catch {
+        ok = true
+      } catch {
         case t: AssertionError           => checkTimeout(t)
         case t: ComponentLookupException => checkTimeout(t)
       }
@@ -50,7 +52,7 @@ object TestPlus {
 
 trait TestPlus {
   def pause(ms: Long) = Pause.pause(ms)
-    
+
   def waitFor[T](assertion: => T, timeout: Long = TestPlus.DEFAULT_WAIT_TIME): T = TestPlus.waitFor(assertion, timeout)
 
   /** Expect a Throwable of the method */
@@ -68,7 +70,7 @@ trait TestPlus {
     try { test; Assert.fail("Exception(Throwable) was expected but none came.") }
     catch {
       case e: Throwable =>
-        if(e.getClass != expectedThrowableClass) e.printStackTrace
+        if (e.getClass != expectedThrowableClass) e.printStackTrace
         e.getClass ==> ("expectedThrowable class", expectedThrowableClass)
     }
 
@@ -100,17 +102,18 @@ trait TestPlus {
     def ===(expected: Any): A = ==>("", expected)
     def ==>(descriptionAndExpected: Tuple2[String, Any]): A = {
       val description = descriptionAndExpected._1
-      val expected= descriptionAndExpected._2
+      val expected = descriptionAndExpected._2
       expected match {
-        case t:Throwable => expect(t, actual); null.asInstanceOf[A]
-        case _ => val a = actual; assertThat(a).as(description).isEqualTo(expected); a
+        case t: Throwable =>
+          expect(t, actual); null.asInstanceOf[A]
+        case _            => val a = actual; assertThat(a).as(description).isEqualTo(expected); a
       }
     }
   }
 
   implicit class ThrowableTestImplicit[T <: Throwable](expectedThrowable: T) {
     /** Expect throwable(left) from the actual (right)*/
-//    def <==(actual: => Unit) = expect(expectedThrowable, actual)
+    //    def <==(actual: => Unit) = expect(expectedThrowable, actual)
   }
 
   implicit class AnyTestImpicit[T <: Any](actual: T) {
@@ -234,4 +237,11 @@ trait TestPlus {
     def getAllValues: java.util.List[T] = this.capturingMatcher.getAllValues
   }
 
+  implicit class ObservableTestPlusImplicit[T](observable: Observable[T]) {
+    def test: AssertableSubscriber[T] = {
+      val ts = AssertableSubscriberObservable.create[T](Long.MaxValue)
+      observable.subscribe(ts.onNext, ts.onError, () => ts.onCompleted())
+      ts
+    }
+  }
 }

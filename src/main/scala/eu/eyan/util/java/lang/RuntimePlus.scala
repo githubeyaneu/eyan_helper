@@ -61,9 +61,9 @@ object RuntimePlus {
   }
 
   private def startProcess(cmds: List[String]) = {
-    val cmd = List("cmd", "/C",  "start",  "/B",  "/LOW")++cmds
+    val cmd = List("cmd", "/C") ++ cmds
     Log.info(cmd.mkString(" "))
-    val processBuilder = new ProcessBuilder(cmd:_*)
+    val processBuilder = new ProcessBuilder(cmd: _*)
     val process = processBuilder.start();
 
     process
@@ -72,6 +72,7 @@ object RuntimePlus {
   private def startProcess(cmd: String) = {
     //val process = Runtime.getRuntime.exec(cmd)
 
+    //FIXME the start /B has some side effects: it causes the stdin or out to be closed? has to be checked.
     val processBuilder = new ProcessBuilder("cmd", "/C start /B /LOW " + cmd)
     val process = processBuilder.start();
 
