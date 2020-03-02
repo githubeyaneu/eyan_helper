@@ -287,6 +287,8 @@ abstract class JPanelBuilderDelegator(jPanelBuilder: JPanelBuilder, component: C
   def addTextArea = jPanelBuilder.addTextArea
 }
 
+case class Click()
+
 class JPanelBuilderTextField(jPanelBuilder: JPanelBuilder, jTextField: JTextField) extends JPanelBuilderDelegator(jPanelBuilder, jTextField) {
   def text(text: String) = { jTextField.setText(text); this }
   def text(text: Observable[String]) = { text.subscribe(jTextField.setText(_)); this }
@@ -300,7 +302,8 @@ class JPanelBuilderLabel(jPanelBuilder: JPanelBuilder, jLabel: JLabel) extends J
   def text(text: Observable[String]) = { text.subscribe(jLabel.setText(_)); this }
   def cursor_HAND_CURSOR = { jLabel.cursor_HAND_CURSOR; this }
   def onMouseClicked(action: String => Unit) = { jLabel.onMouseClicked(action(jLabel.getText)); this }
-  def onMouseClicked(observer: Observer[String]) = { jLabel.onMouseClicked(observer.onNext(jLabel.getText)); this }
+  def onMouseClickedEvent(observer: Observer[String]) = { jLabel.onMouseClicked(observer.onNext(jLabel.getText)); this }
+  def onMouseClicked(observer: Observer[Click]) = { jLabel.onMouseClicked(observer.onNext(Click())); this }
 }
 class JPanelBuilderCheckBox(jPanelBuilder: JPanelBuilder, jCheckBox: JCheckBox) extends JPanelBuilderDelegator(jPanelBuilder, jCheckBox) {
   def text(text: String) = { jCheckBox.setText(text); this }
@@ -314,7 +317,8 @@ class JPanelBuilderButton(jPanelBuilder: JPanelBuilder, jButton: JButton) extend
   def text(text: String) = { jButton.setText(text); this }
   def text(text: Observable[String]) = { text.subscribe(jButton.setText(_)); this }
   def onAction(action: String => Unit) = { jButton.onAction(action(jButton.getText)); this }
-  def onAction(observer: Observer[String]) = { jButton.onAction(observer.onNext(jButton.getText)); this }
+  def onActionEvent(observer: Observer[String]) = { jButton.onAction(observer.onNext(jButton.getText)); this }
+  def onAction(observer: Observer[Click]) = { jButton.onAction(observer.onNext(Click())); this }
   def enabled(enabled: Observable[Boolean]) = { enabled.subscribe(jButton.setEnabled(_)); this }
   def disabled = { jButton.setEnabled(false); this }
   def onDropFiles(observer: Observer[List[File]]) = { jButton.onDropFiles(observer.onNext); this }

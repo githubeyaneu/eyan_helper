@@ -89,6 +89,8 @@ class LogWindow {
   buttons.newColumn.addLabel("max rows:")
   val maxRowsTf = buttons.newColumn.addTextField("10000", 6).rememberValueInRegistry("LogWindowMaxRows").onTextChanged(limitLines.setLimitLines(maxRows))
 
+  buttons.newColumn.addButton("Redirect Out+Err").onAction(LogWindow.redirectSystemOutAndErrToLogWindow)
+
   def maxRows: Int = try { maxRowsTf.getText.toInt } catch { case _: Throwable => 1000 }
 
   content.newRow.addSeparatorWithTitle("Logs")
