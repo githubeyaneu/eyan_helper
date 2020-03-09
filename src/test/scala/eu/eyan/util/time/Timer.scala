@@ -18,4 +18,10 @@ object Timer {
 
   private def now = System.currentTimeMillis
   private var startTime = now
+  
+  def time(action: => Unit){
+    timerStart
+    action
+    timerPrint
+  }
 }
