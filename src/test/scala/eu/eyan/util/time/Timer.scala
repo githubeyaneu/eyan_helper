@@ -1,6 +1,5 @@
 package eu.eyan.util.time
 
-
 // TODO: remove it is in the TestPlus...
 object Timer {
   val SECOND = 1000L
@@ -11,15 +10,15 @@ object Timer {
   def timerPrint = println(timerElapsed)
 
   private def readableTime(ms: Long) = {
-    if (ms < SECOND) ms + "ms"
-    else if (ms < MINUTE) ms / SECOND + "s"
+    if (ms < SECOND * 10) ms + "ms"
+    else if (ms < MINUTE * 10) ms / SECOND + "s"
     else ms / MINUTE + "min"
   }
 
   private def now = System.currentTimeMillis
   private var startTime = now
-  
-  def time(action: => Unit){
+
+  def time(action: => Unit) {
     timerStart
     action
     timerPrint
