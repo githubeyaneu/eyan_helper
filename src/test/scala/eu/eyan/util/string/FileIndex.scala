@@ -7,7 +7,6 @@ import scala.collection.TraversableOnce.flattenTraversableOnce
 
 import eu.eyan.util.io.CachedFileLineReader
 import eu.eyan.util.memory.Memory.printmem
-import eu.eyan.util.time.Timer.timerElapsed
 import eu.eyan.util.time.Timer.timerStart
 
 object FileIndex {
@@ -18,23 +17,23 @@ object FileIndex {
     val INDEXING_DEPTH = 1
     // new Thread(AwtHelper.newRunnable { () => {while(true){Thread.sleep(1000); printmem}} }).start
 
-    timerStart
+    val timer = timerStart()
     reader.load(file, null)
-    println("loaded " + timerElapsed + " " + NumberFormat.getInstance.format(reader.size) + " lines.")
+    println("loaded " + timer.timerElapsed + " " + NumberFormat.getInstance.format(reader.size) + " lines.")
     printmem
 
     val lineIterator = reader.lines
     val linesWithIndices = lineIterator.zipWithIndex
     //    val lines = for (lineIndex <- 0 to reader.size-1) yield (lineIndex, reader.get(lineIndex))
-    println("lines done " + timerElapsed)
+    println("lines done " + timer.timerElapsed)
     printmem
 
     val itemsOfLines = linesWithIndices.flatMap(p => StringsSearchTree.allSubStrings(p._1, INDEXING_DEPTH).map((_, p._2)))
-    println("itemsOfLines done " + timerElapsed)
+    println("itemsOfLines done " + timer.timerElapsed)
     printmem
 
     val tree = itemsOfLines.foldLeft(StringsSearchTree.newTree[Int])((tree, pair) => tree.add(pair._1, pair._2))
-    println("tree done " + timerElapsed)
+    println("tree done " + timer.timerElapsed)
     printmem
 
     println(tree)

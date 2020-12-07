@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <script type="text/javascript">
+         function WebSocketTest() {
+            if ("WebSocket" in window) {
+               var ws = new WebSocket("ws://localhost:56745/echo");
+
+               ws.onopen = function() {
+                  log('Web Socket is connected, send data using send()');
+                  ws.send("Message to send");
+                  log("Message is sent...");
+               };
+
+               ws.onmessage = function (evt) {
+                  console.log(evt)
+                  log("Message is received: "+ evt.data);
+               };
+
+               ws.onclose = function() { log("Connection is closed..."); };
+            } else {
+               alert("WebSocket NOT supported by your Browser!");
+            }
+         }
+         function log(msg) {
+            document.getElementById('log').insertAdjacentHTML('beforeend', msg+ '<BR>');
+         }
+    </script>
+</head>
+<body>
+<a href="javascript:WebSocketTest()">Run WebSocket</a>
+<div id="log"></div>
+</body>
+</html>

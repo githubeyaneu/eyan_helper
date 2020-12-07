@@ -1,11 +1,10 @@
 package eu.eyan.util.java.lang
 
+import java.util.concurrent.Executors
+
 import eu.eyan.log.Log
 import eu.eyan.util.scala.TryCatch
-import rx.lang.scala.subjects.PublishSubject
 import rx.lang.scala.Observable
-import rx.lang.scala.subjects.BehaviorSubject
-import java.util.concurrent.Executors
 
 object ThreadPlus {
 
@@ -18,7 +17,9 @@ object ThreadPlus {
   //  }
 
   def runObservable[T](action: => T) = Observable[T](emitter => {
-    new Thread(RunnablePlus.runnable(TryCatch({ emitter.onNext(action); emitter.onCompleted }, emitter.onError _))).start
+    new Thread(RunnablePlus.runnable(TryCatch({
+      emitter.onNext(action); emitter.onCompleted
+    }, emitter.onError _))).start()
   })
 
   def runBlockingWithTimeout[T](ms: Long, action: => T, cancel: => Unit) = {

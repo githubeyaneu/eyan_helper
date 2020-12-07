@@ -1,13 +1,9 @@
 package org.slf4j.impl
 
-import org.slf4j.ILoggerFactory
-import org.slf4j.ILoggerFactory
-import org.slf4j.Logger
-import org.slf4j.Marker
 import eu.eyan.log._
+import org.slf4j.{ILoggerFactory, Logger}
 
 import scala.collection.mutable
-import scala.collection.mutable.Map
 
 object StaticLoggerBinder {
   lazy val staticLoggerBinder = new StaticLoggerBinder()

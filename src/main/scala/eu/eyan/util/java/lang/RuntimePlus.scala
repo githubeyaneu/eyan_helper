@@ -49,6 +49,18 @@ object RuntimePlus {
 
   def availableProcessors = Runtime.getRuntime.availableProcessors
 
+  def exec(cmd: List[String], codec: Codec ):ProcessResult = {
+    Log.info("Executing process: " + cmd)
+    val process = startProcess(cmd)
+    def readStreamInThread(stream: InputStream) = ThreadPlus.run(Source.fromInputStream(stream)(codec).mkString)
+    val outRunner = readStreamInThread(process.getInputStream)
+    val errRunner = readStreamInThread(process.getErrorStream)
+    process.waitFor
+    process.destroy()
+    Log.info("Executing process finished: " + cmd)
+    ProcessResult(process.exitValue, outRunner.result, errRunner.result)
+  }
+
   def execAndProcessOutputs(cmd: List[String], callbackOut: String => Unit, callbackErr: String => Unit) = {
     //TODO params: copy out end arr to console and as a result...
     val process = startProcess(cmd)

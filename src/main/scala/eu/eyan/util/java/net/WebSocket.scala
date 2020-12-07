@@ -1,10 +1,6 @@
 package eu.eyan.util.java.net
 
-import java.io.BufferedOutputStream
-import java.io.Closeable
-import java.io.InputStream
-import java.io.OutputStream
-import java.io.PrintWriter
+import java.io._
 import java.net.Socket
 import java.security.MessageDigest
 import java.util.UUID
@@ -14,7 +10,6 @@ import eu.eyan.util.io.CloseablePlus
 import eu.eyan.util.java.lang.ThreadPlus
 import eu.eyan.util.rx.lang.scala.subjects.BehaviorSubjectPlus.BehaviorSubjectImplicit
 import eu.eyan.util.scala.Try
-import eu.eyan.util.scala.TryCatch
 import rx.lang.scala.Observer
 import rx.lang.scala.schedulers.IOScheduler
 import rx.lang.scala.subjects.BehaviorSubject
@@ -23,6 +18,7 @@ import sun.misc.BASE64Encoder
 object WebSocket {
 
   def handshake(outputStream: OutputStream, secWebsocketKey: String): Boolean = {
+    Log.info("")
     val NEW_LINE = "\r\n"
     val sha1 = MessageDigest.getInstance("SHA-1")
     val base64Encoder = new BASE64Encoder()
@@ -40,10 +36,10 @@ object WebSocket {
     val responseLines = List(responseHttp, responseUpgradeWebsocket, responseConnectionUpgrade, responseWebSocketAccept)
     val response = responseLines.mkString(NEW_LINE)
 
-    Log.info("Response: " + response)
+    Log.info("ResponseLines: " + responseLines.mkString(", "))
     if (hash.isSuccess) socketOutPw.write(response)
     socketOutPw.write(NEW_LINE + NEW_LINE)
-    socketOutPw.flush
+    socketOutPw.flush()
 
     hash.isSuccess
   }
@@ -52,7 +48,7 @@ case class WebSocket(get: Get, parameters: Map[String, String], private val sock
   def receivedMessages = receivedMessages_.distinctUntilChanged.subscribeOn(IOScheduler())
   def socketClosed = socketClosed_.distinctUntilChanged.subscribeOn(IOScheduler())
   def sendMessageObserver = Observer[String](onSendMessageNext: String => Unit, onSendMessageError: Throwable => Unit, () => onSendMessageCompleted())
-  def close = closeWebSocket
+  def close() = closeWebSocket
 
   private val socketOut = new BufferedOutputStream(socket.getOutputStream)
   private val socketClosed_ = BehaviorSubject[String]()
@@ -69,7 +65,7 @@ case class WebSocket(get: Get, parameters: Map[String, String], private val sock
         receivedMessages_.onNext(receivedMessage.get)
       } else {
         Log.debug(s"$socketId socket ended")
-        close
+        close()
         receivedMessages_ onCompleted ()
         Log.debug(s"$socketId socket receiver completed")
       }
@@ -77,7 +73,7 @@ case class WebSocket(get: Get, parameters: Map[String, String], private val sock
 
   receiving.subscribe(res => { }, t => {
     Log.error(s"recieving: $socketId socket problem", t)
-    close
+    close()
     receivedMessages_ onError t
   }, () => Log.debug("recieving: ended"))
 
@@ -96,6 +92,7 @@ case class WebSocket(get: Get, parameters: Map[String, String], private val sock
   private def logBytes(title: String, bytes: Array[Byte]): Unit = Log.trace(title + bytes.map(b => String.format("%02X ", b.asInstanceOf[Object])).mkString)
 
   private def reiceveMessage(inputStream: InputStream): Option[String] = {
+    Log.info("")
     val messageHeader = Array.ofDim[Byte](2)
     inputStream.read(messageHeader) // BLOCKS
     logBytes("Headers:", messageHeader)
@@ -112,11 +109,14 @@ case class WebSocket(get: Get, parameters: Map[String, String], private val sock
       val mask = payloadBuffer.slice(0, 4)
       val data = payloadBuffer.slice(4, payloadBuffer.length)
       for (i <- data.indices) data(i) = (data(i) ^ mask(i % mask.length)).toByte
-      Some(new String(data))
+      val result = new String(data)
+      Log.info(result)
+      Some(result)
     }
   }
 
   private def sendMessage(os: BufferedOutputStream, msg: String): Unit = {
+    Log.info(msg)
     val SINGLE_FRAME_UNMASKED = 0x81
 
     val msgBytes = msg.getBytes
@@ -125,6 +125,6 @@ case class WebSocket(get: Get, parameters: Map[String, String], private val sock
     os.write(SINGLE_FRAME_UNMASKED)
     os.write(msgBytes.length)
     os.write(msgBytes)
-    os.flush
+    os.flush()
   }
 }

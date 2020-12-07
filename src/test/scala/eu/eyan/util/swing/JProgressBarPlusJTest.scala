@@ -4,12 +4,10 @@ import org.fest.assertions.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-
-import eu.eyan.testutil.ScalaEclipseJunitRunner
-import eu.eyan.testutil.TestPlus.waitFor
+import eu.eyan.testutil.{ScalaEclipseJunitRunner, TestPlus}
 
 @RunWith(classOf[ScalaEclipseJunitRunner])
-class JProgressBarPlusJTest() {
+class JProgressBarPlusJTest() extends TestPlus{
 
   @Before
   def setUp = {}

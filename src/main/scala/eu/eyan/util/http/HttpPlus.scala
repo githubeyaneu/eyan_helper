@@ -1,29 +1,29 @@
 package eu.eyan.util.http
 
-import java.io.DataOutputStream
+import java.io.{DataOutputStream, InputStream}
 import java.net.CookieHandler
 import java.net.CookieManager
 import java.net.HttpURLConnection
 import java.net.URL
-import scala.io.Source
+
+import scala.io.{BufferedSource, Codec, Source}
 import eu.eyan.log.Log
 import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.TrustManager
 import javax.net.ssl.X509TrustManager
 import javax.net.ssl.SSLContext
-import scala.io.Codec
 
 object HttpPlus {
-  private def activateCookieManager = if (CookieHandler.getDefault == null) CookieHandler.setDefault(new CookieManager())
+  private def activateCookieManager(): Unit = if (CookieHandler.getDefault == null) CookieHandler.setDefault(new CookieManager())
 
   startSSLWorkaround
 
   // FIXME: this is not going to stop:
-  def startSSLWorkaround = {
+  def startSSLWorkaround: Any = {
     val trustManager =  new X509TrustManager {
       override def getAcceptedIssuers: Array[java.security.cert.X509Certificate] = null
-      override def checkClientTrusted(certs: Array[java.security.cert.X509Certificate], authType: String) = {}
-      override def checkServerTrusted(certs: Array[java.security.cert.X509Certificate], authType: String) = {}
+      override def checkClientTrusted(certs: Array[java.security.cert.X509Certificate], authType: String): Unit = {}
+      override def checkServerTrusted(certs: Array[java.security.cert.X509Certificate], authType: String): Unit = {}
     }
     
     val trustAllCerts = Array[TrustManager](trustManager)
@@ -39,8 +39,8 @@ object HttpPlus {
     }
   }
 
-  def sendPost(urlPath: String, postParams: String = "") = {
-    activateCookieManager
+  def sendPost(urlPath: String, postParams: String = ""): BufferedSource = {
+    activateCookieManager()
     Log.debug("Sending 'POST' request to URL : " + urlPath)
     Log.trace("  params: " + postParams)
 
@@ -63,18 +63,18 @@ object HttpPlus {
     // Send post request
     val wr = new DataOutputStream(conn.getOutputStream)
     wr.writeBytes(postParams)
-    wr.flush
-    wr.close
+    wr.flush()
+    wr.close()
 
     Log.debug("Response Code : " + conn.getResponseCode)
     Source.fromInputStream(conn.getInputStream)(Codec.UTF8)
   }
 
-  def sendGet_responseAsStream(url: String) = {
-    val obj = new URL(url)
-    Log.debug("Sending 'GET' request to URL : " + url)
+  def sendGet_responseAsStream(urlAsString: String): InputStream = {
+    val url = new URL(urlAsString)
+    Log.debug("Sending 'GET' request to URL : " + urlAsString)
 
-    val conn = obj.openConnection.asInstanceOf[HttpURLConnection]
+    val conn = url.openConnection.asInstanceOf[HttpURLConnection]
     conn.setUseCaches(false)
     conn.setRequestMethod("GET")
     conn.setRequestProperty("User-Agent", "Mozilla/5.0")

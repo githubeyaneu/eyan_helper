@@ -13,6 +13,6 @@ import eu.eyan.util.swing.JPanelPlus.JPanelImplicit
 
 @RunWith(classOf[ScalaEclipseJunitRunnerTheories])
 class GolTest extends TestPlus {
-  @Test def cellExists = 2 === 3
+  //@Test def cellExists = 2 === 3
 
 }

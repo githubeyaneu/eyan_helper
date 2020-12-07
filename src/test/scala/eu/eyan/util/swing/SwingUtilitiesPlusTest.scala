@@ -6,17 +6,16 @@ import java.awt.event.KeyEvent
 import org.fest.assertions.Assertions.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
-
-import eu.eyan.testutil.ScalaEclipseJunitRunner
-import eu.eyan.testutil.TestPlus.waitFor
+import eu.eyan.testutil.{ScalaEclipseJunitRunner, TestPlus}
 import eu.eyan.util.jgoodies.FormLayoutPlus
 import javax.swing.JPanel
 import javax.swing.JTextPane
 import eu.eyan.util.swing.JTextComponentPlus.JTextComponentImplicit
+
 import scala.language.reflectiveCalls
 
 @RunWith(classOf[ScalaEclipseJunitRunner])
-class SwingUtilitiesPlusTest() {
+class SwingUtilitiesPlusTest() extends TestPlus{
 
   @Test
   def test_createListContentsChangedListener = {

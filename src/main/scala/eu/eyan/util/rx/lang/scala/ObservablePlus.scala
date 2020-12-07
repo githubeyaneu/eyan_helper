@@ -22,6 +22,8 @@ object ObservablePlus {
     def combineLatestFirst[T2](observable2: Observable[T2]): Observable[T] = observable.combineLatest(observable2).map(_._1)
     def takeLatestOf[T2](observable2: Observable[T2]): Observable[T2] = observable.withLatestFrom(observable2)((t, t2) => t2)
     def withLatestOf[T2](observable2: Observable[T2]): Observable[(T,T2)] = observable.withLatestFrom(observable2)((t, t2) => (t,t2))
+
+    def touch(touchAction: T => Unit ) = observable.map(item => {touchAction(item);item})
   }
 
   implicit class ObservableVarargsImplicit[T](observables: Observable[T]*) {
@@ -64,6 +66,8 @@ object ObservablePlus {
     def or[O2 <: Observable[Boolean]](observableBoolean2: O2) = observableBoolean.combineLatest(observableBoolean2).map({ case (b1, b2) => b1 || b2 })
   }
 
+  def not[O <: Observable[Boolean]](observableBoolean: O) = observableBoolean.not
+
   implicit class ObservableImplicitInt[O <: Observable[Int]](observableInt: O) {
     def emptySingularPlural[T](empty: Observable[T], singular: Observable[T], plural: Observable[T]): Observable[T] = {
       val textsCombined = ObservablePlus.toList(empty, singular, plural)
@@ -84,11 +88,16 @@ object ObservablePlus {
 		  List(o1, o2)
 		  .combineLatest
 		  .map(list => (list(0).asInstanceOf[T1], list(1).asInstanceOf[T2]))
-  
+
+  def combineLatest[T1, T2, T3](o1: Observable[T1], o2: Observable[T2], o3: Observable[T3]) =
+    List(o1, o2, o3)
+      .combineLatest
+      .map(list => (list(0).asInstanceOf[T1], list(1).asInstanceOf[T2], list(2).asInstanceOf[T3]))
+
   def combineLatest[T1, T2, T3, T4](o1: Observable[T1], o2: Observable[T2], o3: Observable[T3], o4: Observable[T4]) =
-		  List(o1, o2, o3, o4)
-		  .combineLatest
-		  .map(list => (list(0).asInstanceOf[T1], list(1).asInstanceOf[T2], list(2).asInstanceOf[T3], list(3).asInstanceOf[T4]))
+    List(o1, o2, o3, o4)
+      .combineLatest
+      .map(list => (list(0).asInstanceOf[T1], list(1).asInstanceOf[T2], list(2).asInstanceOf[T3], list(3).asInstanceOf[T4]))
   
   def combineLatest[T1, T2, T3, T4, T5, T6, T7, T8, T9](o1: Observable[T1], o2: Observable[T2], o3: Observable[T3], o4: Observable[T4], o5: Observable[T5], o6: Observable[T6], o7: Observable[T7], o8: Observable[T8], o9: Observable[T9]) =
 		  List(o1, o2, o3, o4, o5, o6, o7, o8, o9)

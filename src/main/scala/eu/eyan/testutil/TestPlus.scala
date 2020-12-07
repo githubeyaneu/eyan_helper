@@ -1,122 +1,173 @@
 package eu.eyan.testutil
 
-import org.fest.assertions.Assertions._
-import org.junit.Assert
-import eu.eyan.util.io.OutputStreamPlus
-import eu.eyan.util.io.PrintStreamPlus
+import java.io.{BufferedReader, InputStreamReader}
+import java.net.{HttpURLConnection, URL}
+import java.util.Scanner
+import java.util.concurrent.atomic.{AtomicBoolean, AtomicInteger, AtomicReference}
+import java.util.stream.Collectors
+
+import eu.eyan.log.Log
+import eu.eyan.testutil.TestPlus.DEFAULT_WAIT_TIME
+import eu.eyan.util.io.{InputStreamPlus, OutputStreamPlus}
+import eu.eyan.util.io.InputStreamPlus.InputStreamPlusImplicit
 import eu.eyan.util.io.PrintStreamPlus.PrintStreamImplicit
+import eu.eyan.util.scala.{TryCatch, TryFinallyClose}
 import eu.eyan.util.time.TimeCounter
+import org.fest.assertions.Assertions._
 import org.fest.swing.exception.ComponentLookupException
-import eu.eyan.util.scala.Try
-import eu.eyan.util.scala.TryCatch
-import org.mockito.Mockito
-import scala.reflect.ClassTag
-import org.mockito.ArgumentCaptor
-import org.mockito.stubbing.OngoingStubbing
-import org.mockito.MockSettings
-import org.mockito.internal.matchers.CapturingMatcher
+import org.fest.swing.timing.Pause
+import org.junit.Assert
 import org.mockito.internal.matchers.CapturingMatcher
 import org.mockito.internal.util.Primitives
-import org.mockito.ArgumentMatchers
-import org.fest.assertions.ObjectAssert
-import eu.eyan.log.Log
-import org.fest.swing.timing.Pause
+import org.mockito.{ArgumentMatchers, Mockito}
+import rx.internal.observers.AssertableSubscriberObservable
 import rx.lang.scala.Observable
 import rx.observers.AssertableSubscriber
-import rx.internal.observers.AssertableSubscriberObservable
+
+import scala.io.{BufferedSource, Source}
+import scala.reflect.ClassTag
+import scala.util.{Failure, Try}
 
 object TestPlus {
-
   val DEFAULT_WAIT_TIME = 1500
-
-  val DEFAULT_SLEEP_TIME = 100
-
-  def waitFor[T](assertion: => T, timeout: Long = DEFAULT_WAIT_TIME): T = {
-    val start = System.currentTimeMillis()
-    def elapsedTime = System.currentTimeMillis() - start
-    var ok = false
-    var res: T = null.asInstanceOf[T]
-    def checkTimeout(t: Throwable) = if (timeout < elapsedTime) throw t else Thread.sleep(DEFAULT_SLEEP_TIME)
-    while (!ok)
-      try {
-        Log.debug("try")
-        res = assertion
-        ok = true
-      } catch {
-        case t: AssertionError           => checkTimeout(t)
-        case t: ComponentLookupException => checkTimeout(t)
-      }
-    res
-  }
 }
 
 trait TestPlus {
   def pause(ms: Long) = Pause.pause(ms)
 
-  def waitFor[T](assertion: => T, timeout: Long = TestPlus.DEFAULT_WAIT_TIME): T = TestPlus.waitFor(assertion, timeout)
+  def waitFor[T](assertion: => T, timeout: Long = DEFAULT_WAIT_TIME): T = {
+    val start = System.currentTimeMillis()
+
+    def elapsedTime = System.currentTimeMillis() - start
+
+    val ok = new AtomicBoolean(false)
+    val retryCounter = new AtomicInteger(-1)
+    val res = new AtomicReference[T](null.asInstanceOf[T])
+
+    def fibs: Stream[Int] = 0 #:: 1 #:: (fibs zip fibs.tail).map { t => t._1 + t._2 } //TODO not effective...
+    val sleepTimeIterator = fibs.toIterator
+
+    def checkTimeout(t: Throwable) = if (timeout < elapsedTime) throw t else Thread.sleep(sleepTimeIterator.next())
+
+    def stackTraceToString(stack: StackTraceElement) = {
+      if (stack.isNativeMethod) "(Native Method)"
+      else if (stack.getFileName != null && stack.getLineNumber >= 0) "(" + stack.getFileName + ":" + stack.getLineNumber + ")"
+      else if (stack.getFileName != null) "(" + stack.getFileName + ")"
+      else "(Unknown Source)"
+    }
+
+    while (!ok.get())
+      try {
+        if (retryCounter.incrementAndGet() > 0) Log.debug(retryCounter.get + ". retry " + stackTraceToString(Thread.currentThread().getStackTrace()(12)))
+        val result = assertion
+        result match {
+          case bool: Boolean if !bool => throw new AssertionError("result was false")
+          case _ =>
+        }
+        res.set(result)
+        ok.set(true)
+      } catch {
+        case t: AssertionError => checkTimeout(t)
+        case t: ComponentLookupException => checkTimeout(t)
+      }
+    res.get
+  }
 
   /** Expect a Throwable of the method */
-  def expect(expectedThrowable: Throwable, test: => Unit, same: Boolean = false) =
-    try { test; Assert.fail("Exception(Throwable) was expected but none came.") }
+  def expect(expectedThrowable: Throwable, test: => Any, same: Boolean = false): Any = {
+    val result = try {
+      test
+    }
     catch {
+      case e: Throwable => e
+    }
+
+    result match {
       case e: Throwable =>
         if (same) e ==> ("expectedThrowable", expectedThrowable)
         e.getClass ==> ("expectedThrowable class", expectedThrowable.getClass)
         e.getMessage ==> ("expectedThrowable message", expectedThrowable.getMessage)
+      case _ =>
+        Assert.fail("Exception(Throwable) was expected but none came. Result: " + result)
     }
+  }
+
+  /** Expect a Failure with throwable */
+  def expectFailure(expectedThrowable: Throwable, test: => Any, same: Boolean = false): Any = {
+    val result = test
+
+    result match {
+      case Failure(e) => expect(expectedThrowable, e)
+      case _ => Assert.fail("Result is not failure: " + result)
+    }
+  }
 
   /** Expect a Throwable type of the method */
   def expectThrowable(expectedThrowableClass: Class[_], test: => Unit) =
-    try { test; Assert.fail("Exception(Throwable) was expected but none came.") }
+    try {
+      test
+      Assert.fail("Exception(Throwable) was expected but none came.")
+    }
     catch {
       case e: Throwable =>
-        if (e.getClass != expectedThrowableClass) e.printStackTrace
+        if (e.getClass != expectedThrowableClass) e.printStackTrace()
         e.getClass ==> ("expectedThrowable class", expectedThrowableClass)
     }
 
   /**
    * Expect no Throwable of the method: remember this makes no sense, as the exception thrown makes a junit test failed.
-   *  However it is nicer to read what the test about and if it is deeper tested in an other try...
+   * However it is nicer to read what the test about and if it is deeper tested in an other try...
    */
-  def expectNoException(test: => Unit) = try { test } catch { case e: Throwable => Assert.fail("Exception(Throwable) was NOT expected but came: " + e) }
+  def expectNoException(test: => Unit) = try {
+    test
+  } catch {
+    case e: Throwable => Assert.fail("Exception(Throwable) was NOT expected but came: " + e)
+  }
 
-  implicit class IntTestImpicit[T <: Int](actual: T) {
+  implicit class IntTestImplicit[T <: Int](actual: T) {
     def shouldBeLessThan(msg: String, other: Int) = assertThat(actual).as(msg).isLessThan(other)
+
     def shouldBeMoreThan(msg: String, other: Int) = assertThat(actual).as(msg).isGreaterThan(other)
   }
 
-  implicit class LongTestImpicit[T <: Long](actual: T) {
+  implicit class LongTestImplicit[T <: Long](actual: T) {
     def shouldBeLessThan(msg: String, other: Long) = assertThat(actual).as(msg).isLessThan(other)
+
     def shouldBeMoreThan(msg: String, other: Long) = assertThat(actual).as(msg).isGreaterThan(other)
   }
 
-  implicit class StringTestImpicit[T <: String](actual: T) {
+  implicit class StringTestImplicit[T <: String](actual: T) {
     def shouldStartWith(expectedStart: String) = assertThat(actual).startsWith(expectedStart)
+
     def shouldContain(expectedContains: String) = assertThat(actual).contains(expectedContains)
   }
 
   implicit class TestPlusImplicitAssert[A](actual: => A) {
     def shouldBeNull = shouldBe(null)
+
     def shouldBe(expected: Any) = ==>(expected)
+
     def ==>(expected: Any): A = ==>("", expected)
+
     def ===(expected: Any): A = ==>("", expected)
-    def ==>(descriptionAndExpected: Tuple2[String, Any]): A = {
+
+    def ==>(descriptionAndExpected: (String, Any)): A = {
       val description = descriptionAndExpected._1
       val expected = descriptionAndExpected._2
       expected match {
-        case t: Throwable =>
-          expect(t, actual); null.asInstanceOf[A]
-        case _            => val a = actual; assertThat(a).as(description).isEqualTo(expected); a
+        case Failure(t) => expectFailure(t, actual); null.asInstanceOf[A]
+        case t: Throwable => expect(t, actual); null.asInstanceOf[A]
+        case _ => val a = actual; assertThat(a).as(description).isEqualTo(expected); a
       }
     }
   }
 
   implicit class ThrowableTestImplicit[T <: Throwable](expectedThrowable: T) {
-    /** Expect throwable(left) from the actual (right)*/
+    /** Expect throwable(left) from the actual (right) */
     //    def <==(actual: => Unit) = expect(expectedThrowable, actual)
   }
 
-  implicit class AnyTestImpicit[T <: Any](actual: T) {
+  implicit class AnyTestImplicit[T <: Any](actual: T) {
     /** assertThat(left).isEqualTo(right) */
     //    def ==>(expected: Any) = assertThat(actual).isEqualTo(expected)
     /** assertThat(left).as(right_1).isEqualTo(right_2) */
@@ -134,8 +185,10 @@ trait TestPlus {
   def collectOutput(action: => Unit) = {
 
     var output = ""
+
     def OutputStreamToString = {
       def newChar(i: Int) = output += i.toChar
+
       OutputStreamPlus(newChar, {}, {})
     }
 
@@ -158,8 +211,10 @@ trait TestPlus {
 
     //TODO code duplicate
     var output = ""
+
     def OutputStreamToString = {
       def newChar(i: Int) = output += i.toChar
+
       OutputStreamPlus(newChar, {}, {})
     }
 
@@ -181,17 +236,19 @@ trait TestPlus {
   def collectOutputAndError(action: => Unit) = {
     var out = ""
     val err = collectOutputError {
-      out = collectOutput { action }
+      out = collectOutput {
+        action
+      }
     }
     OutAndErr(out, err)
   }
 
   case class OutAndErr(output: String, error: String)
 
-  def shouldBeFaster(expectedMaxMillisecs: Int, msg: String = "execution time")(action: => Unit) = {
+  def shouldBeFaster(expectedMaxMilliseconds: Int, msg: String = "execution time")(action: => Unit) = {
     val executionTime = TimeCounter.millisecsOf(action)
     println(s"$msg $executionTime ms")
-    executionTime shouldBeLessThan (msg, expectedMaxMillisecs)
+    executionTime shouldBeLessThan(msg, expectedMaxMilliseconds)
     executionTime.toInt
   }
 
@@ -214,34 +271,85 @@ trait TestPlus {
     }
   }
 
-  implicit class MockitoTestPlusImplicit[A](mockee: => A) {
-    def -->(args: A*) = args.foldLeft(Mockito.when(mockee))((stubbing, nextValue) => stubbing thenReturn nextValue)
+  implicit class MockitoTestPlusImplicit[A](mock: => A) {
+    def -->(args: A*) = args.foldLeft(Mockito.when(mock))((stubbing, nextValue) => stubbing thenReturn nextValue)
   }
+
   implicit class MockitoTestPlusImplicitAny[T <: Any](actual: T) {
     def verify = Mockito.verify(actual, Mockito.times(1))
   }
-  def mock[T](implicit m: Manifest[T]) = Mockito.mock(implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[T]])
-  def captor[T](actionOnArgument: T => Unit = (x: T) => {})(implicit m: Manifest[T]) = new ArgumentCaptorPlus(implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[T]], actionOnArgument)
-  def capture[T](actionOnArgument: T => Unit = (x: T) => {})(implicit m: Manifest[T]): T = captor[T](actionOnArgument).capture
 
-  class CapturingMatcherPlus[T](actionOnArgument: T => Unit = (x: T) => {}) extends CapturingMatcher[T]() {
+  def mock[T](implicit m: Manifest[T]) = Mockito.mock(implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[T]])
+
+  def captor[T](actionOnArgument: T => Unit = (_: T) => {})(implicit m: Manifest[T]) = new ArgumentCaptorPlus(implicitly[ClassTag[T]].runtimeClass.asInstanceOf[Class[T]], actionOnArgument)
+
+  def capture[T](actionOnArgument: T => Unit = (_: T) => {})(implicit m: Manifest[T]): T = captor[T](actionOnArgument).capture
+
+  class CapturingMatcherPlus[T](actionOnArgument: T => Unit = (_: T) => {}) extends CapturingMatcher[T]() {
     override def captureFrom(argument: Object) = {
       super.captureFrom(argument)
       actionOnArgument(argument.asInstanceOf[T])
     }
   }
-  class ArgumentCaptorPlus[T](val clazz: Class[_ <: T], actionOnArgument: T => Unit = (x: T) => {}) {
+
+  class ArgumentCaptorPlus[T](val clazz: Class[_ <: T], actionOnArgument: T => Unit = (_: T) => {}) {
     val capturingMatcher: CapturingMatcher[T] = new CapturingMatcherPlus(actionOnArgument)
-    def capture: T = { ArgumentMatchers.argThat(capturingMatcher); Primitives.defaultValue(clazz) }
+
+    def capture: T = {
+      ArgumentMatchers.argThat(capturingMatcher)
+      Primitives.defaultValue(clazz)
+    }
+
     def getValue: T = this.capturingMatcher.getLastValue
+
     def getAllValues: java.util.List[T] = this.capturingMatcher.getAllValues
   }
 
   implicit class ObservableTestPlusImplicit[T](observable: Observable[T]) {
+    //noinspection UnstableApiUsage
     def test: AssertableSubscriber[T] = {
       val ts = AssertableSubscriberObservable.create[T](Long.MaxValue)
       observable.subscribe(ts.onNext, ts.onError, () => ts.onCompleted())
       ts
     }
   }
+
+  implicit class StringTestPlusImplicit(string: String) {
+    def urlGet(timeout: Int = 100): Try[String] = {
+      val ct = Thread.currentThread().getId
+      val url = new URL(string)
+      val conn = url.openConnection.asInstanceOf[HttpURLConnection]
+      conn.setUseCaches(false)
+      conn.setRequestMethod("GET")
+      conn.setRequestProperty("User-Agent", "Mozilla/5.0")
+      conn.setRequestProperty("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+      conn.setRequestProperty("Accept-Language", "en-US,en;q=0.5")
+      conn.setConnectTimeout(timeout)
+      conn.setReadTimeout(timeout)
+
+      try {
+        val responseCode = conn.getResponseCode
+        Log.debug("UrlGet - Response Code : ", responseCode)
+        if (responseCode == 200) TryFinallyClose(Source.fromInputStream(conn.getInputStream), (stream: BufferedSource) => stream.mkString)
+        else Failure(new Exception(string + " not available, response code:" + responseCode + ", response message: " + conn.getResponseMessage))
+      } catch {
+        case t: Throwable =>
+          System.err.synchronized {
+            System.err.println(ct + " Error >>>>>>>>> ")
+            System.err.println(ct + " Error " + string)
+            System.err.println(ct + " Error " + t.getMessage)
+            //System.err.println(ct + " conn.getErrorStream " + conn.getErrorStream)
+            t.printStackTrace()
+//            val errorLines = new BufferedReader(new InputStreamReader(conn.getErrorStream)).lines().collect(Collectors.joining("\n"));
+//            System.err.println(ct + " Error errorLines" + errorLines)
+            System.err.println(ct + " Error <<<<<<<<< ")
+
+          }
+
+          Log.error(string, t)
+          Failure(t)
+      }
+    }
+  }
+
 }

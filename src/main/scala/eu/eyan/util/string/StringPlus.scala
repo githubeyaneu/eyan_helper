@@ -42,6 +42,7 @@ import javax.crypto.spec.SecretKeySpec
 import java.util.Base64
 import rx.lang.scala.Observable
 import java.nio.charset.Charset
+import java.security.MessageDigest
 
 object StringPlus {
   lazy val reg = "[\\p{InCombiningDiacriticalMarks}]".r
@@ -53,6 +54,7 @@ object StringPlus {
   def s1_containsSearch_s2_doesNot(s1: String, s2: String, search: String) = s1.contains(search) && !s2.contains(search)
 
   implicit class StringPlusImplicit(val s: String) {
+
     def print = { System.out.print(s); s }
     def printErr = { System.err.print(s); s }
     def println = { System.out.println(s); s }
@@ -304,5 +306,27 @@ object StringPlus {
       val matches = for (m <- re.findAllIn(s)) yield (m)
       matches.toList
     }
+
+    def createHash(plus: String*): String = {
+      val messageDigest = MessageDigest.getInstance("SHA")
+      messageDigest.update(s.getBytes)
+      plus.foreach(s => messageDigest.update(s.getBytes))
+      messageDigest.digest.map("%02x".format(_)).mkString
+    }
+
+    def just = Observable.just(s)
+
+    @deprecated("Dont use this method as the location is not correctly logged")
+    def logFatal: String = {Log.fatal(s); s}
+    @deprecated("Dont use this method as the location is not correctly logged")
+    def logError: String = {Log.error(s); s}
+    @deprecated("Dont use this method as the location is not correctly logged")
+    def logWarn: String = {Log.warn(s); s}
+    @deprecated("Dont use this method as the location is not correctly logged")
+    def loginfo: String = {Log.info(s); s}
+    @deprecated("Dont use this method as the location is not correctly logged")
+    def logDebug: String = {Log.debug(s); s}
+    @deprecated("Dont use this method as the location is not correctly logged")
+    def logTrace: String = {Log.trace(s); s}
   }
 }

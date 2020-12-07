@@ -80,7 +80,7 @@ object JTabbedPanePlus {
   }
 }
 
-class JTabbedPanePlus[TYPE <: WithComponent] extends JTabbedPane { //TODO rename? new class
+class JTabbedPanePlus[TYPE <: WithComponent] extends JTabbedPane with RememberInRegistry[JTabbedPanePlus[TYPE]] { //TODO rename? new class
   def tabsObservable = tabs.distinctUntilChanged
 
   def activeTabObservable = activeTab.distinctUntilChanged
@@ -112,4 +112,10 @@ class JTabbedPanePlus[TYPE <: WithComponent] extends JTabbedPane { //TODO rename
   private val activeTab = BehaviorSubject[Option[TYPE]](None)
 
   this.onSelectionChanged(activeTab.onNext(tabsMap.lift(getSelectedIndex)))
+  
+  protected def rememberComponent: JTabbedPanePlus[TYPE] = this
+  protected def rememberEventListener(action: => Unit): JTabbedPanePlus[TYPE] = this.onSelectionChanged(action)
+  protected def rememberValueGet: String = this.getSelectedIndex+""
+  protected def rememberValueSet(value: String): Unit = this.setSelectedIndex(value.toInt)
+
 }
