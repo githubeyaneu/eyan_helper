@@ -133,13 +133,14 @@
   </pluginRepositories>
 
   <dependencies>
+
     <!-- UPNP 
-    -->
     <dependency>
       <groupId>org.fourthline.cling</groupId>
       <artifactId>cling-core</artifactId>
       <version>2.1.2</version>
     </dependency>
+    -->
 
     <dependency>
       <groupId>org.scala-lang</groupId>
