@@ -1,7 +1,6 @@
 package eu.eyan.util.scala
 
-import scala.util.Failure
-import scala.util.Success
+import scala.util.{Failure, Success, Try}
 import java.io.Closeable
 import eu.eyan.log.Log
 import eu.eyan.util.io.CloseablePlus._
@@ -9,26 +8,27 @@ import eu.eyan.util.io.CloseablePlus._
 /** To execute sg silently -> Throwable catched, logged, result as Try.*/
 object Try {
   /**To execute sg silently -> Throwable catched, logged, result as Try. */
-  def apply[T](action: => T) = TryCatchFinally(Success(action), e => { Log.error(e); Failure(e) }, {})
+  def apply[T](action: => T): Try[T] = TryCatchFinally(Success(action), e => { Log.error(e); Failure(e) }, {})
 }
 //object CloseFinally { def apply[T, CLOSEABLE <: Closeable](closeable: => CLOSEABLE, action: CLOSEABLE => T) = FinallyClose(closeable, action) }
 //object FinallyClose { def apply[T, CLOSEABLE <: Closeable](closeable: => CLOSEABLE, action: CLOSEABLE => T) = TryFinally(action(closeable), CloseablePlus.closeQuietly(closeable)) }
 /** closes (quietly) the closeables afterwards. */
 object TryCatchFinallyClose {
+
   /** closes (quietly) the closeable afterwards. */
-  def apply[T, CLOSEABLE <: Closeable](closeable: => CLOSEABLE, action: => CLOSEABLE => T, errorAction: => Throwable => T) =
+  def apply[T, CLOSEABLE <: Closeable](closeable: => CLOSEABLE, action: => CLOSEABLE => T, errorAction: => Throwable => T): T =
     try {
       val toClose = closeable
-      TryCatchFinally(action(toClose), errorAction, closeQuietly(toClose))
+      TryCatchFinally(action(toClose), (t:Throwable)=>throw t, closeQuietly(toClose))
     } catch { case e: Throwable => errorAction(e) }
 
   /** closes (quietly) the 2 closeables afterwards. */
-  def apply[T, CLOSEABLE1 <: Closeable, CLOSEABLE2 <: Closeable](closeable1: => CLOSEABLE1, closeable2: => CLOSEABLE2, action: => (CLOSEABLE1, CLOSEABLE2) => T, errorAction: => Throwable => T) =
+  def apply[T, CLOSEABLE1 <: Closeable, CLOSEABLE2 <: Closeable](closeable1: => CLOSEABLE1, closeable2: => CLOSEABLE2, action: => (CLOSEABLE1, CLOSEABLE2) => T, errorAction: => Throwable => T): T =
     try {
       val toClose1 = closeable1
       try {
         val toClose2 = closeable2
-        TryCatchFinally(action(toClose1, toClose2), errorAction, closeQuietly(toClose2))
+        TryCatchFinally(action(toClose1, toClose2), (t:Throwable)=>throw t, closeQuietly(toClose2))
       } finally closeQuietly(toClose1)
     } catch { case e: Throwable => errorAction(e) }
 }
@@ -36,7 +36,7 @@ object TryCatchFinallyClose {
 //TODO: create TESTS TryFinallyClose without Catch, return is Try[T]
 object TryFinallyClose {
   /** closes (quietly) the closeable afterwards. */
-  def apply[T, CLOSEABLE <: Closeable](closeable: => CLOSEABLE, action: => CLOSEABLE => T) = {
+  def apply[T, CLOSEABLE <: Closeable](closeable: => CLOSEABLE, action: => CLOSEABLE => T): Try[T] = {
     val toClose = closeable
     try {
       Try(action(toClose))
@@ -51,11 +51,11 @@ object TryFinallyClose {
 
 // use try{} catch {case t:Throwable =>{}} instead. This has no really use.
 // TODO: write tests
-object TryCatch { def apply[T](action: => T, errorAction: => T) = TryCatchThrowable[T](action, t => errorAction) }
+object TryCatch { def apply[T](action: => T, errorAction: => T): T = TryCatchThrowable[T](action, t => errorAction) }
 // TODO: write tests
-object TryCatchThrowable { def apply[T](action: => T, errorAction: => Throwable => T) = TryCatchFinally[T](action, errorAction, {}) }
+object TryCatchThrowable { def apply[T](action: => T, errorAction: => Throwable => T): T = TryCatchFinally[T](action, errorAction, {}) }
 
-object TryCatchFinally { def apply[T](action: => T, errorAction: => Throwable => T, finaly: => Unit) = new TryCatchFinally[T](action, errorAction, finaly).execute /*.Catch(errorAction)*/ }
+object TryCatchFinally { def apply[T](action: => T, errorAction: => Throwable => T, finaly: => Unit): T = new TryCatchFinally[T](action, errorAction, finaly).execute /*.Catch(errorAction)*/ }
 
 private class TryCatchFinally[T](action: => T, errorAction: => Throwable => T, finaly: => Unit) {
   private def execute =
