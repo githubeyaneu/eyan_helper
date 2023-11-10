@@ -1,59 +1,60 @@
 package eu.eyan.util.string
 
+import eu.eyan.log.Log
+import eu.eyan.util.awt.ImagePlus
+import eu.eyan.util.awt.clipboard.ClipboardPlus
+import eu.eyan.util.http.HttpPlus
+import eu.eyan.util.io.FilePlus.FilePlusImplicit
+import eu.eyan.util.java.lang.RuntimePlus.ProcessResult
+import eu.eyan.util.java.lang.RuntimePlus
+import eu.eyan.util.java.lang.ThreadPlus
+import eu.eyan.util.scala.Try
+import eu.eyan.util.scala.TryCatchFinally
+import eu.eyan.util.scala.collection.StreamPlus.StreamImplicit
+import rx.lang.scala.Observable
+
+import java.awt.Color
+import java.awt.Desktop
 import java.io.BufferedWriter
 import java.io.File
 import java.io.FileOutputStream
 import java.io.FileWriter
+import java.io.InputStream
 import java.io.OutputStreamWriter
+import java.net.URI
+import java.net.URL
 import java.net.URLDecoder
+import java.nio.charset.Charset
+import java.security.MessageDigest
 import java.text.Normalizer
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
-
-import scala.io.Source
-
-import eu.eyan.log.Log
-import eu.eyan.util.http.HttpPlus
-import eu.eyan.util.io.FilePlus
-import eu.eyan.util.io.FilePlus.FilePlusImplicit
-import eu.eyan.util.scala.TryCatchFinally
-import eu.eyan.util.java.lang.RuntimePlus
-import eu.eyan.util.scala.collection.StreamPlus.StreamImplicit
-import java.awt.Desktop
-import java.net.URL
-import java.net.URI
-import scala.util.matching.Regex
-import scala.io.Codec
-import eu.eyan.util.java.lang.RuntimePlus.ProcessResult
-import java.io.InputStream
-import eu.eyan.util.java.lang.ThreadPlus
-import eu.eyan.util.scala.Try
-import javax.swing.ImageIcon
-import eu.eyan.util.awt.clipboard.ClipboardPlus
-import scala.annotation.tailrec
-import eu.eyan.util.awt.ImagePlus
-import java.awt.Color
+import java.util.Base64
 import javax.crypto.Cipher
-import javax.crypto.KeyGenerator
 import javax.crypto.spec.IvParameterSpec
 import javax.crypto.spec.SecretKeySpec
-import java.util.Base64
-import rx.lang.scala.Observable
-import java.nio.charset.Charset
-import java.security.MessageDigest
+import javax.swing.ImageIcon
+import scala.annotation.tailrec
+import scala.io.Codec
+import scala.io.Source
+import scala.util.matching.Regex
 
+//noinspection ScalaWeakerAccess
 object StringPlus {
-  lazy val reg = "[\\p{InCombiningDiacriticalMarks}]".r
+  lazy val accentRegex = "[\\p{InCombiningDiacriticalMarks}]".r
 
-  def withoutAccents(s: String) = reg.replaceAllIn(Normalizer.normalize(s, Normalizer.Form.NFD), "").replaceAll("ß", "ss")
+  def withoutAccents(s: String) = accentRegex.replaceAllIn(Normalizer.normalize(s, Normalizer.Form.NFD), "").replaceAll("ß", "ss")
 
   def s1_startsWithSearch_s2_doesNot(s1: String, s2: String, search: String) = s1.startsWith(search) && !s2.startsWith(search)
   def s2_startsWithSearch_s1_doesNot(s1: String, s2: String, search: String) = !s1.startsWith(search) && s2.startsWith(search)
   def s1_containsSearch_s2_doesNot(s1: String, s2: String, search: String) = s1.contains(search) && !s2.contains(search)
 
+  //noinspection ScalaWeakerAccess,ScalaStyle
   implicit class StringPlusImplicit(val s: String) {
+
+    def orElse(x: => String) = if(s.isNullOrEmpty) x else s
 
     def print = { System.out.print(s); s }
     def printErr = { System.err.print(s); s }
@@ -67,7 +68,7 @@ object StringPlus {
       TryCatchFinally(
         bw.write(s),
         e => Log.error(e),
-        bw.close)
+        bw.close())
       file
     }
 
@@ -76,7 +77,7 @@ object StringPlus {
       TryCatchFinally(
         writer.append(s),
         e => Log.error(e),
-        writer.close)
+        writer.close())
       filename
     }
 
@@ -85,17 +86,19 @@ object StringPlus {
       TryCatchFinally(
         writer.append(s),
         e => Log.error(e),
-        writer.close)
+        writer.close())
       filename
     }
 
     def appendToFile(file: File): Unit = {
       val bw = new BufferedWriter(new FileWriter(file, true))
       bw.write(s)
-      bw.close
+      bw.close()
     }
 
+    //noinspection MutatorLikeMethodIsParameterless
     def deleteAsFile = asFile.delete
+    //noinspection UnitMethodIsParameterless
     def deleteAsDir = asFile.deleteRecursively
 
     def extendFileNameWith(plus: String) = {
@@ -114,18 +117,18 @@ object StringPlus {
     def asUrl = new URL(s)
 
     def execInDir(
-      commandAndArgs: Array[String],
-      codec: Codec,
-      outputProcessor: Stream[String] => Unit = s => {},
-      errorProcessor: Stream[String] => Unit = s => {}) = {
+                   commandAndArgs: Array[String],
+                   codec: Codec,
+                   outputProcessor: Stream[String] => Unit = _ => {},
+                   errorProcessor: Stream[String] => Unit = _ => {}) = {
 
       Log.info(s"Executing process in workDir $s cmd:${commandAndArgs.mkString(" ")}")
 
       //TODO refactor move to ProcessPlus etc... together with RuntimePlus
       val process = new ProcessBuilder(commandAndArgs: _*).directory(s.asFile).start
       def readStreamInThread(stream: InputStream, processor: Stream[String] => Unit) = ThreadPlus.run(processor(Source.fromInputStream(stream)(codec).getLines.toStream))
-      val outRunner = readStreamInThread(process.getInputStream, outputProcessor)
-      val errRunner = readStreamInThread(process.getErrorStream, errorProcessor)
+      readStreamInThread(process.getInputStream, outputProcessor)
+      readStreamInThread(process.getErrorStream, errorProcessor)
       process.waitFor
       process.exitValue
     }
@@ -140,7 +143,7 @@ object StringPlus {
       // TODO use try
       s.writeToFile(batName)
       Log.info("Executing a batch file: " + batName)
-      val result = batName.executeAsProcessWithResultAndOutputLineCallback(s => {})
+      val result = batName.executeAsProcessWithResultAndOutputLineCallback(_ => {})
       Log.info("Result: " + result)
       //      val res = bat.executeAsProcess.println
       if (deleteBatAfterwards) batName.deleteAsFile
@@ -151,9 +154,9 @@ object StringPlus {
     def executeAsProcessWithResult(codec: Codec) = RuntimePlus.exec(s, codec)
 
     def executeAsProcessWithStreamProcessors(
-      codec: Codec,
-      outputProcessor: Stream[String] => Unit = s => {},
-      errorProcessor: Stream[String] => Unit = s => {}) =
+                                              codec: Codec,
+                                              outputProcessor: Stream[String] => Unit = _ => {},
+                                              errorProcessor: Stream[String] => Unit = _ => {}) =
       RuntimePlus.execWithStreamProcessors(s, codec, outputProcessor, errorProcessor)
 
     def executeAsProcessWithResultAndOutputLineCallback(callback: String => Unit) = RuntimePlus.execAndProcessOutputs(s, callback, callback)
@@ -164,13 +167,14 @@ object StringPlus {
 
     def asUrlGet = Source.fromInputStream(asUrlGet_responseAsStream()).mkString
 
+    //noinspection SourceNotClosed
     def linesFromFile = Source.fromFile(s).getLines // FIXME
 
     def toSafeFileName = s.replaceAll(":", "").replaceAll("\\\\", "_")
 
     def asDateTime(format: DateTimeFormatter, zoneId: ZoneId = ZoneOffset.UTC) = LocalDateTime.parse(s, format).atZone(zoneId).toInstant
 
-    def toIntOr(orElse: Int) = try { s.toInt } catch { case nfe: NumberFormatException => orElse }
+    def toIntOr(orElse: Int) = try { s.toInt } catch { case _: NumberFormatException => orElse }
 
     def withoutAccents = StringPlus.withoutAccents(s)
 
@@ -201,7 +205,7 @@ object StringPlus {
 
     //    def containsAny(strings: String*) = strings.exists(s.contains(_)) //TODO
     def containsAny(strings: Seq[String]) = strings.exists(s.contains(_))
-    def matchesAny(strings: String*) = strings.exists(s.matches(_))
+    def matchesAny(strings: String*) = strings.exists(s.matches)
 
     def containsAnyIgnoreCase(strings: Seq[String]) = s.toLowerCase.containsAny(strings.map(_.toLowerCase))
 
@@ -225,8 +229,8 @@ object StringPlus {
       new String(cipher.doFinal(Base64.getDecoder.decode(s.getBytes("utf-8"))), "utf-8")
     }
 
-    def openAsFile = if (s.asFile.exists()) Desktop.getDesktop.open(asFile)
-    def openAsURL = Desktop.getDesktop.browse(new URI(s))
+    def openAsFile() = if (s.asFile.exists()) Desktop.getDesktop.open(asFile)
+    def openAsURL() = Desktop.getDesktop.browse(new URI(s))
 
     //    def findGroup(regex: String, group: Int = 1):Option[String] = findGroup(regex.r, group)
     def findGroup(regex: Regex, group: Int = 1) = {
@@ -293,7 +297,7 @@ object StringPlus {
       camel2Underscore(s, "", first = true)
     }
 
-    def copyToClipboard = ClipboardPlus.copyToClipboard(s)
+    def copyToClipboard() = ClipboardPlus.copyToClipboard(s)
 
     def countOccurrences(tgt: String): Int = if (s != null) s.sliding(tgt.length).count(window => window == tgt) else 0
 
@@ -303,7 +307,7 @@ object StringPlus {
 
     def findAll(regex: String) = {
       val re = regex.r
-      val matches = for (m <- re.findAllIn(s)) yield (m)
+      val matches = for (m <- re.findAllIn(s)) yield m
       matches.toList
     }
 
