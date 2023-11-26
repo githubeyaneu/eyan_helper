@@ -85,7 +85,7 @@ class JTabbedPanePlus[TYPE <: WithComponent] extends JTabbedPane with RememberIn
 
   def activeTabObservable = activeTab.distinctUntilChanged
 
-  def getActiveTab = activeTab.get[Option[TYPE]]
+  def getActiveTab = activeTab.take1Synchronous[Option[TYPE]]
 
   def addTab(item: TYPE, title: Text, toolTip: String, onCloseAction: TYPE => Unit) = {
     tabsMap.+=(item)

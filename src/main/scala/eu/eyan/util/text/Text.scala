@@ -26,12 +26,12 @@ object Text {
  * The text translation should not happen here, the template should be updated in this case.
  */
 class Text(private val initialTemplate: String, private val args: Observable[Any]*) extends Observable[String] {
-	def get = text.get[String]
+	def get = text.take1Synchronous[String]
 	
 	def setTemplate(nextTemplate: String) = templateSubject onNext nextTemplate
 	
   private  val templateSubject = BehaviorSubject[String](initialTemplate)
-  Log.debug("Text created " + templateSubject.get)
+  Log.debug("Text created " + templateSubject.take1Synchronous)
   Log.debug("Text created args:" + args.size)
   
   private lazy val paramsCombined = args.toList.combineLatest

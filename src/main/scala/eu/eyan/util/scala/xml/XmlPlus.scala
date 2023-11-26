@@ -2,6 +2,7 @@ package eu.eyan.util.scala.xml
 
 import scala.xml.XML
 import scala.xml.Node
+import scala.language.postfixOps
 
 object XmlPlus {
   implicit class StringToXml(string: String) {
@@ -12,7 +13,7 @@ object XmlPlus {
   implicit class Xml(node:Node) {
     def childDeepText(xPath: String) = (node.\\(xPath)).text
     def childText(child: String) = (node \ child) text
-    def firstChildDeepText(child: String) = ((node \\ child).toList.lift(0).map(_.text).getOrElse(""))
+    def firstChildDeepText(child: String) = ((node \\ child).toList.headOption.map(_.text).getOrElse(""))
     def attributeText(attrName: String) = node.attribute(attrName).map(_.text).getOrElse("")
   }
 }

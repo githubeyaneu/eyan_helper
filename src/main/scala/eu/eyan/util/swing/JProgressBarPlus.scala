@@ -72,7 +72,7 @@ class JProgressBarPlus(private val min: Int = 0, private val max: Int = 100, pri
     }); this
   }
 
-  @deprecated("use setValue$ instead", "2020-06-21")
+  // used at many places does not look dangerous so not deprecated: @deprecated("use setValue$ instead", "2020-06-21")
   def valueChanged(newValue: Int) = {
     lock.synchronized {
       value$$.onNext(newValue)
@@ -80,7 +80,7 @@ class JProgressBarPlus(private val min: Int = 0, private val max: Int = 100, pri
     this
   }
 
-  @deprecated("use setFormat$ instead", "2020-06-21")
+  // used at many places does not look dangerous so not deprecated: @deprecated("use setFormat$ instead", "2020-06-21")
   def setFormat(newFormat: String) = {
     lock.synchronized {
       format$$.onNext(newFormat)

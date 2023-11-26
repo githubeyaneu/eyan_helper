@@ -25,5 +25,5 @@ class VideoRunnerExceptionTest {
   }
 
   @Test
-  def test_expectedExceptionWhenCompoentNotSetInBefore = {}
+  def test_expectedExceptionWhenComponentNotSetInBefore = {}
 }
