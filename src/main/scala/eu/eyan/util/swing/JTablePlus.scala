@@ -175,7 +175,7 @@ class JTableModelPlus[T](listModel: ListModel[T], columns: List[String], cellVal
 
 class JXTableWithEmptyText(emptyTextObs: Observable[String]) extends JXTable {
   override protected def paintComponent(g: Graphics) = paintOrTextIfEmpty(g.asInstanceOf[Graphics2D])
-  private def paintOrTextIfEmpty(g2d: Graphics2D) = { super.paintComponent(g2d); if (getRowCount == 0) g2d.drawString(emptyTextObs.get[String], Color.BLACK, 10, 20) }
+  private def paintOrTextIfEmpty(g2d: Graphics2D) = { super.paintComponent(g2d); if (getRowCount == 0) g2d.drawString(emptyTextObs.take1Synchronous[String], Color.BLACK, 10, 20) }
   emptyTextObs.foreach(x => repaint())
 }
 
@@ -221,7 +221,7 @@ class JTablePlus3[COLUMN_TYPE, ROW_TYPE](getters: Tuple2[COLUMN_TYPE, ROW_TYPE =
     if (oldSize > 0) model.fireTableRowsDeleted(0, oldSize - 1)
   }
 
-  def selection: Option[ROW_TYPE] = selectionObservable.get
+  def selection: Option[ROW_TYPE] = selectionObservable.take1Synchronous
 
   private val selectionObservable = BehaviorSubject[Option[ROW_TYPE]](None)
 

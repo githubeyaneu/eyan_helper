@@ -15,7 +15,7 @@
 
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
+        <version>3.11.0</version>
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
@@ -63,7 +63,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>3.1.2</version>
+        <version>3.3.0</version>
         <executions>
           <execution>
             <goals>
@@ -77,16 +77,16 @@
       <plugin>
         <groupId>net.alchim31.maven</groupId>
         <artifactId>scala-maven-plugin</artifactId>
-        <version>4.1.0</version>
-        <configuration>
-          <compilerPlugins>
-            <compilerPlugin>
-              <groupId>com.artima.supersafe</groupId>
-              <artifactId>supersafe_2.12.7</artifactId>
-              <version>1.1.12</version>
-            </compilerPlugin>
-          </compilerPlugins>
-        </configuration>
+        <version>4.8.1</version>
+<!--        <configuration>-->
+<!--          <compilerPlugins>-->
+<!--            <compilerPlugin>-->
+<!--              <groupId>com.artima.supersafe</groupId>-->
+<!--              <artifactId>supersafe_2.12.7</artifactId>-->
+<!--              <version>1.1.12</version>-->
+<!--            </compilerPlugin>-->
+<!--          </compilerPlugins>-->
+<!--        </configuration>-->
         <executions>
         </executions>
       </plugin>
@@ -102,11 +102,11 @@
       <url>https://maven.google.com/</url>
     </repository>
 
-    <repository>
-      <id>scala-tools.org</id>
-      <name>Scala-tools Maven2 Repository</name>
-      <url>https://scala-tools.org/repo-releases</url>
-    </repository>
+<!--    <repository>-->
+<!--      <id>scala-tools.org</id>-->
+<!--      <name>Scala-tools Maven2 Repository</name>-->
+<!--      <url>https://scala-tools.org/repo-releases</url>-->
+<!--    </repository>-->
 
     <!-- For scalatest -->
     <repository>
@@ -116,11 +116,11 @@
     </repository>
 
     <!-- UPNP -->
-    <repository>
-      <id>4thline</id>
-      <name>4th line</name>
-      <url>http://4thline.org/m2</url>
-    </repository>
+<!--    <repository>-->
+<!--      <id>4thline</id>-->
+<!--      <name>4th line</name>-->
+<!--      <url>http://4thline.org/m2</url>-->
+<!--    </repository>-->
 
   </repositories>
 
@@ -145,13 +145,13 @@
     <dependency>
       <groupId>org.scala-lang</groupId>
       <artifactId>scala-library</artifactId>
-      <version>2.12.9</version>
+      <version>2.12.18</version>
     </dependency>
 
     <dependency>
       <groupId>org.scala-lang.modules</groupId>
       <artifactId>scala-xml_2.12</artifactId>
-      <version>1.2.0</version>
+      <version>2.2.0</version>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/io.reactivex/rxscala -->
@@ -159,6 +159,12 @@
       <groupId>io.reactivex</groupId>
       <artifactId>rxscala_2.12</artifactId>
       <version>0.27.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.scala-lang</groupId>
+          <artifactId>scala-library</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
 

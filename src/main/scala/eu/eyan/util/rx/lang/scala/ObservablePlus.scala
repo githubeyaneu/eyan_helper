@@ -11,8 +11,7 @@ object ObservablePlus {
   // https://stackoverflow.com/questions/41486024/scala-multiple-type-parameters-for-implicit-class
   // https://stackoverflow.com/questions/5598085/where-does-scala-look-for-implicits/5598107#5598107
   implicit class ObservableImplicit[O <: Observable[_]](observable: O) {
-    @deprecated("Using this is not reactive...", "2020.02.04")
-    def get[T]: T = {
+    def take1Synchronous[T]: T = {
       var result = null.asInstanceOf[T]
       observable.take(1).subscribe(s => result = s.asInstanceOf[T])
       result

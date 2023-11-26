@@ -1,6 +1,6 @@
 package eu.eyan.util.scala
 
-import scala.util.{Failure, Success, Try}
+import scala.util.{Failure, Success}
 import java.io.Closeable
 import eu.eyan.log.Log
 import eu.eyan.util.io.CloseablePlus._
@@ -8,7 +8,7 @@ import eu.eyan.util.io.CloseablePlus._
 /** To execute sg silently -> Throwable catched, logged, result as Try.*/
 object Try {
   /**To execute sg silently -> Throwable catched, logged, result as Try. */
-  def apply[T](action: => T): Try[T] = TryCatchFinally(Success(action), e => { Log.error(e); Failure(e) }, {})
+  def apply[T](action: => T): scala.util.Try[T] = TryCatchFinally(Success(action), e => { Log.error(e); Failure(e) }, {})
 }
 //object CloseFinally { def apply[T, CLOSEABLE <: Closeable](closeable: => CLOSEABLE, action: CLOSEABLE => T) = FinallyClose(closeable, action) }
 //object FinallyClose { def apply[T, CLOSEABLE <: Closeable](closeable: => CLOSEABLE, action: CLOSEABLE => T) = TryFinally(action(closeable), CloseablePlus.closeQuietly(closeable)) }
@@ -36,7 +36,7 @@ object TryCatchFinallyClose {
 //TODO: create TESTS TryFinallyClose without Catch, return is Try[T]
 object TryFinallyClose {
   /** closes (quietly) the closeable afterwards. */
-  def apply[T, CLOSEABLE <: Closeable](closeable: => CLOSEABLE, action: => CLOSEABLE => T): Try[T] = {
+  def apply[T, CLOSEABLE <: Closeable](closeable: => CLOSEABLE, action: => CLOSEABLE => T): scala.util.Try[T] = {
     val toClose = closeable
     try {
       Try(action(toClose))

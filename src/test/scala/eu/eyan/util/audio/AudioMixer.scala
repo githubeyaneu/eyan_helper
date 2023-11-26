@@ -29,7 +29,7 @@ object AudioMixer extends App {
 
   startAudioStreams()
 
-  private val jFrame = new JFrame()
+  new JFrame()
     .name("AudioMixer")
     .title("AudioMixer")
     .iconFromChar('A')
@@ -37,6 +37,7 @@ object AudioMixer extends App {
     .withComponent(panel)
     .packAndSetVisible
     .maximize
+
 
   def startAudioStreams() = {
     val mixers = AudioSystem.getMixerInfo

@@ -31,7 +31,7 @@ class Progress(val counter: Long, val max: Option[Long]) {
     progressSubject.onNext(ProgressUpdate(InProgress, value, max))
   }
 
-  def stop = progressSubject.onNext(ProgressUpdate(Ended, progressSubject.get[ProgressUpdate].counter, max)) 
+  def stop = progressSubject.onNext(ProgressUpdate(Ended, progressSubject.take1Synchronous[ProgressUpdate].counter, max))
 
   private val progressSubject = BehaviorSubject[ProgressUpdate](ProgressUpdate(NotStarted, 0, max))
 }

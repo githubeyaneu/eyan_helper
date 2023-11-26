@@ -11,7 +11,7 @@ import eu.eyan.util.rx.lang.scala.ObservablePlus.ObservableImplicit
 
 trait RememberInRegistry[T <: Component] {
   def rememberValueInRegistry(name: String, saveEnabledObservable: Observable[Boolean] = BehaviorSubject(true)): T = {
-    def saveEnabled: Boolean = saveEnabledObservable.get
+    def saveEnabled: Boolean = saveEnabledObservable.take1Synchronous
     val comp = rememberComponent
     def nameInRegistry = if (name == null || name == "") comp.componentPath else name
     def regValue = {

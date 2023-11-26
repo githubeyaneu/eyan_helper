@@ -37,7 +37,7 @@ class SwingUtilitiesPlusTest() extends TestPlus{
         processKeyEvent(new KeyEvent(this, KeyEvent.KEY_TYPED, 0, KeyEvent.VK_UNDEFINED, KeyEvent.VK_UNDEFINED, KeyEvent.VK_UNDEFINED))
       }
     }
-    textPane.onKeyPressed(called = true)
+    textPane.onKeyPressed({called = true})
     textPane.pressKey
     assertThat(called).isTrue
   }

@@ -58,7 +58,7 @@ case class WebSocket(get: Get, parameters: Map[String, String], private val sock
 
   //FIXME do somehow better threading.
   val receiving = ThreadPlus.runObservable(
-    while ("closed" != socketClosed_.get) {
+    while ("closed" != socketClosed_.take1Synchronous) {
       val receivedMessage = reiceveMessage(socket.getInputStream) // BLOCKS
       if (receivedMessage.nonEmpty) {
         Log.debug(s"$socketId Recieved from client: " + receivedMessage.get)
